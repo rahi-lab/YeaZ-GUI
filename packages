@@ -6,4 +6,5 @@ install h5py
 install scikit-image
 install openpyxl
 install Tensorflow==1.9.0
-Install Keras
+install Keras
+install pytiff
