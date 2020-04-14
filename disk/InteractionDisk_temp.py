@@ -382,24 +382,29 @@ class Reader:
      
     def Segment(self, segparamvalue, currentT, currentFOV):
         print(segparamvalue)
-        
+
 #        Check if thresholded version exists
         filethr = h5py.File(self.thresholdname, 'r+')
-        
-        if self.TestTimeExist(currentT, currentFOV, filethr):
-            
+        fileprediction = h5py.File(self.predictname,'r+')	# SJR: added to read out the prediction as well
+
+#        if self.TestTimeExist(currentT, currentFOV, filethr):
+        if self.TestTimeExist(currentT, currentFOV, filethr) and self.TestTimeExist(currentT, currentFOV, fileprediction):	# SJR: added to read out the prediction as well
+
             tmpthrmask = np.array(filethr['/{}/{}'.format(self.fovlabels[currentFOV], self.tlabels[currentT])])
-            
-            segmentedmask = nn.segment(tmpthrmask, segparamvalue)
+            pred = np.array(fileprediction['/{}/{}'.format(self.fovlabels[currentFOV], self.tlabels[currentT])])	# SJR: added to read out the prediction as well
+            fileprediction.close()	# SJR: added to read out the prediction as well
+
+#            segmentedmask = nn.segment(tmpthrmask, segparamvalue)
+            segmentedmask = nn.segment(tmpthrmask, pred, segparamvalue)	# SJR: added to read out the prediction as well
             filethr.close()
-            
+
             return segmentedmask
-        
-        
+
         else:
-        
+
             filethr.close()
             return np.zeros([self.sizey,self.sizex], dtype = np.uint16)
+
         
         
     def ThresholdPred(self, thvalue, currentT, currentFOV):
