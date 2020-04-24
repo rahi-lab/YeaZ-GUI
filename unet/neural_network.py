@@ -14,6 +14,10 @@ import numpy as np
 import skimage
 from skimage import io
 
+# SJR:
+import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
+
 def create_directory_if_not_exists(path):
     """
     Create in the file system a new directory if it doesn't exist yet.
@@ -50,6 +54,12 @@ def prediction(im):
     Return:
         res: the predicted distribution of probability of the labels (numpy array)
     """
+
+    
+    imsize=im.shape
+    im = im[0:2048,0:2048]										#crop image if too large
+    im = np.pad(im,((0, 2048 - imsize[0]         ),(0, 2048 -  imsize[1]          )),constant_values=0) # pad with zeros if too small
+
     path_test = './tmp/test/image/'
     create_directory_if_not_exists(path_test)
 
@@ -65,61 +75,16 @@ def prediction(im):
     model = unet( pretrained_weights = None,
                   input_size = (2048,2048,1) )
 
-    model.load_weights('./unet_weights_batchsize_25_Nepochs_100_full.hdf5')
+#    model.load_weights('unet/unet_weights_batchsize_25_Nepochs_100_full.hdf5')
+    model.load_weights('unet/unet_weights_batchsize_25_Nepochs_100_SJR0_6.hdf5')
 
     results = model.predict_generator(testGene,
                                       1,
                                       verbose=1)
 
-#    res = reconstruct_result(236, results[:,10:246,10:246,0], resized_shape,original_shape)
-#   if the size of the image is not 2048x2048, the difference between 2048x2048
-#   and the original size is cut off here. (in the prediction it is
-#   artificially augmented from the original size to 2048x2048)
+    res = results[0,:,:,0]			#get rid of strange 1st and 4th indices
+    res = res[0:imsize[0],0:imsize[1]]									#crop if needed, e.g., im was smaller than 2048x2048
+    res = np.pad(res,((0, max(0,imsize[0] - 2048) ),(0, max(0,imsize[0] - 2048) )),constant_values=0)	# pad with zeros if too small
 
-    index_x = 2048-len(im[:,0])
-    index_y = 2048-len(im[0,:])
-    #this bolean values are true if index_x(y)/2 else they are false.
-    #they are initialized to false.
-    flagx = False
-    flagy = False
+    return res
 
-    #test if x dimension of im is not already the max size
-    if index_x != 0:
-        #if index_x not the 0 (im has not max size in x axis) then the
-        #the difference is divided by two, index_x is the difference between
-        #size of im in x axis and max size 2048
-       ind_x = index_x/2
-       if index_x%2 == 0:
-           ind_x = int(ind_x)
-           flagx = True
-    else:
-        #if already max size, it is set to 0
-       ind_x = 0
-       flagx = True
-
-    #test if y dimension of im is not already the max size
-    if index_y != 0:
-        #if index_y not the 0 (im has not max size in y axis) then the
-        #the difference is divided by two, index_y is the difference between
-        #size of im in y axis and max size 2048
-       ind_y = index_y/2
-       if index_y%2 == 0:
-           ind_y = int(ind_y)
-           flagy = True
-    else:
-       ind_y = 0
-       flagy = True
-
-
-    if flagx and flagy:
-         res = results[0,ind_x:2048-ind_x,ind_y:2048-ind_y,0]
-         return res
-    elif not(flagx) and flagy:
-         res = results[0,int(ind_x):2048-(int(ind_x)+1),ind_y:2048-ind_y,0]
-         return res
-    elif flagx and not(flagy):
-         res = results[0,ind_x:2048-ind_x, int(ind_y):2048-(int(ind_y)+1),0]
-         return res
-    else:
-         res = results[0, int(ind_x):2048-(int(ind_x)+1),int(ind_y):2048-(int(ind_y)+1),0]
-         return res

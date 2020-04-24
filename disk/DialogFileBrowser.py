@@ -18,26 +18,27 @@ class FileBrowser(QDialog):
         self.setGeometry(100,100, 800,200)
         
         
-        self.button_opennd2 = QPushButton('Open Image File')
+        self.button_opennd2 = QPushButton('Open image file')
         self.button_opennd2.setEnabled(True)
         self.button_opennd2.clicked.connect(self.getnd2path)
         self.button_opennd2.setToolTip("Browse for an image file")
         self.button_opennd2.setMaximumWidth(150)
         
-        self.button_openfolder = QPushButton('Open Image Folder')
+        self.button_openfolder = QPushButton('Open image folder')
         self.button_openfolder.setEnabled(True)
         self.button_openfolder.clicked.connect(self.getfolder)
         self.button_openfolder.setToolTip("Browse for folder with images")
         self.button_openfolder.setMaximumWidth(150)
         
-        self.button_openhdf = QPushButton('Open hdf file')
+        self.button_openhdf = QPushButton('Open mask file')
         self.button_openhdf.setEnabled(True)
         self.button_openhdf.clicked.connect(self.gethdfpath)
-        self.button_openhdf.setToolTip("Browse for an hdf file containing the masks")
+        self.button_openhdf.setToolTip("Browse for a mask file")
         self.button_openhdf.setMaximumWidth(150)
         
         self.newhdfentry = QLineEdit()
 #        self.newhdfentry(Qt.AlignLeft)
+        self.newhdfentry.setText("newmaskfile")
 
 
 
@@ -56,10 +57,10 @@ class FileBrowser(QDialog):
 
 
         self.labelnd2 = QLabel()
-        self.labelnd2.setText('No nd2 file selected')
+        self.labelnd2.setText('No image file (.nd2, .tif, .tiff) selected')
         
         self.labelhdf = QLabel()
-        self.labelhdf.setText('No hdf file selected')
+        self.labelhdf.setText('No mask file (.h5, .tif, .tiff) selected')
         
         self.labelfolder = QLabel()
         self.labelfolder.setText('No folder selected')
@@ -78,15 +79,19 @@ class FileBrowser(QDialog):
         
 
     def getnd2path(self):
-        self.nd2name,_ = QFileDialog.getOpenFileName(self, 'Open .nd2 File','', 'Image Files (*.nd2 *.tif *.tiff)')
+        self.nd2name,_ = QFileDialog.getOpenFileName(self, 'Open image file','', 'Image files (*.nd2 *.tif *.tiff)')
 #      print(self.nd2name)
 #      print(self.nd2name)
-        self.labelnd2.setText(self.nd2name)
+        if self.nd2name != '':
+            self.labelnd2.setText(self.nd2name)
       
     def gethdfpath(self):
-        self.hdfname,_ = QFileDialog.getOpenFileName(self,'Open .hdf File','', 'hdf Files (*.h5)')
-        self.labelhdf.setText(self.hdfname)
+        self.hdfname,_ = QFileDialog.getOpenFileName(self,'Open mask file','', 'Mask files (*.h5 *.tif *.tiff)')
+        if self.hdfname != '':
+            self.labelhdf.setText(self.hdfname)
+            self.newhdfentry.setText("")
         
     def getfolder(self):
         self.nd2name = QFileDialog.getExistingDirectory(self, ("Select Image Folder"))
-        self.labelnd2.setText(self.nd2name)
+        if self.nd2name != '':
+            self.labelnd2.setText(self.nd2name)

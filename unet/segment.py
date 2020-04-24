@@ -93,4 +93,5 @@ def segment(th, pred, min_distance=10, topology=None): #SJR: added pred to evalu
          #   display(obj1+1,' no longer there.')
 
     return wshclean
+#    return wsh
 

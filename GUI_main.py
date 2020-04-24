@@ -193,7 +193,14 @@ class App(QMainWindow):
         
 #        loading the first images of the cells from the nd2 file
         self.currentframe = self.reader.LoadOneImage(self.Tindex,self.FOVindex)
-        self.nextframe = self.reader.LoadOneImage(self.Tindex+1, self.FOVindex)
+        
+        #check if the t+1 time frame exists, avoid failure if there is only
+        #one picture in the folder/nd2 file
+        if self.Tindex+1 < self.reader.sizet:
+            self.nextframe = self.reader.LoadOneImage(self.Tindex+1, self.FOVindex)
+        else:
+            self.nextframe = np.zeros([self.reader.sizey, self.reader.sizex])
+        
         self.previousframe = np.zeros([self.reader.sizey, self.reader.sizex])
         
         
@@ -201,7 +208,14 @@ class App(QMainWindow):
 #        loading the first masks from the hdf5 file
         self.mask_curr = self.reader.LoadMask(self.Tindex, self.FOVindex)
         self.mask_previous = np.zeros([self.reader.sizey, self.reader.sizex])
-        self.mask_next = self.reader.LoadMask(self.Tindex+1, self.FOVindex)
+        
+        #check if the t+1 mask exists, avoid failure if there is only
+        #one mask in the hdf file
+        if self.Tindex+1 < self.reader.sizet:
+            self.mask_next = self.reader.LoadMask(self.Tindex+1, self.FOVindex)
+        else:
+            self.mask_next = np.zeros([self.reader.sizey, self.reader.sizex])
+        
 
     
 #        creates a list of all the buttons, which will then be used in order
@@ -1097,19 +1111,24 @@ class App(QMainWindow):
         self.m.prevpicture = np.zeros([self.reader.sizey, self.reader.sizex], dtype = np.uint16)
         self.m.prevplotmask = np.zeros([self.reader.sizey, self.reader.sizex], dtype = np.uint16)
         
-#        load the image and the mask for the next plot.
-        self.m.nextpicture = self.reader.LoadOneImage(self.Tindex+1, self.FOVindex)
-        self.m.nextplotmask = self.reader.LoadMask(self.Tindex+1, self.FOVindex)
-        
-        
+#        load the image and the mask for the next plot, check if it exists
+        if self.Tindex+1 < self.reader.sizet:
+            self.m.nextpicture = self.reader.LoadOneImage(self.Tindex+1, self.FOVindex)
+            self.m.nextplotmask = self.reader.LoadMask(self.Tindex+1, self.FOVindex)
+            #       enables the next frame button in case it was disabled when the 
+            #        fov/channel was changed
+            self.button_nextframe.setEnabled(True)
+        else:
+            self.m.nextpicture = np.zeros([self.reader.sizey, self.reader.sizex], dtype = np.uint16)
+            self.m.nextplotmask =  np.zeros([self.reader.sizey, self.reader.sizex], dtype = np.uint16)
+            #       disables the next frame button if the mask or the picture
+            # does not exist.
+            self.button_nextframe.setEnabled(False)
+            
 #        once the images and masks are loaded into the variables, they are 
 #        displaye in the gui.
         self.m.UpdateBckgrndPicture()
         
-        
-#       enables the next frame button in case it was disabled when the 
-#        fov/channel was changed
-        self.button_nextframe.setEnabled(True)
 #        disables the previous frame button in case it was active before 
 #        changing fov/channel.
         self.button_previousframe.setEnabled(False)
@@ -1388,8 +1407,8 @@ class App(QMainWindow):
 #            self.button_nextframe.setShortcut(Qt.Key_Right)
 #            self.button_nextframe.pressed.connect(self.Test)
 #            self.button_nextframe.setChecked(False)
-
-            self.button_nextframe.setEnabled(True)
+            if self.Tindex + 1 < self.reader.sizet:
+                self.button_nextframe.setEnabled(True)
 #            self.button_nextframe.pressed.connect(self.Test)
 
 #            self.button_nextframe.setChecked(False)
@@ -1418,8 +1437,11 @@ class App(QMainWindow):
 #        self.button_nextframe.disconnect()
         self.Disable(self.button_nextframe)
 
+        print("self.Tindex",self.Tindex)
+        print("self.reader.sizet",self.reader.sizet)
 
         if self.Tindex + 1 < self.reader.sizet - 1 :
+            print('if')
             self.reader.SaveMask(self.Tindex, self.FOVindex, self.m.plotmask)
             
             self.m.prevpicture = self.m.currpicture.copy()
@@ -1440,6 +1462,7 @@ class App(QMainWindow):
                     
 #           
         else:
+            print('else')
             self.reader.SaveMask(self.Tindex, self.FOVindex, self.m.plotmask)
         
             self.m.prevpicture = self.m.currpicture.copy()
@@ -1641,7 +1664,7 @@ class App(QMainWindow):
             
             self.m.titlecurr.set_text('Time index {}'.format(self.Tindex))
             self.m.titleprev.set_text('No frame {}'.format(''))
-            self.m.titlenext.set_text('Next Time index {}'.format(self.Tindex+1))
+            self.m.titlenext.set_text('Next time index {}'.format(self.Tindex+1))
             
             
 #            self.m.ax.set_title('Time index {}'.format(self.Tindex))
@@ -1668,7 +1691,7 @@ class App(QMainWindow):
         else:
             self.m.titlecurr.set_text('Time index {}'.format(self.Tindex))
             self.m.titleprev.set_text('Previous time index {}'.format(self.Tindex-1))
-            self.m.titlenext.set_text('Next Time index {}'.format(self.Tindex+1))
+            self.m.titlenext.set_text('Next time index {}'.format(self.Tindex+1))
             
             
 #            self.m.ax.set_title('Time index {}'.format(self.Tindex))
@@ -1970,7 +1993,7 @@ class PlotCanvas(FigureCanvas):
         
         self.titlecurr = self.ax.set_title('Time index {}'.format(parent.Tindex))
         self.titleprev = self.ax2.set_title('No frame {}'.format(''))
-        self.titlenext = self.ax3.set_title('Next Time index {}'.format(parent.Tindex+1))
+        self.titlenext = self.ax3.set_title('Next time index {}'.format(parent.Tindex+1))
         
         
 #        these variables are just set to test the states of the buttons
@@ -2228,6 +2251,7 @@ class PlotCanvas(FigureCanvas):
        background coordinates, setting the background to 0 again.
        """
        if flag:
+#           print("plotmask",self.plotmask.shape)
            self.currmask.set_data((self.plotmask%10+1)*(self.plotmask!=0))
        else :
            self.currmask.set_data((self.tempmask%10+1)*(self.tempmask!=0))
@@ -2297,9 +2321,13 @@ class PlotCanvas(FigureCanvas):
 
          if self.button_showval_check.isChecked():
              vals = np.unique(self.plotmask)
+             vals = np.delete(vals,np.where(vals==0)) #SJR: for some reason are floats and contains background (0)
+             xtemp = []
+             ytemp = []
+             val = []
              for k in vals:
-                 x,y = (self.plotmask==k).nonzero()
-                 sample = np.random.choice(len(x), size=20, replace=False)
+                 y,x = (self.plotmask==k).nonzero() # this was wrong x,y I believe
+                 sample = np.random.choice(len(x), size=20, replace=True)
                  meanx = np.mean(x[sample])
                  meany = np.mean(y[sample])
                  xtemp.append(int(round(meanx)))
@@ -2325,7 +2353,7 @@ class PlotCanvas(FigureCanvas):
 ##                     val.append(k)
              if xtemp:
                  for i in range(0,len(xtemp)):
-                      ann = self.ax.annotate(str(val[i]), (xtemp[i], ytemp[i]))
+                      ann = self.ax.annotate(str(int(val[i])), (xtemp[i], ytemp[i]))
                       self.ann_list.append(ann)
              
             
@@ -2359,7 +2387,7 @@ class PlotCanvas(FigureCanvas):
          
          if self.button_showval_check.isChecked():
                           
-             maxval = np.amax(self.prevplotmask)
+             maxval = int(np.amax(self.prevplotmask))
              minval =  1
              xtemp = []
              ytemp = []
@@ -2416,7 +2444,7 @@ class PlotCanvas(FigureCanvas):
         
          if self.button_showval_check.isChecked():
                           
-             maxval = np.amax(self.nextplotmask)
+             maxval = int(np.amax(self.nextplotmask))
              minval =  1
              xtemp = []
              ytemp = []

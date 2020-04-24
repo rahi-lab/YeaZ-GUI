@@ -1,0 +1,10 @@
+install numpy
+install PyQt5
+install matplotlib
+install nd2reader==3.2.1
+install h5py
+install scikit-image
+install openpyxl
+install Tensorflow==1.9.0
+install Keras
+install opencv-python
