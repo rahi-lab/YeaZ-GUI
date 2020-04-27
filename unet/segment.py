@@ -87,6 +87,8 @@ def segment(th, pred, min_distance=10, topology=None): #SJR: added pred to evalu
                             objcoords[obj1,1] = max(objcoords[obj1,1],objcoords[obj2,1])
                             objcoords[obj1,2] = min(objcoords[obj1,2],objcoords[obj2,2])
                             objcoords[obj1,3] = max(objcoords[obj1,3],objcoords[obj2,3])
+                            print("Merged cell ",obj1+1," and ",obj2+1,".")
+
 
             wshclean = wshclean + maskoriobj1*objcounter
         #else:

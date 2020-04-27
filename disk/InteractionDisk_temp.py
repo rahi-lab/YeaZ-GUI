@@ -139,6 +139,11 @@ class Reader:
             elif extension == '.tiff' or extension == '.tif':
                 #SJR: Careful, self.hdfpath is a tif file
                 im = skimage.io.imread(self.hdfpath)
+                print('Inithdf',im.shape)
+                imdims = im.shape
+                if len(imdims) == 3 and imdims[2] < imdims[0] and imdims[2] < imdims[1]:  # num pages should be smaller than x or y dimension, very unlikely not to be the case
+                    im = np.moveaxis(im, -1, 0) # move last axis to first
+
                 with h5py.File(filenamewithpath + '.h5', 'w') as hf:
                     hf.create_group('FOV0')  
         
@@ -375,6 +380,8 @@ class Reader:
             with pytiff.Tiff(self.nd2path) as handle:
                 handle.set_page(currentT)
                 im = handle[:]
+                print('Debug in InteractionDisk_temp',im.shape)
+#                print('Debug in InteractionDisk_temp',im[0,0],np.amin(im),np.amax(im))
                                 
         elif self.isfolder:
             filelist = os.listdir(self.nd2path)

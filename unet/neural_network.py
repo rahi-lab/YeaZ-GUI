@@ -76,7 +76,7 @@ def prediction(im):
                   input_size = (2048,2048,1) )
 
 #    model.load_weights('unet/unet_weights_batchsize_25_Nepochs_100_full.hdf5')
-    model.load_weights('unet/unet_weights_batchsize_25_Nepochs_100_SJR0_6.hdf5')
+    model.load_weights('unet/unet_weights_batchsize_25_Nepochs_100_SJR0_9.hdf5')
 
     results = model.predict_generator(testGene,
                                       1,
