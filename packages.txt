@@ -7,4 +7,4 @@ install scikit-image
 install openpyxl
 install Tensorflow==1.9.0
 install Keras
-install pytiff
+install opencv-python

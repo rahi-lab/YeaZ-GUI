@@ -5,6 +5,8 @@ Initializing all the buttons in this file.
 from PyQt5.QtWidgets import QWidget, QPushButton, QShortcut, QComboBox, QCheckBox, QLineEdit, QStatusBar
 from PyQt5 import QtGui
 from PyQt5.QtCore import pyqtSignal, QObject, Qt
+import numpy as np
+
 def Init(parent):
     
     
@@ -44,6 +46,9 @@ def Init(parent):
         parent.button_nextframe.setToolTip("Use right arrow key for shortcut")
         parent.button_nextframe.setMaximumWidth(150)
         parent.button_nextframe.setShortcut(Qt.Key_Right)
+        # if there is only one picture than this button is disabled
+        if np.all(parent.nextframe == 0):
+            parent.button_nextframe.setEnabled(False)
 #        parent.buttonlist.append(parent.button_nextframe)
 #        parent.button_nextframe.setShortcutAutoRepeat(False)
         

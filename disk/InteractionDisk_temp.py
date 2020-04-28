@@ -49,25 +49,33 @@ class Reader:
                 self.sizey = images.sizes['y']
                 self.sizec = images.sizes['c']
                 self.sizet = images.sizes['t']
+                print("Debug: self.sizet",self.sizet)
                 self.Npos  = images.sizes['v']
                 self.channel_names = images.metadata['channels']
                 
         elif self.istiff:
             with pytiff.Tiff(self.nd2path) as handle:
-                self.sizex, self.sizey = handle.shape
+                self.sizey, self.sizex = handle.shape #SJR: changed by me
                 self.sizec = 1
                 self.sizet = handle.number_of_pages
+                print("Debug: handle.number_of_pages",handle.number_of_pages)
                 self.Npos = 1
                 self.channel_names = ['Channel1']
                 
         elif self.isfolder:
+            
             filelist = os.listdir(self.nd2path)
+            
+            for f in filelist:
+                if f.startswith('.'):
+                    filelist.remove(f)
+            
             im = skimage.io.imread(self.nd2path + '/' + filelist[0])
-            self.sizex, self.sizey = im.shape
+            self.sizey, self.sizex = im.shape #SJR: changed by me
             self.sizec = 1
             self.Npos = 1
             self.sizet = len(filelist)
-            print(self.sizet)
+            print("Debug: self.sizet",self.sizet)
             self.channel_names = ['Channel1']
                             
         #create the labels which index the masks with respect to time and 
@@ -118,14 +126,57 @@ class Reader:
         if not self.hdfpath:
             return self.Createhdf()
         else:
-#            
-            temp = self.hdfpath[:-3]
             
-            self.thresholdname = temp + '_thresholded' + '.h5'
-            self.segmentname = temp + '_segmented' + '.h5'
-            self.predictname = temp + '_predicted' + '.h5'
+            filenamewithpath, extension = os.path.splitext(self.hdfpath)
             
-#           
+            if extension == ".h5":
+                temp = self.hdfpath[:-3]
+            
+                self.thresholdname = temp + '_thresholded' + '.h5'
+                self.segmentname = temp + '_segmented' + '.h5'
+                self.predictname = temp + '_predicted' + '.h5'
+            #SJR: Mask is a tiff file
+            elif extension == '.tiff' or extension == '.tif':
+                #SJR: Careful, self.hdfpath is a tif file
+                im = skimage.io.imread(self.hdfpath)
+                print('Inithdf',im.shape)
+                imdims = im.shape
+                if len(imdims) == 3 and imdims[2] < imdims[0] and imdims[2] < imdims[1]:  # num pages should be smaller than x or y dimension, very unlikely not to be the case
+                    im = np.moveaxis(im, -1, 0) # move last axis to first
+
+                with h5py.File(filenamewithpath + '.h5', 'w') as hf:
+                    hf.create_group('FOV0')  
+        
+                    if im.ndim==2:
+                        hf.create_dataset('/FOV0/T0', data = im, compression = 'gzip')
+                    elif im.ndim==3:
+                        nim = im.shape[0]
+                        for i in range(nim):
+                            hf.create_dataset('/FOV0/T{}'.format(i), 
+                                              data = im[i,:,:], compression = 'gzip')
+
+                #SJR addition:
+                self.thresholdname = filenamewithpath + '_thresholded' + '.h5'
+                hf = h5py.File(self.thresholdname,'w')
+                hf.create_group('FOV0')
+                hf.close()
+    
+                self.segmentname = filenamewithpath + '_segmented' + '.h5'
+                hf = h5py.File(self.segmentname,'w')
+                hf.create_group('FOV0')
+                hf.close()
+    
+                self.predictname = filenamewithpath + '_predicted' + '.h5'
+                hf = h5py.File(self.predictname,'w')
+                hf.create_group('FOV0')
+                hf.close()
+
+                self.hdfpath = filenamewithpath + '.h5'
+
+
+
+
+            
             
     def Createhdf(self):
         
@@ -206,9 +257,7 @@ class Reader:
             mask = np.array(file['/{}/{}'.format(self.fovlabels[currentFOV], self.tlabels[currentT])], dtype = np.uint16)
             file.close()
             
-
             return mask
-        
         
         else:
             
@@ -322,6 +371,8 @@ class Reader:
             with ND2Reader(self.nd2path) as images:
                 images.default_coords['v'] = currentfov
                 images.default_coords['c'] = self.default_channel
+                print('Debug in InteractionDisk_temp',currentfov)
+                print('Debug in InteractionDisk_temp',self.default_channel)
                 images.iter_axes = 't'
                 im = images[currentT]
                 
@@ -329,31 +380,35 @@ class Reader:
             with pytiff.Tiff(self.nd2path) as handle:
                 handle.set_page(currentT)
                 im = handle[:]
+                print('Debug in InteractionDisk_temp',im.shape)
+#                print('Debug in InteractionDisk_temp',im[0,0],np.amin(im),np.amax(im))
                                 
         elif self.isfolder:
             filelist = os.listdir(self.nd2path)
+            for f in filelist:
+                if f.startswith('.'):
+                    filelist.remove(f)
             im = skimage.io.imread(self.nd2path + '/' + filelist[currentT])
-        
-        return np.array(im, dtype = np.uint16)
+            
+        # be careful here, the output is converted to 16, not sure it's a good idea.
+        outputarray = np.array(im, dtype = np.uint16)
+        print("Time point", currentT, ". Image properties: ", np.mean(outputarray), " (mean), ", np.std(outputarray), " (std), ", np.median(outputarray), " (median).")
+        return outputarray
 
             
     def LoadSeg(self, currentT, currentFOV):
-        
-        
+
         file = h5py.File(self.segmentname, 'r+')
         
         if self.TestTimeExist(currentT,currentFOV,file):
             mask = np.array(file['/{}/{}'.format(self.fovlabels[currentFOV], self.tlabels[currentT])], dtype = np.uint16)
             file.close()
-            
             return mask
-        
-        
+            
         else:
 
             zeroarray = np.zeros([self.sizey, self.sizex],dtype = np.uint16)
             file.create_dataset('/{}/{}'.format(self.fovlabels[currentFOV], self.tlabels[currentT]), data = zeroarray, compression = 'gzip', compression_opts = 7)
-
             file.close()
             return zeroarray
         
@@ -452,6 +507,7 @@ class Reader:
         
         
         im = self.LoadOneImage(currentT, currentFOV)
+        im = im*1.0;	# SJR: for some reason has to be float64
         pred = nn.prediction(im)
         file.create_dataset('/{}/{}'.format(self.fovlabels[currentFOV], 
                                     self.tlabels[currentT]), data = pred, compression = 'gzip', 
