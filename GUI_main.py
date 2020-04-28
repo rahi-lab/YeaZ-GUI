@@ -65,7 +65,7 @@ import numpy as np
 
 
 # Import everything for the Graphical User Interface from the PyQt5 library.
-from PyQt5.QtWidgets import QApplication, QMainWindow, QMenu, QVBoxLayout, QSizePolicy, QMessageBox, QWidget, QPushButton, QShortcut, QComboBox, QCheckBox, QLineEdit, QMenu, QAction, QStatusBar
+from PyQt5.QtWidgets import QApplication, QMainWindow, QDialog, QMenu, QVBoxLayout, QSizePolicy, QMessageBox, QWidget, QPushButton, QShortcut, QComboBox, QCheckBox, QLineEdit, QMenu, QAction, QStatusBar, QErrorMessage
 from PyQt5 import QtGui
 from PyQt5.QtCore import pyqtSignal, QObject, Qt
 
@@ -126,6 +126,11 @@ from openpyxl import load_workbook
 from openpyxl import Workbook
 
 
+#def show_error(msg):
+#    error_dialog = QErrorMessage()
+#    error_dialog.showMessage(msg)
+#    error_dialog.exec_
+    
 
 
 class NavigationToolbar(NavigationToolbar):
@@ -816,59 +821,60 @@ class App(QMainWindow):
         dlg = lbp.CustomDialog(self)
         
 #        this if tests if the user pressed 'ok' in the dialog window
-        if dlg.exec_():
+        if dlg.exec_() == QDialog.Accepted:
             
-#           it tests if the user has entered some values
-#           if not it ignores and returns.
-            if dlg.entry1.text()!= '' and dlg.entry2.text() != '':
-                
-#                reads out the entry given by the user and converts the index
-#                to integers
-                time_value1 = int(dlg.entry1.text())
-                time_value2 = int(dlg.entry2.text())
-
-
-#                it tests if the first value is smaller or equal such that
-#                time_value1 is the lower range of the time range
-#                and time_value2 the upper boundary of the range.
-                if time_value1 <= time_value2 :
-                    
-#                    displays that the neural network is running
-                    self.statusBar.showMessage('Running the neural network...')
-
-#                    it iterates in the list of the user-selected fields 
-#                    of view, to return the corresponding index, the function
-#                    dlg.listfov.row(item) is used which gives an integer
-                    for item in dlg.listfov.selectedItems():
+    #       it tests if the user has entered some values
+    #       if not it ignores and returns.
+            if not (dlg.entry1.text()!= '' and dlg.entry2.text() != ''):
+                QMessageBox.critical(self, "Error", "No Time Specified")
+                return 
                         
-#                        iterates over the time indices in the range
-                        for t in range(time_value1, time_value2+1):
-                            
-#                            calls the neural network for time t and selected
-#                            fov
-                            if dlg.entry_threshold.text() !=  '':
-                                thr_val = float(dlg.entry_threshold.text())
-                            else:
-                                thr_val = None
-                            if dlg.entry_segmentation.text() != '':
-                                seg_val = int(dlg.entry_segmentation.text())
-                            else:
-                                seg_val = 10
-                            
-                            self.PredThreshSeg(t, dlg.listfov.row(item), thr_val, seg_val)
-                            
-                            
-#                   once it has iterated over all the fov, the message in 
-#                   the status bar is cleared and the buttons are enabled.
-                    self.statusBar.clearMessage()
-                    self.EnableCNNButtons()
-               
-                else:
-                    return
-            else:
-                return            
-        else:
-            return
+    #       reads out the entry given by the user and converts the index
+    #       to integers
+            time_value1 = int(dlg.entry1.text())
+            time_value2 = int(dlg.entry2.text())
+    
+    
+    #                it tests if the first value is smaller or equal such that
+    #                time_value1 is the lower range of the time range
+    #                and time_value2 the upper boundary of the range.
+            if time_value1 > time_value2 :
+                QMessageBox.critical(self, "Error", 'Invalid Time Constraints')
+                return
+            
+            
+            
+            # displays that the neural network is running
+            self.statusBar.showMessage('Running the neural network...')
+    
+            #it iterates in the list of the user-selected fields 
+            #of view, to return the corresponding index, the function
+            #dlg.listfov.row(item) is used which gives an integer
+            if len(dlg.listfov.selectedItems())==0:
+                QMessageBox.critical(self, "Error", "No FOV Selected")
+            
+            for item in dlg.listfov.selectedItems():
+                #iterates over the time indices in the range
+                for t in range(time_value1, time_value2+1):                    
+                    #calls the neural network for time t and selected
+                    #fov
+                    if dlg.entry_threshold.text() !=  '':
+                        thr_val = float(dlg.entry_threshold.text())
+                    else:
+                        thr_val = None
+                    if dlg.entry_segmentation.text() != '':
+                        seg_val = int(dlg.entry_segmentation.text())
+                    else:
+                        seg_val = 10
+                    
+                    self.PredThreshSeg(t, dlg.listfov.row(item), thr_val, seg_val)
+                                
+                                
+           #once it has iterated over all the fov, the message in 
+           #the status bar is cleared and the buttons are enabled.
+            self.statusBar.clearMessage()
+            self.EnableCNNButtons()
+   
     
     def PredThreshSeg(self, timeindex, fovindex, thr_val, seg_val):
           """
