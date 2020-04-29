@@ -12,6 +12,7 @@ import numpy as np
 
 import h5py
 import os.path
+import skimage
 import skimage.io
 #import segment as seg
 import neural_network as nn
@@ -507,6 +508,8 @@ class Reader:
         
         
         im = self.LoadOneImage(currentT, currentFOV)
+        im = skimage.exposure.equalize_adapthist(im)    # I added this recently because this is what is done before training as well!
+
         im = im*1.0;	# SJR: for some reason has to be float64
         pred = nn.prediction(im)
         file.create_dataset('/{}/{}'.format(self.fovlabels[currentFOV], 
