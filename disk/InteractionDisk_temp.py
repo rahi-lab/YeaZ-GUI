@@ -65,7 +65,9 @@ class Reader:
                 
         elif self.isfolder:
             
-            filelist = os.listdir(self.nd2path)
+            filelist = sorted(os.listdir(self.nd2path))
+
+            print(filelist)
             
             for f in filelist:
                 if f.startswith('.'):
@@ -385,7 +387,7 @@ class Reader:
 #                print('Debug in InteractionDisk_temp',im[0,0],np.amin(im),np.amax(im))
                                 
         elif self.isfolder:
-            filelist = os.listdir(self.nd2path)
+            filelist = sorted(os.listdir(self.nd2path))
             for f in filelist:
                 if f.startswith('.'):
                     filelist.remove(f)
