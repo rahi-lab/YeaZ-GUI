@@ -150,7 +150,8 @@ class App(QMainWindow):
     def __init__(self, nd2pathstr, hdfpathstr, newhdfstr):
         super().__init__()
 #        initializes the window
-
+#       set a title to the window
+        self.title = 'YeaZ 1.0'
 
 #        id is an integer that gives the id of the connection between the mouseclick method
 #        and the activation of the button.
@@ -166,7 +167,7 @@ class App(QMainWindow):
 
 
 #       it calls an object of the class Load Image from the InteractionDisk
-#       file which is used to load images and masks from the nd2 file. To
+#       file which is used to load images and masks from the nd2 file or tiff files. To
 #       initialize this object it needs the path of the nd2 file, of an
 #       existing hdf file and the name of a new hdf file. If the user has no
 #       hdf file yet the hdfpathstr will be empty and vice versa if the user
@@ -273,7 +274,7 @@ class App(QMainWindow):
         self.button_segment = QCheckBox('Segment')
         self.buttonlist.append(self.button_segment)
                  
-        self.button_cellcorespondance = QPushButton('Cell Correspondance')
+        self.button_cellcorespondance = QPushButton('Tracking')
         self.buttonlist.append(self.button_cellcorespondance)
         
         self.button_changecellvalue = QPushButton('Change cell value')
@@ -281,6 +282,9 @@ class App(QMainWindow):
         
         self.button_extractfluorescence = QPushButton('Extract Fluorescence')
         self.buttonlist.append(self.button_extractfluorescence)
+        
+        self.button_hide_show = QPushButton('CNN')
+        self.buttonlist.append(self.button_hide_show)
         
         
         self.initUI()
@@ -817,8 +821,43 @@ class App(QMainWindow):
 #        clear the message shown in the status bar
         self.statusBar.clearMessage()
 
+    
+    def ShowHideCNNbuttons(self):
+        
+        """hide and show the buttons corresponding to the neural network.
+            this function is called by the button CNN which is hidden. But
+            if activated in the InitLayout.py then you can have a button
+            which hides the CNN buttons (which are now on the normal also
+            hidden...).
+        """
+        
+        
+        if self.button_hide_show.isChecked():
+            
+            
+            self.button_cnn.setVisible(True)
+            self.button_segment.setVisible(True)
+            self.button_savesegmask.setVisible(True)
+            self.button_threshold.setVisible(True)
+            self.button_SetThreshold.setVisible(True)
+            self.button_savethresholdmask.setVisible(True)
+            self.button_SetSegmentation.setVisible(True)
+
+
 
         
+        else:
+            
+
+            self.button_cnn.setVisible(False)
+            self.button_segment.setVisible(False)
+            self.button_savesegmask.setVisible(False)
+            self.button_threshold.setVisible(False)
+            self.button_SetThreshold.setVisible(False)
+            self.button_savethresholdmask.setVisible(False)
+            self.button_SetSegmentation.setVisible(False)
+            
+
     def LaunchBatchPrediction(self):
         """This function is called whenever the button Launch CNN is pressed.
         It allows to run the neural network over a time range and selected
@@ -882,10 +921,27 @@ class App(QMainWindow):
                         seg_val = 10
                     
                     self.PredThreshSeg(t, dlg.listfov.row(item), thr_val, seg_val)
-                                
-                                
-           #once it has iterated over all the fov, the message in 
-           #the status bar is cleared and the buttons are enabled.
+                    
+                    # if tracker has been checked then apply it
+                    
+                    if dlg.tracking_checkbox.isChecked():
+                        
+                        if t != 0:
+                        
+                            temp_mask,_ = self.reader.CellCorrespondance(t,dlg.listfov.row(item))
+                            self.reader.SaveMask(t,dlg.listfov.row(item), temp_mask)
+                        
+                        else:
+                            
+                            temp_mask = self.reader.LoadSeg(t, dlg.listfov.row(item))
+                            self.reader.SaveMask(t,dlg.listfov.row(item), temp_mask)
+                            
+                        
+            
+            self.ReloadThreeMasks()
+               
+            #once it has iterated over all the fov, the message in 
+            #the status bar is cleared and the buttons are enabled.
             self.statusBar.clearMessage()
             self.EnableCNNButtons()
    
@@ -1159,10 +1215,86 @@ class App(QMainWindow):
 #        enables the neural network buttons if there is already an 
 #        existing prediction for the current image.
         self.EnableCNNButtons()
+        
+        
+        
+    def ReloadThreeMasks(self):
+        """
+        A function which replots all the masks at the current time and fov 
+        indices. Needed after the batch prediction is completed to display
+        the result of the NN.
+        """
+        
+        
+        if self.Tindex >= 0 and self.Tindex <= self.reader.sizet-1:
 
+            
+            if self.Tindex == 0:
+                self.button_nextframe.setEnabled(True)
+                
+                self.m.nextplotmask = self.reader.LoadMask(self.Tindex+1, self.FOVindex)
+                
+                self.m.plotmask = self.reader.LoadMask(self.Tindex, self.FOVindex)
+                
+                
+                self.m.prevplotmask = np.zeros([self.reader.sizey, self.reader.sizex], dtype = np.uint16)
+    
+    
+                self.m.UpdateBckgrndPicture()
+                self.button_previousframe.setEnabled(False)
+                
+                
+            elif self.Tindex == self.reader.sizet-1:
+                self.button_previousframe.setEnabled(True)
+                
+                self.m.prevplotmask = self.reader.LoadMask(self.Tindex-1, self.FOVindex)
+                   
+               
+                self.m.plotmask = self.reader.LoadMask(self.Tindex, self.FOVindex)
+                  
+                  
+                
+                self.m.nextplotmask =  np.zeros([self.reader.sizey, self.reader.sizex], dtype = np.uint16)
+                
+                self.m.UpdateBckgrndPicture()
+                self.button_nextframe.setEnabled(False)
+                
+            
+            else:
+                
+                self.button_nextframe.setEnabled(True)
+                self.button_previousframe.setEnabled(True)
+                
+                self.m.prevplotmask = self.reader.LoadMask(self.Tindex-1, self.FOVindex)
+                   
+               
+                self.m.plotmask = self.reader.LoadMask(self.Tindex, self.FOVindex)              
+                  
+                
+                self.m.nextplotmask = self.reader.LoadMask(self.Tindex+1, self.FOVindex)
+                
+                self.m.UpdateBckgrndPicture()
+            
+            self.UpdateTitleSubplots()
+
+            
+            if self.button_showval.isChecked():
+                self.m.ShowCellNumbersCurr()
+                self.m.ShowCellNumbersNext()
+                self.m.ShowCellNumbersPrev()
+            
+            if self.button_hidemask.isChecked():
+                self.m.HideMask()
+            self.EnableCNNButtons()
+        
+        else:
+
+            return
+        
+    
     def ChangeTimeFrame(self):
-        """This funcion is called whenever the user gives an new time index, 
-        to jump to the new given index, onces "enter" button is pressed.
+        """This funcion is called whenever the user gives a new time index, 
+        to jump to the new given index, once "enter" button is pressed.
         """
         
 #        it reads out the text in the button and converts it to an int.
@@ -1221,6 +1353,7 @@ class App(QMainWindow):
             
             self.UpdateTitleSubplots()
             self.button_timeindex.clearFocus()
+            self.button_timeindex.setText(str(self.Tindex)+'/'+str(self.reader.sizet-1))
             
             if self.button_showval.isChecked():
                 self.m.ShowCellNumbersCurr()
@@ -1235,16 +1368,7 @@ class App(QMainWindow):
             self.button_timeindex.clearFocus()
             return
         
-#    def keyPressEvent(self, event):
-##        print('keypressevengda211111')
-##        print(event.key())
-#        if not self.button_nextframe.isChecked() and event.key() == Qt.Key_Right:
-#            self.button_nextframe.setChecked(True)
-#            self.ForwardTime()
-#            self.button_nextframe.setChecked(False)
-#        else:
-#            print('inside keypressevent')
-#            event.ignore()
+
      
     def CellCorrespActivation(self):
             self.Disable(self.button_cellcorespondance)
@@ -1506,7 +1630,7 @@ class App(QMainWindow):
         self.statusBar.clearMessage()
 #        if self.Tindex < self.reader.sizet - 1 :
 #            self.button_nextframe.setEnabled(True)
-        self.button_timeindex.setText(str(self.Tindex))
+        self.button_timeindex.setText(str(self.Tindex)+'/'+str(self.reader.sizet-1))
 
     
     def BackwardTime(self):
@@ -1588,7 +1712,7 @@ class App(QMainWindow):
             
 #        self.button_previousframe.setChecked(False)
         self.statusBar.clearMessage()
-        self.button_timeindex.setText(str(self.Tindex))
+        self.button_timeindex.setText(str(self.Tindex)+'/' + str(self.reader.sizet-1))
 
     def MouseDraw(self):
         
@@ -1939,7 +2063,14 @@ class PlotCanvas(FigureCanvas):
 #       define three subplots corresponding to the previous, current and next
 #       time index.
         fig, (self.ax2, self.ax, self.ax3) = plt.subplots(1,3, sharex = True, sharey = True)
-
+        
+        # self.ax2.axis('tight')
+        # self.ax.axis('tight')
+        # self.ax3.axis('tight')
+        
+        # plt.gca().xaxis.set_major_locator(plt.NullLocator())
+        # plt.gca().yaxis.set_major_locator(plt.NullLocator())
+        fig.subplots_adjust(bottom=0, top=1, left=0, right=1, wspace = 0.05, hspace = 0.05)
         FigureCanvas.__init__(self, fig)
         self.setParent(parent)
         
