@@ -1040,7 +1040,7 @@ class App(QMainWindow):
             
 #            if the user presses 'ok' in the dialog window it executes the code
 #           else it does nothing
-            if dlg.exec():
+            if dlg.exec_():
 #                it tests that the user has entered some value, that it is not
 #                empty and that it is equal or bigger to 0.
                 if dlg.entry1.text() != '' and int(dlg.entry1.text()) >= 0:
