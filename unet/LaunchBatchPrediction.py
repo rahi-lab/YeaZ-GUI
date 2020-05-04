@@ -3,7 +3,7 @@
 Created on Tue Nov 19 17:38:58 2019
 """
 
-from PyQt5.QtWidgets import QApplication, QMainWindow, QMenu, QVBoxLayout, QSizePolicy, QMessageBox, QWidget, QPushButton, QShortcut, QComboBox, QDialog, QDialogButtonBox, QInputDialog, QLineEdit, QFormLayout, QLabel, QListWidget, QAbstractItemView
+from PyQt5.QtWidgets import QApplication, QMainWindow, QMenu, QVBoxLayout, QSizePolicy, QMessageBox, QWidget, QPushButton, QShortcut, QComboBox, QDialog, QDialogButtonBox, QInputDialog, QLineEdit, QFormLayout, QLabel, QListWidget, QAbstractItemView, QCheckBox
 from PyQt5 import QtGui
 #from PyQt5.QtGui import QIcon, QKeySequence
 from PyQt5.QtCore import pyqtSignal, QObject, Qt
@@ -43,9 +43,16 @@ class CustomDialog(QDialog):
         
         self.entry_threshold = QLineEdit()
         self.entry_threshold.setValidator(QtGui.QDoubleValidator())
+        self.entry_threshold.setText('0.5')
+        
+        
         
         self.entry_segmentation = QLineEdit()
         self.entry_segmentation.setValidator(QtGui.QIntValidator())
+        self.entry_segmentation.setText('10')
+        
+        self.tracking_checkbox = QCheckBox()
+        
         
         
         flo = QFormLayout()
@@ -54,10 +61,12 @@ class CustomDialog(QDialog):
         flo.addRow('Upper Boundary for time axis', self.entry2)
         
         
-        flo.addRow('Select Fields of fiew from  the list', self.listfov)
+        flo.addRow('Select Field(s) of fiew from  the list', self.listfov)
         
         flo.addRow('Enter a threshold value', self.entry_threshold)
         flo.addRow('Enter a segmentation value', self.entry_segmentation)
+        
+        flo.addRow('Apply Cell Tracker', self.tracking_checkbox)
         
         QBtn = QDialogButtonBox.Ok | QDialogButtonBox.Cancel
         
