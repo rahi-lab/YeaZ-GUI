@@ -12,6 +12,7 @@ import numpy as np
 
 import h5py
 import os.path
+import skimage
 import skimage.io
 #import segment as seg
 import neural_network as nn
@@ -64,7 +65,9 @@ class Reader:
                 
         elif self.isfolder:
             
-            filelist = os.listdir(self.nd2path)
+            filelist = sorted(os.listdir(self.nd2path))
+
+            print(filelist)
             
             for f in filelist:
                 if f.startswith('.'):
@@ -384,7 +387,7 @@ class Reader:
 #                print('Debug in InteractionDisk_temp',im[0,0],np.amin(im),np.amax(im))
                                 
         elif self.isfolder:
-            filelist = os.listdir(self.nd2path)
+            filelist = sorted(os.listdir(self.nd2path))
             for f in filelist:
                 if f.startswith('.'):
                     filelist.remove(f)
@@ -507,6 +510,8 @@ class Reader:
         
         
         im = self.LoadOneImage(currentT, currentFOV)
+        im = skimage.exposure.equalize_adapthist(im)    # I added this recently because this is what is done before training as well!
+
         im = im*1.0;	# SJR: for some reason has to be float64
         pred = nn.prediction(im)
         file.create_dataset('/{}/{}'.format(self.fovlabels[currentFOV], 

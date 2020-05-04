@@ -58,7 +58,7 @@ def prediction(im):
     
     imsize=im.shape
     im = im[0:2048,0:2048]										#crop image if too large
-    im = np.pad(im,((0, 2048 - imsize[0]         ),(0, 2048 -  imsize[1]          )),constant_values=0) # pad with zeros if too small
+    im = np.pad(im,((0, max(0,2048 - imsize[0])         ),(0, max(0,2048 -  imsize[1])          )),constant_values=0) # pad with zeros if too small
 
     path_test = './tmp/test/image/'
     create_directory_if_not_exists(path_test)
@@ -76,7 +76,7 @@ def prediction(im):
                   input_size = (2048,2048,1) )
 
 #    model.load_weights('unet/unet_weights_batchsize_25_Nepochs_100_full.hdf5')
-    model.load_weights('unet/unet_weights_batchsize_25_Nepochs_100_SJR0_9.hdf5')
+    model.load_weights('unet/unet_weights_batchsize_25_Nepochs_100_SJR0_10.hdf5')
 
     results = model.predict_generator(testGene,
                                       1,
