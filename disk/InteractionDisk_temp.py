@@ -52,7 +52,10 @@ class Reader:
                 self.sizec = images.sizes['c']
                 self.sizet = images.sizes['t']
                 print("Debug: self.sizet",self.sizet)
-                self.Npos  = images.sizes['v']
+                try:
+                    self.Npos  = images.sizes['v']
+                except KeyError:
+                    self.Npos  = 1
                 self.channel_names = images.metadata['channels']
                 
         elif self.istiff:
@@ -373,7 +376,10 @@ class Reader:
         
         if self.isnd2:
             with ND2Reader(self.nd2path) as images:
-                images.default_coords['v'] = currentfov
+                try:
+                    images.default_coords['v'] = currentfov
+                except ValueError:
+                    pass
                 images.default_coords['c'] = self.default_channel
                 print('Debug in InteractionDisk_temp',currentfov)
                 print('Debug in InteractionDisk_temp',self.default_channel)
@@ -571,7 +577,10 @@ class Reader:
     def LoadImageChannel(self,currentT, currentFOV, ch):
         if self.isnd2:
             with ND2Reader(self.nd2path) as images:
-                images.default_coords['v'] = currentFOV
+                try:
+                    images.default_coords['v'] = currentFOV
+                except ValueError:
+                    pass
                 images.default_coords['t'] = currentT
                 images.iter_axes = 'c'
                 im = images[ch]
