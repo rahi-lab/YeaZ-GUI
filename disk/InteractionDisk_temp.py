@@ -19,7 +19,8 @@ import neural_network as nn
 import pytiff
 
 
-import CellCorrespondance as cc
+import hungarian as hu
+# import CellCorrespondance as cc
 # import matplotlib.pyplot as plt
 
 
@@ -548,23 +549,24 @@ class Reader:
                 print('inside cellcorerspoindacefunction')
                 prevmask = np.array(filemasks['/{}/{}'.format(self.fovlabels[currentFOV], self.tlabels[currentT-1])])
                 nextmask = np.array(fileseg['/{}/{}'.format(self.fovlabels[currentFOV], self.tlabels[currentT])])             
-                newmask, notifymask = cc.CellCorrespondancePlusTheReturn(nextmask, prevmask)
+                # newmask = cc.CellCorrespondancePlusTheReturn(nextmask, prevmask)
+                newmask = hu.correspondance(prevmask, nextmask)
                 filemasks.close()
                 fileseg.close()
-                return newmask, notifymask
+                return newmask
             
             else:
                 filemasks.close()
                 fileseg.close()
                 null = np.zeros([self.sizey, self.sizex])
                 
-                return null, null
+                return null
         else:
             
             filemasks.close()
             fileseg.close()
             null = np.zeros([self.sizey, self.sizex])
-            return null, null
+            return null
                     
     def LoadImageChannel(self,currentT, currentFOV, ch):
         if self.isnd2:

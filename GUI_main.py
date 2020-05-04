@@ -927,7 +927,7 @@ class App(QMainWindow):
                         
                         if t != 0:
                         
-                            temp_mask,_ = self.reader.CellCorrespondance(t,dlg.listfov.row(item))
+                            temp_mask = self.reader.CellCorrespondance(t,dlg.listfov.row(item))
                             self.reader.SaveMask(t,dlg.listfov.row(item), temp_mask)
                         
                         else:
@@ -1374,7 +1374,7 @@ class App(QMainWindow):
             self.statusBar.showMessage('Doing the cell correspondance')
 
             if self.Tindex != 0:
-                self.m.plotmask,_ = self.reader.CellCorrespondance(self.Tindex, self.FOVindex)
+                self.m.plotmask = self.reader.CellCorrespondance(self.Tindex, self.FOVindex)
                 self.m.updatedata()
             else:
                 self.m.plotmask = self.reader.LoadSeg(self.Tindex, self.FOVindex)
