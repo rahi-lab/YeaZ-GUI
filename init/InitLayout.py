@@ -61,10 +61,22 @@ def Init(parent):
 #        makes a horizontal layout for the buttons used to navigate through 
 #        the time axis.
         hboxtimeframes = QtWidgets.QHBoxLayout()
+
+        hboxtimeframes.addWidget(parent.button_fov)
+        hboxtimeframes.addWidget(parent.button_channel)
+        hboxtimeframes.addStretch()
         hboxtimeframes.addWidget(parent.button_previousframe)
         hboxtimeframes.addWidget(parent.button_timeindex)
         hboxtimeframes.addWidget(parent.button_nextframe)
-        layout.addWidget(parent.m)
+        hboxtimeframes.addStretch()
+        
+        
+        # add the frames of the pictures in the layout.
+        hlayout = QtWidgets.QHBoxLayout()
+        hlayout.addWidget(parent.m)
+        hlayout.setContentsMargins(0, 0, 0, 0)
+
+        layout.addLayout(hlayout)
         
         layout.addLayout(hboxtimeframes)
         
@@ -73,42 +85,48 @@ def Init(parent):
         hboxcorrectionsbuttons = QtWidgets.QHBoxLayout()
         hboxcorrectionsbuttons.addWidget(parent.button_add_region)
         hboxcorrectionsbuttons.addWidget(parent.button_newcell)
-
         hboxcorrectionsbuttons.addWidget(parent.button_drawmouse)
         hboxcorrectionsbuttons.addWidget(parent.button_eraser)
         hboxcorrectionsbuttons.addWidget(parent.button_savemask)
         hboxcorrectionsbuttons.addStretch(1)
+        hboxcorrectionsbuttons.addWidget(parent.button_showval)
+        hboxcorrectionsbuttons.addWidget(parent.button_hidemask)
         layout.addLayout(hboxcorrectionsbuttons)
                 
-#        layout.addStretch(0.7)
+        
+        
+        
+#       LAYOUT FOR EDITING CELL VALUES, SHOW CELL VALUES AND HIDE MASK, CNN BUTTONS
+
         hboxcellval = QtWidgets.QHBoxLayout()
         hboxcellval.addWidget(parent.button_exval)
         hboxcellval.addWidget(parent.button_changecellvalue)
         hboxcellval.addStretch(1)
+        hboxcellval.addWidget(parent.button_cnn)
+        hboxcellval.addWidget(parent.button_cellcorespondance)
+        hboxcellval.addWidget(parent.button_extractfluorescence)
         layout.addLayout(hboxcellval)
 
 
-        hboxlistbuttons = QtWidgets.QHBoxLayout()
-        hboxlistbuttons.addWidget(parent.button_fov)
-        hboxlistbuttons.addWidget(parent.button_channel)
-        hboxlistbuttons.addStretch(1)
-        layout.addLayout(hboxlistbuttons)
 
-        layout.addWidget(parent.button_extractfluorescence)
+# #       LAYOUT FOR LAUNCH NN, TRACK CELLS AND EXTRACT FLUORESCENCE
         
-        hboxcheckbox = QtWidgets.QHBoxLayout()
-        hboxcheckbox.addWidget(parent.button_showval)
-        hboxcheckbox.addWidget(parent.button_hidemask)
-        hboxcheckbox.addStretch(1)
+#         hboxcnnbuttons = QtWidgets.QHBoxLayout()
+#         hboxcnnbuttons.addStretch(1)
 
-        layout.addLayout(hboxcheckbox)
+
+        
+#         layout.addLayout(hboxcnnbuttons)
         
         
-        layout.addWidget(parent.button_cnn)
         
-        layout.addLayout(hbox_threshold)
         
-        layout.addLayout(hbox_segment)
-        layout.addWidget(parent.button_cellcorespondance)
+        # BUTTONS TO SHOW THE THRESHOLD AND SEGMENTATION ARE HIDDEN HERE!
+        # UNCOMMENT THEM TO MAKE THEM APPEAR ON THE GUI.
+        
+        # layout.addLayout(hbox_threshold)
+        
+        # layout.addLayout(hbox_segment)
+
 
 

@@ -17,8 +17,17 @@ def Init(parent):
 #        connected to the button, this button stays active (or Checked)
     
     
+#       hide / show cnn buttons
+        parent.button_hide_show.setCheckable(True)    
+        parent.button_hide_show.setMaximumWidth(150)
+        parent.button_hide_show.clicked.connect(parent.ShowHideCNNbuttons)
+        # parent.button_hide_show.setShortcut("R")
+        # parent.button_hide_show.setToolTip("Use R Key for shortcut")
+        parent.button_hide_show.setStatusTip('Press to hide and show neural network buttons')
+        
+        
     
-    #           ADD REGION
+#       ADD REGION
         parent.button_add_region.setCheckable(True)
         parent.button_add_region.setMaximumWidth(150)
         parent.button_add_region.clicked.connect(parent.clickmethod)
