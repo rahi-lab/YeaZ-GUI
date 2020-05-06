@@ -11,3 +11,4 @@ install opencv-python
 install pytiff
 install pandas
 install munkres
+install sklearn
