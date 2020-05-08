@@ -644,7 +644,15 @@ class App(QMainWindow):
                 timecolindex = timecolindex + 4
               
 #       saves the xls file.
-        book.save(xlsfilename)
+        print(xlsfilename)
+        try:
+            book.save(xlsfilename)
+            break
+        except TypeError:
+            QMessageBox.critical(self, "Error", "TypeError encountered. \
+                                 Make sure you have openpyxl version 3.0.1 \
+                                 installed. If the problem persists contact \
+                                 the developers.")
 
 
 
