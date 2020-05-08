@@ -51,7 +51,6 @@ class Reader:
                 self.sizey = images.sizes['y']
                 self.sizec = images.sizes['c']
                 self.sizet = images.sizes['t']
-                print("Debug: self.sizet",self.sizet)
                 try:
                     self.Npos  = images.sizes['v']
                 except KeyError:
@@ -63,7 +62,6 @@ class Reader:
                 self.sizey, self.sizex = handle.shape #SJR: changed by me
                 self.sizec = 1
                 self.sizet = handle.number_of_pages
-                print("Debug: handle.number_of_pages",handle.number_of_pages)
                 self.Npos = 1
                 self.channel_names = ['Channel1']
                 
@@ -89,7 +87,6 @@ class Reader:
             self.sizec = 1
             self.Npos = 1
             self.sizet = len(filelist)
-            print("Debug: self.sizet",self.sizet)
             self.channel_names = ['Channel1']
                             
         #create the labels which index the masks with respect to time and 
@@ -289,9 +286,6 @@ class Reader:
         """
         if currentT <= len(self.tlabels) - 1:
             for t in file['/{}'.format(self.fovlabels[currentFOV])].keys():
-                print('Debug currentT',currentT)
-                print('Debud self.tlabels',self.tlabels)
-                print(len(self.tlabels))
                 # currentT is a number
                 # self.tlabels is some string that indexes the time point? E.g., T0?
                 if t == self.tlabels[currentT]:
@@ -395,8 +389,6 @@ class Reader:
                 except ValueError:
                     pass
                 images.default_coords['c'] = self.default_channel
-                print('Debug in InteractionDisk_temp',currentfov)
-                print('Debug in InteractionDisk_temp',self.default_channel)
                 images.iter_axes = 't'
                 im = images[currentT]
                 
@@ -404,8 +396,6 @@ class Reader:
             with pytiff.Tiff(self.nd2path) as handle:
                 handle.set_page(currentT)
                 im = handle[:]
-                print('Debug in InteractionDisk_temp',im.shape)
-#                print('Debug in InteractionDisk_temp',im[0,0],np.amin(im),np.amax(im))
                                 
         elif self.isfolder:
             filelist = sorted(os.listdir(self.nd2path))
