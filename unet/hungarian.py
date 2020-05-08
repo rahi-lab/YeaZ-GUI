@@ -5,7 +5,6 @@ from sklearn.preprocessing import scale
 from sklearn.metrics.pairwise import euclidean_distances
 
 
-
 def correspondance(prev, curr):
     """
     Corrects correspondance between previous and current mask, returns current
@@ -31,6 +30,7 @@ def correspondance(prev, curr):
         new[curr==key] = val
         
     return new
+
 
 def hungarian_align(m1, m2):
     """
