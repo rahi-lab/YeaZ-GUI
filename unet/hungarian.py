@@ -40,6 +40,12 @@ def hungarian_align(m1, m2):
     value is -1.
     """
     dist, ix1, ix2 = cell_distance(m1, m2)
+    
+    # If dist couldn't be calculated, return dictionary from cells to themselves 
+    if dist is None:
+        unique_m2 = np.unique(m2)
+        return dict(zip(unique_m2, unique_m2))
+    
     solver = Munkres()
     indexes = solver.compute(make_square(dist))
     
@@ -62,18 +68,12 @@ def cell_to_features(im, c, nsamples=None, time=None):
     
     com = sampled.mean(axis=0)
     
-    # roundness, principal direction
-    dev = sampled - com
-    cov = dev.T @ dev
-    evals, evecs = np.linalg.eig(cov)
-    roundness = min(evals)/max(evals)
     return {'cell': c,
             'time': time,
             'sqrtarea': np.sqrt(area),
             'area': area,
             'com_x': com[0],
-            'com_y': com[1],
-            'roundness': roundness}
+            'com_y': com[1]}
     
     
 def cell_distance(m1, m2, weight_com=3):
@@ -97,6 +97,11 @@ def cell_distance(m1, m2, weight_com=3):
     # Create df, rescale
     feat1, ix_to_cell1 = get_features(m1, 1)
     feat2, ix_to_cell2 = get_features(m2, 2)
+    
+    # Check if one of matrices doesn't contain cells
+    if len(feat1)==0 or len(feat2)==0:
+        return None, None, None
+    
     df = pd.concat((feat1, feat2))
     df[cols] = scale(df[cols])
     
