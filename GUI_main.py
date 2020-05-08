@@ -59,25 +59,23 @@ sys.path.append("./disk")
 sys.path.append("./icons")
 sys.path.append("./init")
 sys.path.append("./misc")
-import time
-import os
 import numpy as np
 
 
 # Import everything for the Graphical User Interface from the PyQt5 library.
-from PyQt5.QtWidgets import QApplication, QMainWindow, QDialog, QMenu, QVBoxLayout, QSizePolicy, QMessageBox, QWidget, QPushButton, QShortcut, QComboBox, QCheckBox, QLineEdit, QMenu, QAction, QStatusBar, QErrorMessage
+from PyQt5.QtWidgets import QApplication, QMainWindow, QDialog, QSizePolicy, \
+    QMessageBox, QPushButton, QCheckBox, QAction, QStatusBar
 from PyQt5 import QtGui
-from PyQt5.QtCore import pyqtSignal, QObject, Qt
 
 #Import from matplotlib to use it to display the pictures and masks.
-from matplotlib.backends.qt_compat import QtCore, QtWidgets, is_pyqt5
+from matplotlib.backends.qt_compat import QtWidgets
 from matplotlib.backends.backend_qt5agg import (FigureCanvasQTAgg as FigureCanvas, NavigationToolbar2QT as NavigationToolbar)
-from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
+
 #import the colormaps function to create a customed colormap scale with 10 
 #colors only
 from matplotlib import cm
-from matplotlib.colors import ListedColormap, LinearSegmentedColormap
+from matplotlib.colors import ListedColormap
 #import Path functions to handle the regions drawn by the user. ("add region
 #and new cell")
 from matplotlib.path import Path
