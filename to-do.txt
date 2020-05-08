@@ -1,1 +1,0 @@
-if user chooses .tif mask, check whether .h5 mask exists and warn that will be overwritten
