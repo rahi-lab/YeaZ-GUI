@@ -647,7 +647,6 @@ class App(QMainWindow):
         print(xlsfilename)
         try:
             book.save(xlsfilename)
-            break
         except TypeError:
             QMessageBox.critical(self, "Error", "TypeError encountered. \
                                  Make sure you have openpyxl version 3.0.1 \
