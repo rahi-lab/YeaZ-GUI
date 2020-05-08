@@ -9,5 +9,6 @@ install Tensorflow==1.9.0
 install Keras
 install opencv-python
 install pytiff
-install sklearn
+install pandas
 install munkres
+install sklearn

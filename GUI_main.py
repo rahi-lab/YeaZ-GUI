@@ -23,7 +23,7 @@ On top of the picture, there is always a mask which is displayed, if no cells
 are present in the mask then the mask is blank and the user does not see it. 
 If one wants to hand anmotate the pictures, one can just start to draw on the
 picture using the different functions (New Cell, Add Region, Brush, Eraser,
-Save Mask,...) and the informations will be saved in the mask overlayed on 
+Save Mask, ...) and the informations will be saved in the mask overlayed on 
 top of the pictures. 
 
 If one wants to segment using a neural network, one can press the
