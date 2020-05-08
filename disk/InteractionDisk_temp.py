@@ -9,7 +9,7 @@ reads the hdf file containing the segmentation.
 from nd2reader import ND2Reader
 #import matplotlib.pyplot as plt
 import numpy as np
-
+import re
 import h5py
 import os.path
 import skimage
@@ -24,15 +24,15 @@ import hungarian as hu
 # import matplotlib.pyplot as plt
 
 
-
 class Reader:
     
     def __init__(self, hdfpathname, newhdfname, nd2pathname):
 
-        
-#        Initializes the data corresponding to the sizes of the pictures,
-#        the number of different fields of views(Npos) taken in the experiment.
-#        And it also sets the number of time frames per field of view.
+        """
+        Initializes the data corresponding to the sizes of the pictures,
+        the number of different fields of views(Npos) taken in the experiment.
+        And it also sets the number of time frames per field of view.
+        """
         
         # Identify filetype of image file
         _, self.extension = os.path.splitext(nd2pathname)
@@ -40,9 +40,15 @@ class Reader:
         self.istiff = self.extension == '.tif' or self.extension == '.tiff'
         self.isfolder = self.extension == ''
         
-        
         self.nd2path = nd2pathname # path name is nd2path for legacy reasons
         self.hdfpath = hdfpathname
+        
+        # Create newhdfname with right path
+        templist = self.nd2path.split('/')
+        tmp = ""
+        for k in range(0, len(templist)-1):
+            tmp += templist[k]+'/'        
+        self.newhdfpath = tmp+newhdfname+'.h5'
         self.newhdfname = newhdfname
         
         if self.isnd2:
@@ -66,24 +72,20 @@ class Reader:
                 self.channel_names = ['Channel1']
                 
         elif self.isfolder:
-            
-            filelist = sorted(os.listdir(self.nd2path))
-
-            print(filelist)
-            
+            filelist = sorted(os.listdir(self.nd2path))            
             for f in filelist:
                 if f.startswith('.'):
                     filelist.remove(f)
-
             self.sizey = 0
             self.sizex = 0
+            
+            # filter filelist for supported image files
+            filelist = [f for f in filelist if re.search(r".png|.tif|.jpg|.bmp|.jpeg|.pbm|.pgm|.ppm|.pxm|.pnm|.jp2", f)]
+            
             for f in filelist:
                 im = skimage.io.imread(self.nd2path + '/' + f)
                 self.sizey = max(self.sizey, im.shape[0]) #SJR: changed by me
                 self.sizex = max(self.sizex, im.shape[1]) #SJR: changed by me
-            
-#            im = skimage.io.imread(self.nd2path + '/' + filelist[0])
-#            self.sizey, self.sizex = im.shape #SJR: changed by me
             self.sizec = 1
             self.Npos = 1
             self.sizet = len(filelist)
@@ -102,15 +104,8 @@ class Reader:
         self.predictname = ''
         self.thresholdname = ''
         self.segmentname = ''
-        
-#        self.channelwindow = chch.CustomDialog(self)
-#        
-#        if self.channelwindow.exec_():
-#
-#             self.default_channel = self.channelwindow.button_channel.currentIndex()
-             
-            
-#        create an new hfd5 file if no one existing already
+                    
+        # create an new hfd5 file if no one existing already
         self.Inithdf()
         
 
@@ -134,15 +129,21 @@ class Reader:
         a new group is created in the createhdf method
         """
         
-        if not self.hdfpath:
+        newFileExists = os.path.isfile(self.newhdfpath)
+        print(newFileExists)
+        print(self.newhdfpath)
+        print(self.hdfpath)
+        if not self.hdfpath and not newFileExists:            
             return self.Createhdf()
+             
         else:
-            
+            if not self.hdfpath:
+                self.hdfpath = self.newhdfpath
             filenamewithpath, extension = os.path.splitext(self.hdfpath)
             
             if extension == ".h5":
                 temp = self.hdfpath[:-3]
-            
+                
                 self.thresholdname = temp + '_thresholded' + '.h5'
                 self.segmentname = temp + '_segmented' + '.h5'
                 self.predictname = temp + '_predicted' + '.h5'
@@ -190,31 +191,26 @@ class Reader:
             
             
     def Createhdf(self):
-        
         """In this method, for each field of view one group is created. And 
         in each one of these group, there will be for each time frame a 
         corresponding dataset equivalent to a 2d array containing the 
         corresponding masks data (segmented/thresholded/predicted).
         """
-#        print('createhdf')
+                    
+        self.hdfpath = self.newhdfpath
         
-        self.hdfpath = ''
         templist = self.nd2path.split('/')
-        for k in range(0, len(templist)-1):
-            self.hdfpath = self.hdfpath+templist[k]+'/'
+#        for k in range(0, len(templist)-1):
+#            self.hdfpath = self.hdfpath+templist[k]+'/'
         
-        self.hdfpath = self.hdfpath + self.newhdfname + '.h5'
+#        self.hdfpath = self.hdfpath + self.newhdfname + '.h5'
         
         hf = h5py.File(self.hdfpath, 'w')
         
         for i in range(0, self.Npos):
-            
             grpname = self.fovlabels[i]
             hf.create_group(grpname)
-            
         hf.close()
-        
-
         
         
         for k in range(0, len(templist)-1):
@@ -230,6 +226,7 @@ class Reader:
             
         hf.close()
         
+        
         for k in range(0, len(templist)-1):
             self.segmentname = self.segmentname+templist[k]+'/'
         self.segmentname = self.segmentname + self.newhdfname + '_segmented' + '.h5'
@@ -242,6 +239,7 @@ class Reader:
             hf.create_group(grpname)
             
         hf.close()
+
 
         for k in range(0, len(templist)-1):
             self.predictname = self.predictname+templist[k]+'/'
@@ -495,7 +493,6 @@ class Reader:
             fileprediction.close()
             return np.zeros([self.sizey, self.sizex], dtype = np.uint16)
         
-#    def LaunchPrediction(self, currentT, currentFOV):
         
     
     def TestPredExisting(self, currentT, currentFOV):
