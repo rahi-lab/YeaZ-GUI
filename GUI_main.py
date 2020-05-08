@@ -1231,7 +1231,10 @@ class App(QMainWindow):
             if self.Tindex == 0:
                 self.button_nextframe.setEnabled(True)
                 
-                self.m.nextplotmask = self.reader.LoadMask(self.Tindex+1, self.FOVindex)
+                if self.Tindex < self.reader.sizet-1:
+                    self.m.nextplotmask = self.reader.LoadMask(self.Tindex+1, self.FOVindex)
+                else:
+                    np.zeros([self.reader.sizey, self.reader.sizex], dtype = np.uint16)
                 
                 self.m.plotmask = self.reader.LoadMask(self.Tindex, self.FOVindex)
                 

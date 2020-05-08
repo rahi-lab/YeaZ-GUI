@@ -10,6 +10,10 @@ import numpy as np
 from skimage import data, util, filters, color
 import cv2
 
+# get rid of this
+from skimage import io
+
+
 def segment(th, pred, min_distance=10, topology=None): #SJR: added pred to evaluate new borders
     """
     Performs watershed segmentation on thresholded image. Seeds have to
@@ -20,13 +24,34 @@ def segment(th, pred, min_distance=10, topology=None): #SJR: added pred to evalu
     """
     dtr = ndi.morphology.distance_transform_edt(th)
     if topology is None:
+        print('topology is none')
         topology = -dtr
     elif callable(topology):
         topology = topology(dtr)
 
     m = peak_local_max(-topology, min_distance, indices=False)
     m_lab = ndi.label(m)[0]
+#    print(m_lab.shape)
+#    print(type(m_lab[0,0]))
+#    print(type(th[0,0]))
+#    print(type(topology[0,0]))
+#    io.imsave("/home/sjrahi/Desktop/peaks.tif",               np.array(m_lab, np.uint32))
+#    io.imsave("/home/sjrahi/Desktop/image.tif",               np.array(th, np.float32))
+#    io.imsave("/home/sjrahi/Desktop/top.tif",                 np.array(topology, np.float32))
+#    io.imsave("/home/sjrahi/Desktop/peaks.tif",               m_lab)
+#    io.imsave("/home/sjrahi/Desktop/image.tif",               th)
+#    io.imsave("/home/sjrahi/Desktop/top.tif",                 topology)
     wsh = watershed(topology, m_lab, mask=th)
+
+#    print(m_lab.shape)
+#    print(wsh.shape)
+#    print(th.shape)
+#    print(topology.shape)
+
+    print(type(wsh[0,0]))
+#    io.imsave("/home/sjrahi/Desktop/wsh.tif",               np.array(wsh, np.uint32))
+#    io.imsave("/home/sjrahi/Desktop/wsh.tif",                 wsh)
+
 
     wshshape=wsh.shape	# size of the watershed images, could probably get the sizes from the original input images but too lazy to figure out how
     oriobjs=np.zeros((wsh.max()+1,wshshape[0],wshshape[1]))	# the masks for the original cells are saved each separately here

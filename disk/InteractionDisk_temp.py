@@ -76,9 +76,16 @@ class Reader:
             for f in filelist:
                 if f.startswith('.'):
                     filelist.remove(f)
+
+            self.sizey = 0
+            self.sizex = 0
+            for f in filelist:
+                im = skimage.io.imread(self.nd2path + '/' + f)
+                self.sizey = max(self.sizey, im.shape[0]) #SJR: changed by me
+                self.sizex = max(self.sizex, im.shape[1]) #SJR: changed by me
             
-            im = skimage.io.imread(self.nd2path + '/' + filelist[0])
-            self.sizey, self.sizex = im.shape #SJR: changed by me
+#            im = skimage.io.imread(self.nd2path + '/' + filelist[0])
+#            self.sizey, self.sizex = im.shape #SJR: changed by me
             self.sizec = 1
             self.Npos = 1
             self.sizet = len(filelist)
@@ -280,12 +287,19 @@ class Reader:
         """This method tests if the array which is requested by LoadMask
         already exists or not in the hdf file.
         """
+        if currentT <= len(self.tlabels) - 1:
+            for t in file['/{}'.format(self.fovlabels[currentFOV])].keys():
+                print('Debug currentT',currentT)
+                print('Debud self.tlabels',self.tlabels)
+                print(len(self.tlabels))
+                # currentT is a number
+                # self.tlabels is some string that indexes the time point? E.g., T0?
+                if t == self.tlabels[currentT]:
+                    return True
         
-        for t in file['/{}'.format(self.fovlabels[currentFOV])].keys():
-            if t == self.tlabels[currentT]:
-                return True
-        
-        return False
+            return False
+        else:
+            return False
     
 
             
@@ -399,6 +413,7 @@ class Reader:
                 if f.startswith('.'):
                     filelist.remove(f)
             im = skimage.io.imread(self.nd2path + '/' + filelist[currentT])
+            im = np.pad(im,( (0, self.sizey - im.shape[0]) , (0, self.sizex -  im.shape[1] ) ),constant_values=0) # pad with zeros so all images in the same folder have same size
             
         # be careful here, the output is converted to 16, not sure it's a good idea.
         outputarray = np.array(im, dtype = np.uint16)
