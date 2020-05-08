@@ -644,7 +644,6 @@ class App(QMainWindow):
                 timecolindex = timecolindex + 4
               
 #       saves the xls file.
-        print(xlsfilename)
         try:
             book.save(xlsfilename)
         except TypeError:
