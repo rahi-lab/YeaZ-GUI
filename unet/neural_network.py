@@ -5,13 +5,8 @@ Created on Sat Dec 21 18:54:10 2019
 
 """
 import os
-
 from model import unet
 import data
-#from quality_measures import *
-#from segment import *
-#from data_processing import *
-
 import numpy as np
 import skimage
 
