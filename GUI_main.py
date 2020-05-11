@@ -1600,6 +1600,7 @@ class App(QMainWindow):
 
             else:
                 self.m.updatedata()
+                
             self.Enable(self.button_add_region)
             self.m.ShowCellNumbers()
             self.statusBar.clearMessage()
@@ -1832,7 +1833,7 @@ class PlotCanvas(FigureCanvas):
         """
         if self.ax == event.inaxes:
             self.storebrushclicks[0] = [False, False]
-            self.ShowCellNumbers()S
+            self.ShowCellNumbers()
         
         
     def OneClick(self, event):
@@ -2322,13 +2323,23 @@ class PlotCanvas(FigureCanvas):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    wind = dfb.FileBrowser()
-    if wind.exec_():
-        nd2name1 = wind.nd2name
-        hdfname1 = wind.hdfname
-        hdfnewname = wind.newhdfentry.text()
-        ex = App(nd2name1, hdfname1, hdfnewname)
+    
+    # If two arguments are given, make them nd2name and hdfname
+    if len(sys.argv)==3:
+        nd2name1 = sys.argv[1]
+        hdfname1 = sys.argv[2]
+        ex = App(nd2name1, hdfname1, '')
         sys.exit(app.exec_())
+    
+    # Launch file browser otherwise
     else:
-        app.exit()
+        wind = dfb.FileBrowser()
+        if wind.exec_():
+            nd2name1 = wind.nd2name
+            hdfname1 = wind.hdfname
+            hdfnewname = wind.newhdfentry.text()
+            ex = App(nd2name1, hdfname1, hdfnewname)
+            sys.exit(app.exec_())
+        else:
+            app.exit()
         
