@@ -50,7 +50,6 @@ the corresponding picture. This mask can also be corrected using the
 usual buttons (because the Cell Correspondance makes also mistakes). 
 
 """
-import random
 import sys
 import numpy as np
 
@@ -60,7 +59,7 @@ from openpyxl import Workbook
 
 # Import everything for the Graphical User Interface from the PyQt5 library.
 from PyQt5.QtWidgets import QApplication, QMainWindow, QDialog, QSizePolicy, \
-    QMessageBox, QPushButton, QCheckBox, QAction, QStatusBar
+    QMessageBox, QPushButton, QCheckBox, QAction, QStatusBar, QLabel
 from PyQt5 import QtGui
 
 #Import from matplotlib to use it to display the pictures and masks.
@@ -306,6 +305,8 @@ class App(QMainWindow):
         # creates a status bar with user instructions
         self.statusBar = QStatusBar()
         self.setStatusBar(self.statusBar)
+        self.statusBarText = QLabel()
+        self.statusBar.addWidget(self.statusBarText)
                 
         self.show()
                 
@@ -630,7 +631,7 @@ class App(QMainWindow):
         It then saves the xls file.
         """
         self.Disable(self.button_extractfluorescence)
-        self.statusBar.showMessage('Extracting the fluorescence...')
+        self.WriteStatusBar('Extracting the fluorescence...')
         
         # opens the file to read it.
         book = load_workbook(self.xlsfilename)
@@ -715,7 +716,7 @@ class App(QMainWindow):
                             book.save(xlsfilename)
 
         self.Enable(self.button_extractfluorescence)
-        self.statusBar.clearMessage()
+        self.ClearStatusBar()
 
 
 # -----------------------------------------------------------------------------
@@ -783,7 +784,7 @@ class App(QMainWindow):
                 return
             
             # displays that the neural network is running
-            self.statusBar.showMessage('Running the neural network...')
+            self.WriteStatusBar('Running the neural network...')
     
             #it iterates in the list of the user-selected fields 
             #of view, to return the corresponding index, the function
@@ -820,7 +821,7 @@ class App(QMainWindow):
                
             #once it has iterated over all the fov, the message in 
             #the status bar is cleared and the buttons are enabled.
-            self.statusBar.clearMessage()
+            self.ClearStatusBar()
             self.EnableCNNButtons()
    
     
@@ -845,7 +846,7 @@ class App(QMainWindow):
         the prediction of one picture, with no thresholding and no segmentation
         """
         if not(self.reader.TestPredExisting(self.Tindex, self.FOVindex)):
-            self.statusBar.showMessage('Running the neural network...')
+            self.WriteStatusBar('Running the neural network...')
             self.Disable(self.button_cnn)
             self.reader.LaunchPrediction(self.Tindex, self.FOVindex)
             
@@ -855,7 +856,7 @@ class App(QMainWindow):
             self.button_threshold.setEnabled(True)
             self.button_segment.setEnabled(True)
             self.button_cellcorespondance.setEnabled(True)
-            self.statusBar.clearMessage()
+            self.ClearStatusBar()
         
     
     def SelectChannel(self, index):
@@ -1067,7 +1068,7 @@ class App(QMainWindow):
      
     def CellCorrespActivation(self):
             self.Disable(self.button_cellcorespondance)
-            self.statusBar.showMessage('Doing the cell correspondance')
+            self.WriteStatusBar('Doing the cell correspondance')
 
             if self.Tindex != 0:
                 self.m.plotmask = self.reader.CellCorrespondance(self.Tindex, self.FOVindex)
@@ -1078,7 +1079,7 @@ class App(QMainWindow):
 
             self.Enable(self.button_cellcorespondance)
             self.button_cellcorespondance.setChecked(False)
-            self.statusBar.clearMessage()
+            self.ClearStatusBar()
         
         
     def SegmentBoxCheck(self):
@@ -1213,7 +1214,7 @@ class App(QMainWindow):
         """
         # the t frame is defined as the currently shown frame on the display.
         # If the button "Next time frame" is pressed, this function is called
-        self.statusBar.showMessage('Loading the next frame...')
+        self.WriteStatusBar('Loading the next frame...')
         self.Disable(self.button_nextframe)
 
         if self.Tindex + 1 < self.reader.sizet - 1 :
@@ -1254,7 +1255,7 @@ class App(QMainWindow):
             self.m.HideMask()
 
         self.Enable(self.button_nextframe)
-        self.statusBar.clearMessage()
+        self.ClearStatusBar()
         self.button_timeindex.setText(str(self.Tindex)+'/'+str(self.reader.sizet-1))
 
     
@@ -1267,7 +1268,7 @@ class App(QMainWindow):
         """
         # the t frame is defined as the currently shown frame on the display.
         # If the button "Previous time frame" is pressed, this function is called
-        self.statusBar.showMessage('Loading the previous frame...')
+        self.WriteStatusBar('Loading the previous frame...')
         self.Disable(self.button_previousframe)
         
         self.reader.SaveMask(self.Tindex, self.FOVindex, self.m.plotmask)
@@ -1301,7 +1302,7 @@ class App(QMainWindow):
         if self.Tindex > 0:
             self.button_previousframe.setEnabled(True)          
             
-        self.statusBar.clearMessage()
+        self.ClearStatusBar()
         self.button_timeindex.setText(str(self.Tindex)+'/' + str(self.reader.sizet-1))
 
 
@@ -1319,9 +1320,9 @@ class App(QMainWindow):
         """
         
         # displaying the instructions on the statusbar
-        self.statusBar.showMessage(
-            'Select one cell using the left click \
-             and then enter the desired value in the dialog box')
+        self.WriteStatusBar((
+            'Select one cell using the left click '
+             'and then enter the desired value in the dialog box.'))
 
         # disables all the buttons
         self.Disable(self.button_changecellvalue)
@@ -1385,7 +1386,6 @@ class App(QMainWindow):
                     self.m.updatedata()
                     
         self.Enable(self.button_changecellvalue)
-        self.statusBar.clearMessage()
         self.button_changecellvalue.setChecked(False)
         self.m.ShowCellNumbers()
         
@@ -1433,7 +1433,8 @@ class App(QMainWindow):
         to 0.
         """
         if self.button_drawmouse.isChecked():
-            self.statusBar.showMessage('Drawing using the brush, right click to set a value...')
+            self.WriteStatusBar(('Draw using the brush, right click to select '
+                                 'the cell to draw.'))
             self.Disable(self.button_drawmouse)
             
             self.m.tempmask = self.m.plotmask.copy()
@@ -1443,12 +1444,11 @@ class App(QMainWindow):
             self.id3 = self.m.mpl_connect('button_release_event', self.m.ReleaseClick)
 
             pixmap = QtGui.QPixmap('./icons/brush2.png')
-            cursor = QtGui.QCursor(pixmap, 1,1)
+            cursor = QtGui.QCursor(pixmap, -1,-1)
             QApplication.setOverrideCursor(cursor)
         
-        
         elif self.button_eraser.isChecked():
-            self.statusBar.showMessage('Erasing by setting the values to 0...')
+            self.WriteStatusBar('Erasing by setting the values to 0.')
             self.Disable(self.button_eraser)
             
             self.m.tempmask = self.m.plotmask.copy()
@@ -1459,7 +1459,7 @@ class App(QMainWindow):
             self.id3 = self.m.mpl_connect('button_release_event', self.m.ReleaseClick)
             
             pixmap = QtGui.QPixmap('./icons/eraser.png')
-            cursor = QtGui.QCursor(pixmap, 1,1)
+            cursor = QtGui.QCursor(pixmap, -1, -1)
             QApplication.setOverrideCursor(cursor)
             
         else:
@@ -1470,7 +1470,7 @@ class App(QMainWindow):
             self.Enable(self.button_drawmouse)
             self.Enable(self.button_eraser)
             
-            # self.statusBar.clearMessage()
+            self.ClearStatusBar()
             
             
     def UpdateTitleSubplots(self):
@@ -1519,7 +1519,9 @@ class App(QMainWindow):
         
         """
         if self.button_newcell.isChecked():
-            self.statusBar.showMessage('Draw a new cell...')
+            self.WriteStatusBar(('Draw a new cell. Use the left click to '
+                                 'produce a polygon with a new cell value. '
+                                 'Click the button again to confirm.'))
             self.m.tempmask = self.m.plotmask.copy()
             self.id = self.m.mpl_connect('button_press_event', self.m.MouseClick)
             self.Disable(self.button_newcell)
@@ -1532,7 +1534,7 @@ class App(QMainWindow):
                 self.m.updatedata()
             self.Enable(self.button_newcell)
             self.m.ShowCellNumbers()
-            self.statusBar.clearMessage()
+            self.ClearStatusBar()
             
             
     def TestSelectedPoints(self):
@@ -1580,7 +1582,9 @@ class App(QMainWindow):
         
         """
         if self.button_add_region.isChecked():
-            self.statusBar.showMessage('Adding a region to an existing cell...')
+            self.WriteStatusBar(('Select the cell with the first click, '
+                                 'then draw polygon with subsequent '
+                                 'clicks. Reclick the button to confirm.'))
             self.m.tempmask = self.m.plotmask.copy()
             self.id = self.m.mpl_connect('button_press_event', self.m.MouseClick)           
             self.Disable(self.button_add_region) 
@@ -1597,7 +1601,7 @@ class App(QMainWindow):
                 
             self.Enable(self.button_add_region)
             self.m.ShowCellNumbers()
-            self.statusBar.clearMessage()
+            self.ClearStatusBar()
             
             
 # -----------------------------------------------------------------------------
@@ -1699,6 +1703,16 @@ class App(QMainWindow):
         """
         self.reader.SaveMask(self.Tindex, self.FOVindex, self.m.plotmask)
         
+        
+    def WriteStatusBar(self, text):
+        """Writes text to status bar"""
+        self.statusBarText.setText(text)
+        
+        
+    def ClearStatusBar(self):
+        """Removes text from status bar"""
+        self.statusBarText.setText('')
+
 
 class PlotCanvas(FigureCanvas):
     def __init__(self, parent=None):
@@ -1909,7 +1923,7 @@ class PlotCanvas(FigureCanvas):
             
             
     def MouseClick(self,event):
-        """This function is called whenever, the add region or the new cell
+        """This function is called whenever the add region or the new cell
         buttons are active and the user clicks on the plot. For each 
         click on the plot, it records the coordinate of the click and stores
         it. When the user deactivate the new cell or add region button, 
