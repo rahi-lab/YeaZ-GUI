@@ -1,30 +1,22 @@
 """
 Source of the code: https://github.com/zhixuhao/unet
 """
-import numpy as np
-import os
-import skimage.io as io
-import skimage.transform as trans
-import numpy as np
 
 # Import tensorflow differently depending on version
 from tensorflow import __version__ as tf_version
 tf_version_old = int(tf_version[0]) <= 1
+
+from tensorflow.keras.models import Model
+from tensorflow.keras.layers import (Input, Conv2D, MaxPooling2D, Dropout, 
+                                     concatenate, UpSampling2D)
+from tensorflow.keras.optimizers import Adam
+#from tensorflow.keras.callbacks import ModelCheckpoint, LearningRateScheduler
+
 if tf_version_old:
-    from tensorflow.keras.models import *
-    from tensorflow.keras.layers import *
-    from tensorflow.keras.optimizers import *
-    from tensorflow.keras.callbacks import ModelCheckpoint, LearningRateScheduler
-    from tensorflow.keras import backend as keras
     from tensorflow import ConfigProto
     from tensorflow import InteractiveSession
 
 else:
-    from tensorflow.keras.models import *
-    from tensorflow.keras.layers import *
-    from tensorflow.keras.optimizers import *
-    from tensorflow.keras.callbacks import ModelCheckpoint, LearningRateScheduler
-    from tensorflow.keras import backend as keras
     from tensorflow.compat.v1 import ConfigProto
     from tensorflow.compat.v1 import InteractiveSession
     
@@ -32,22 +24,6 @@ else:
 config = ConfigProto()
 config.gpu_options.allow_growth = True
 session = InteractiveSession(config=config)
-
-#import tensorflow
-#config = ConfigProto()
-#config.gpu_options.allow_growth = True
-#session = InteractiveSession(config=config)
-
-#session_conf = ConfigProto(intra_op_parallelism_threads=8, inter_op_parallelism_threads=8, device_count = {'GPU':0})
-#tensorflow.random.set_seed(1)
-#sess = Session(graph=get_default_graph(), config=session_conf)
-#tensorflow.compat.v1.keras.backend.set_session(sess)
-#gpus = tf.config.experimental.list_physical_devices('GPU')
-#tf.config.experimental.set_memory_growth(gpus[0], True)
-
-
-#os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
-
 
 def unet(pretrained_weights = None,input_size = (256,256,1)):
     inputs = Input(input_size)
@@ -94,8 +70,6 @@ def unet(pretrained_weights = None,input_size = (256,256,1)):
     model = Model(inputs = inputs, outputs = conv10)
 
     model.compile(optimizer = Adam(lr = 1e-4), loss = 'binary_crossentropy', metrics = ['accuracy'])
-
-    #model.summary()
 
     if(pretrained_weights):
     	model.load_weights(pretrained_weights)
