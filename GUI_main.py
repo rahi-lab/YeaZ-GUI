@@ -355,7 +355,8 @@ class App(QMainWindow):
         """
         self.Nvgtlbar.zoom()
         
-        if self.button_zoom.isChecked() and not(self.button_segment.isChecked() or self.button_threshold.isChecked()):
+        if (self.button_zoom.isChecked() and not(self.button_segment.isChecked() 
+            or self.button_threshold.isChecked())):
             self.Disable(self.button_zoom)
             
         elif self.button_zoom.isChecked() and self.button_segment.isChecked():
@@ -439,7 +440,8 @@ class App(QMainWindow):
 
         self.Nvgtlbar.pan()
 
-        if self.button_pan.isChecked() and not(self.button_segment.isChecked() or self.button_threshold.isChecked()):
+        if (self.button_pan.isChecked() and not(self.button_segment.isChecked()
+            or self.button_threshold.isChecked())):
             self.Disable(self.button_pan)
             
         elif self.button_pan.isChecked() and self.button_segment.isChecked():
@@ -927,7 +929,7 @@ class App(QMainWindow):
             
         # once the images and masks are loaded into the variables, they are 
         # displaye in the gui.
-        self.m.UpdateBckgrndPicture()
+        self.m.UpdatePlots()
         
         # disables the previous frame button in case it was active before 
         # changing fov/channel.
@@ -936,12 +938,6 @@ class App(QMainWindow):
         # updates the title of the plots to display the right time indices
         # aboves the plots.
         self.UpdateTitleSubplots()
-
-        # if the button to show cell values is active, it shows the values again.
-        if self.button_showval.isChecked():
-            self.m.ShowCellNumbersCurr()
-            self.m.ShowCellNumbersNext()
-            self.m.ShowCellNumbersPrev()
             
         # if the button to hide the mask was checked before changing fov/channel,
         # it hides the mask again.
@@ -973,7 +969,7 @@ class App(QMainWindow):
                 
                 self.m.plotmask = self.reader.LoadMask(self.Tindex, self.FOVindex)
                 self.m.prevplotmask = np.zeros([self.reader.sizey, self.reader.sizex], dtype = np.uint16)
-                self.m.UpdateBckgrndPicture()
+                self.m.UpdatePlots()
                 self.button_previousframe.setEnabled(False)
                 
                 
@@ -982,7 +978,7 @@ class App(QMainWindow):
                 self.m.prevplotmask = self.reader.LoadMask(self.Tindex-1, self.FOVindex)
                 self.m.plotmask = self.reader.LoadMask(self.Tindex, self.FOVindex)
                 self.m.nextplotmask =  np.zeros([self.reader.sizey, self.reader.sizex], dtype = np.uint16)
-                self.m.UpdateBckgrndPicture()
+                self.m.UpdatePlots()
                 self.button_nextframe.setEnabled(False)
                 
             else:
@@ -991,15 +987,10 @@ class App(QMainWindow):
                 self.m.prevplotmask = self.reader.LoadMask(self.Tindex-1, self.FOVindex)
                 self.m.plotmask = self.reader.LoadMask(self.Tindex, self.FOVindex)              
                 self.m.nextplotmask = self.reader.LoadMask(self.Tindex+1, self.FOVindex)
-                self.m.UpdateBckgrndPicture()
+                self.m.UpdatePlots()
             
             self.UpdateTitleSubplots()
-            
-            if self.button_showval.isChecked():
-                self.m.ShowCellNumbersCurr()
-                self.m.ShowCellNumbersNext()
-                self.m.ShowCellNumbersPrev()
-            
+                        
             if self.button_hidemask.isChecked():
                 self.m.HideMask()
             self.EnableCNNButtons()
@@ -1028,10 +1019,12 @@ class App(QMainWindow):
                 self.m.currpicture = self.reader.LoadOneImage(self.Tindex, self.FOVindex)
                 self.m.plotmask = self.reader.LoadMask(self.Tindex, self.FOVindex)
                 
-                self.m.prevpicture = np.zeros([self.reader.sizey, self.reader.sizex], dtype = np.uint16)
-                self.m.prevplotmask = np.zeros([self.reader.sizey, self.reader.sizex], dtype = np.uint16)
+                self.m.prevpicture = np.zeros([self.reader.sizey, self.reader.sizex], 
+                                              dtype = np.uint16)
+                self.m.prevplotmask = np.zeros([self.reader.sizey, self.reader.sizex], 
+                                               dtype = np.uint16)
     
-                self.m.UpdateBckgrndPicture()
+                self.m.UpdatePlots()
                 self.button_previousframe.setEnabled(False)
                 
             elif self.Tindex == self.reader.sizet-1:
@@ -1042,10 +1035,12 @@ class App(QMainWindow):
                 self.m.currpicture = self.reader.LoadOneImage(self.Tindex, self.FOVindex)
                 self.m.plotmask = self.reader.LoadMask(self.Tindex, self.FOVindex)
                   
-                self.m.nextpicture =  np.zeros([self.reader.sizey, self.reader.sizex], dtype = np.uint16)
-                self.m.nextplotmask =  np.zeros([self.reader.sizey, self.reader.sizex], dtype = np.uint16)
+                self.m.nextpicture =  np.zeros([self.reader.sizey, self.reader.sizex], 
+                                               dtype = np.uint16)
+                self.m.nextplotmask =  np.zeros([self.reader.sizey, self.reader.sizex], 
+                                                dtype = np.uint16)
                 
-                self.m.UpdateBckgrndPicture()
+                self.m.UpdatePlots()
                 self.button_nextframe.setEnabled(False)
                 
             else:
@@ -1059,16 +1054,11 @@ class App(QMainWindow):
                   
                 self.m.nextpicture = self.reader.LoadOneImage(self.Tindex+1,self.FOVindex)
                 self.m.nextplotmask = self.reader.LoadMask(self.Tindex+1, self.FOVindex)
-                self.m.UpdateBckgrndPicture()
+                self.m.UpdatePlots()
             
             self.UpdateTitleSubplots()
             self.button_timeindex.clearFocus()
             self.button_timeindex.setText(str(self.Tindex)+'/'+str(self.reader.sizet-1))
-            
-            if self.button_showval.isChecked():
-                self.m.ShowCellNumbersCurr()
-                self.m.ShowCellNumbersNext()
-                self.m.ShowCellNumbersPrev()
             
             if self.button_hidemask.isChecked():
                 self.m.HideMask()
@@ -1168,7 +1158,10 @@ class App(QMainWindow):
         # update the plots to display the thresholded view
         thresholdvalue = float(self.button_SetThreshold.text())
         
-        self.m.ThresholdMask = self.reader.ThresholdPred(thresholdvalue, self.Tindex,self.FOVindex)
+        self.m.ThresholdMask = self.reader.ThresholdPred(
+            thresholdvalue, 
+            self.Tindex,self.FOVindex)
+        
         self.m.currmask.set_data(self.m.ThresholdMask)
         self.m.ax.draw_artist(self.m.currplot)
         self.m.ax.draw_artist(self.m.currmask)
@@ -1239,7 +1232,7 @@ class App(QMainWindow):
             
             self.m.nextpicture = self.reader.LoadOneImage(self.Tindex+2, self.FOVindex)
             self.m.nextplotmask = self.reader.LoadMask(self.Tindex+2, self.FOVindex)
-            self.m.UpdateBckgrndPicture()
+            self.m.UpdatePlots()
 
             if self.Tindex + 1 == 1:
                 self.button_previousframe.setEnabled(True)
@@ -1252,16 +1245,13 @@ class App(QMainWindow):
             self.m.prevplotmask = self.m.plotmask.copy()
             self.m.currpicture = self.m.nextpicture.copy()
             self.m.plotmask = self.m.nextplotmask.copy()
-            self.m.nextpicture = np.zeros([self.reader.sizey, self.reader.sizex], dtype = np.uint16)
-            self.m.nextplotmask = np.zeros([self.reader.sizey,self.reader.sizex], dtype = np.uint16)
-            self.m.UpdateBckgrndPicture()
+            self.m.nextpicture = np.zeros([self.reader.sizey, self.reader.sizex], 
+                                          dtype = np.uint16)
+            self.m.nextplotmask = np.zeros([self.reader.sizey,self.reader.sizex], 
+                                           dtype = np.uint16)
+            self.m.UpdatePlots()
 
             self.button_nextframe.setEnabled(False)
-
-        if self.button_showval.isChecked():
-            self.m.ShowCellNumbersCurr()
-            self.m.ShowCellNumbersNext()
-            self.m.ShowCellNumbersPrev()
 
         self.Tindex = self.Tindex+1
         self.UpdateTitleSubplots()
@@ -1302,14 +1292,9 @@ class App(QMainWindow):
             self.m.prevpicture = self.reader.LoadOneImage(self.Tindex-2, self.FOVindex)
             self.m.prevplotmask = self.reader.LoadMask(self.Tindex-2, self.FOVindex)
 
-        self.m.UpdateBckgrndPicture()
+        self.m.UpdatePlots()
         if self.Tindex-1 == self.reader.sizet-2:
             self.button_nextframe.setEnabled(True)            
-            
-        if self.button_showval.isChecked():
-            self.m.ShowCellNumbersCurr()
-            self.m.ShowCellNumbersNext()
-            self.m.ShowCellNumbersPrev()
         
         if self.button_hidemask.isChecked():
             self.m.HideMask()
@@ -1340,7 +1325,9 @@ class App(QMainWindow):
         """
         
         # displaying the instructions on the statusbar
-        self.statusBar.showMessage('Select one cell using the left click and then enter the desired value in the dialog box')
+        self.statusBar.showMessage(
+            'Select one cell using the left click \
+             and then enter the desired value in the dialog box')
 
         # disables all the buttons
         self.Disable(self.button_changecellvalue)
@@ -1375,7 +1362,9 @@ class App(QMainWindow):
         # test if the button is a left click and if the coordinates
         # chosen by the user click is inside of the current matplotlib plot
         # which is given by self.m.ax
-        if event.button == 1 and (event.xdata != None and event.ydata != None) and self.m.ax == event.inaxes:
+        if (event.button == 1 
+            and (event.xdata != None and event.ydata != None) 
+            and self.m.ax == event.inaxes):
             newx = int(event.xdata)
             newy = int(event.ydata)
             
@@ -1401,22 +1390,10 @@ class App(QMainWindow):
                     # updates the plot to see the modification.
                     self.m.updatedata()
                     
-                   # if the button to show cell values is checked, then it
-                   # replots the cell values
-                    if self.button_showval.isChecked():
-                        self.m.ShowCellNumbersCurr()
-                        self.m.ShowCellNumbersNext()
-                        self.m.ShowCellNumbersPrev()
-
-        # enables the button again
         self.Enable(self.button_changecellvalue)
-        
-        # clears the message in the status bar
         self.statusBar.clearMessage()
-                
-        # the button is a checkable and it has to be unchecked else it seems
-        # that the button is still in use, because it gets a blue color.
         self.button_changecellvalue.setChecked(False)
+        self.m.ShowCellNumbers()
         
         
     def DialogBoxECV(self, s):
@@ -1439,15 +1416,8 @@ class App(QMainWindow):
                 
                 # calls the function which does the swap
                 self.m.ExchangeCellValue(value1,value2)
+                self.m.ShowCellNumbers()
                 
-                # if the button to display the values of the cell is checked,
-                # the values are again displayed on the graph after the swap
-                # of cells.
-                if self.button_showval.isChecked():
-                    self.m.ShowCellNumbersCurr()
-                    self.m.ShowCellNumbersNext()
-                    self.m.ShowCellNumbersPrev()
-
         else:
             return
 
@@ -1482,6 +1452,7 @@ class App(QMainWindow):
             cursor = QtGui.QCursor(pixmap, 1,1)
             QApplication.setOverrideCursor(cursor)
         
+        
         elif self.button_eraser.isChecked():
             self.statusBar.showMessage('Erasing by setting the values to 0...')
             self.Disable(self.button_eraser)
@@ -1505,10 +1476,6 @@ class App(QMainWindow):
             self.Enable(self.button_drawmouse)
             self.Enable(self.button_eraser)
             
-            if self.button_showval.isChecked():
-                self.m.ShowCellNumbersCurr()
-                self.m.ShowCellNumbersNext()
-                self.m.ShowCellNumbersPrev()
             self.statusBar.clearMessage()
             
             
@@ -1570,15 +1537,11 @@ class App(QMainWindow):
             else:
                 self.m.updatedata()
             self.Enable(self.button_newcell)
-            if self.button_showval.isChecked():
-                self.m.ShowCellNumbersCurr()
-                self.m.ShowCellNumbersNext()
-                self.m.ShowCellNumbersPrev()
+            self.m.ShowCellNumbers()
             self.statusBar.clearMessage()
             
             
     def TestSelectedPoints(self):
-        
         """This function is just used to catch an exception, when the new cell
         or the add region function is called. If all the dots drawn by the user
         are located on one line (horizontal or vertical) the DrawRegion 
@@ -1638,15 +1601,13 @@ class App(QMainWindow):
             else:
                 self.m.updatedata()
             self.Enable(self.button_add_region)
-            
-            if self.button_showval.isChecked():
-                self.m.ShowCellNumbersCurr()
-                self.m.ShowCellNumbersNext()
-                self.m.ShowCellNumbersPrev()
-                
+            self.m.ShowCellNumbers()
             self.statusBar.clearMessage()
             
             
+# -----------------------------------------------------------------------------
+# BUTTON ENABLE / DISABLE
+    
     def Enable(self, button):
          """
          this functions turns on buttons all the buttons, depending on the time
@@ -1680,7 +1641,12 @@ class App(QMainWindow):
          argument.
          """
          flag = False
-         if button == self.button_add_region or button == self.button_newcell or button == self.button_exval or button == self.button_changecellvalue or button == self.button_drawmouse or button == self.button_eraser:
+         if (button == self.button_add_region 
+             or button == self.button_newcell 
+             or button == self.button_exval 
+             or button == self.button_changecellvalue 
+             or button == self.button_drawmouse 
+             or button == self.button_eraser):
              if self.button_segment.isChecked():
                  flag = True
 
@@ -1866,6 +1832,7 @@ class PlotCanvas(FigureCanvas):
         """
         if self.ax == event.inaxes:
             self.storebrushclicks[0] = [False, False]
+            self.ShowCellNumbers()S
         
         
     def OneClick(self, event):
@@ -1874,13 +1841,18 @@ class PlotCanvas(FigureCanvas):
         a square if the click is a left click. (so if the user does just left
         click but does not drag, there will be only a square which is drawn )
         """
-        if event.button == 3 and (event.xdata != None and event.ydata != None) and (not self.button_eraser_check.isChecked()) and self.ax == event.inaxes:
+        if (event.button == 3 
+            and (event.xdata != None and event.ydata != None) 
+            and (not self.button_eraser_check.isChecked()) 
+            and self.ax == event.inaxes):
             tempx = int(event.xdata)
             tempy = int(event.ydata)
             self.cellval = self.plotmask[tempy, tempx]
             self.storebrushclicks[0] = [False, False]
             
-        elif event.button == 1 and (event.xdata != None and event.ydata != None) and self.ax == event.inaxes:
+        elif (event.button == 1 and 
+              (event.xdata != None and event.ydata != None) 
+              and self.ax == event.inaxes):
             tempx = int(event.xdata)
             tempy = int(event.ydata)
             self.plotmask[tempy:tempy+3, tempx:tempx+3] = self.cellval
@@ -1898,7 +1870,9 @@ class PlotCanvas(FigureCanvas):
         So, in order to not only draw points (happens when the mouse is dragged
         too quickly), these points are interpolated here with lines.
         """
-        if event.button == 1 and (event.xdata != None and event.ydata != None) and self.ax == event.inaxes:
+        if (event.button == 1 
+            and (event.xdata != None and event.ydata != None) 
+            and self.ax == event.inaxes):
             newx = int(event.xdata)
             newy = int(event.ydata)
             # when a new cell value is set, there is no point to interpolate, to
@@ -1950,7 +1924,9 @@ class PlotCanvas(FigureCanvas):
         to the self.cellval value.
         """
         # button == 1 corresponds to the left click. 
-        if event.button == 1 and (event.xdata != None and event.ydata != None) and self.ax == event.inaxes:
+        if (event.button == 1 
+            and (event.xdata != None and event.ydata != None) 
+            and self.ax == event.inaxes):
             
             # extract the coordinate of the click inside of the matplotlib figure
             # and then takes the integer part
@@ -1995,43 +1971,82 @@ class PlotCanvas(FigureCanvas):
        ax.axis("off")
 
        self.draw()
-       return ax.imshow(picture, interpolation= 'None', origin = 'upper', cmap = 'gray_r'), ax.imshow((mask%10+1)*(mask != 0), origin = 'upper', interpolation = 'None', alpha = 0.2, cmap = newcmp)
+       return (ax.imshow(picture, interpolation= 'None', 
+                         origin = 'upper', cmap = 'gray_r'), 
+               ax.imshow((mask%10+1)*(mask != 0), origin = 'upper', 
+                         interpolation = 'None', alpha = 0.2, cmap = newcmp))
    
     
-    def UpdateBckgrndPicture(self):
-        """this function can be called to redraw all the pictures and the mask,
-        so it is called whenever a time index is entered by the user and
-        the corresponding pictures and masks are updated. And then they are
-        drawn here. 
-        When the user changes time frame using the next or previous time frame
-        buttons, it is also this function which is called.
-        When the user changes the field of view, it is also
-        this function which finally draws all the plots.
-        """        
+    def UpdatePlots(self):
+        """
+        Updates plots, handles mask and cell numbers.
+        """
+        
+        # Plot images
         self.currplot.set_data(self.currpicture)
         self.currplot.set_clim(np.amin(self.currpicture), np.amax(self.currpicture))
-        self.currmask.set_data((self.plotmask%10+1)*(self.plotmask!=0))
         self.ax.draw_artist(self.currplot)
-        self.ax.draw_artist(self.currmask)
         
         self.previousplot.set_data(self.prevpicture)
         self.previousplot.set_clim(np.amin(self.prevpicture), np.amax(self.prevpicture))
-        self.previousmask.set_data((self.prevplotmask%10+1)*(self.prevplotmask != 0))
-        
         self.ax2.draw_artist(self.previousplot)
-        self.ax2.draw_artist(self.previousmask)
-        
+            
         self.nextplot.set_data(self.nextpicture)
         self.nextplot.set_clim(np.amin(self.nextpicture), np.amax(self.nextpicture))
-        self.nextmask.set_data((self.nextplotmask % 10 +1 )*(self.nextplotmask != 0))
         self.ax3.draw_artist(self.nextplot)
-        self.ax3.draw_artist(self.nextmask)
         
+        # Plot masks
+        if not self.button_hidemask_check.isChecked():
+            self.currmask.set_data((self.plotmask%10+1)*(self.plotmask!=0))
+            self.ax.draw_artist(self.currmask)
+        
+            self.previousmask.set_data((self.prevplotmask%10+1)*(self.prevplotmask != 0))
+            self.ax2.draw_artist(self.previousmask)
+        
+            self.nextmask.set_data((self.nextplotmask % 10 +1 )*(self.nextplotmask != 0))
+            self.ax3.draw_artist(self.nextmask)
+        
+        # Plot cell numbers
+        self.ShowCellNumbers()
+            
         self.update()
         self.flush_events()
         
+    
+#    def UpdateBckgrndPicture(self):
+#        """this function can be called to redraw all the pictures and the mask,
+#        so it is called whenever a time index is entered by the user and
+#        the corresponding pictures and masks are updated. And then they are
+#        drawn here. 
+#        When the user changes time frame using the next or previous time frame
+#        buttons, it is also this function which is called.
+#        When the user changes the field of view, it is also
+#        this function which finally draws all the plots.
+#        """        
+#        self.currplot.set_data(self.currpicture)
+#        self.currplot.set_clim(np.amin(self.currpicture), np.amax(self.currpicture))
+#        self.currmask.set_data((self.plotmask%10+1)*(self.plotmask!=0))
+#        self.ax.draw_artist(self.currplot)
+#        self.ax.draw_artist(self.currmask)
+#        
+#        self.previousplot.set_data(self.prevpicture)
+#        self.previousplot.set_clim(np.amin(self.prevpicture), np.amax(self.prevpicture))
+#        self.previousmask.set_data((self.prevplotmask%10+1)*(self.prevplotmask != 0))
+#        
+#        self.ax2.draw_artist(self.previousplot)
+#        self.ax2.draw_artist(self.previousmask)
+#        
+#        self.nextplot.set_data(self.nextpicture)
+#        self.nextplot.set_clim(np.amin(self.nextpicture), np.amax(self.nextpicture))
+#        self.nextmask.set_data((self.nextplotmask % 10 +1 )*(self.nextplotmask != 0))
+#        self.ax3.draw_artist(self.nextplot)
+#        self.ax3.draw_artist(self.nextmask)
+#        
+#        self.update()
+#        self.flush_events()
         
-    def updatedata(self, flag = True):
+        
+    def updatedata(self, flag=True):
        """
        In order to just display the cells so regions with value > 0
        and also to assign to each of the cell values one color,
@@ -2043,7 +2058,7 @@ class PlotCanvas(FigureCanvas):
        """
        if flag:
            self.currmask.set_data((self.plotmask%10+1)*(self.plotmask!=0))
-       else :
+       else:
            self.currmask.set_data((self.tempmask%10+1)*(self.tempmask!=0))
        
        # show the updates by redrawing the array using draw_artist, it is faster 
@@ -2052,36 +2067,19 @@ class PlotCanvas(FigureCanvas):
        self.ax.draw_artist(self.currmask)
        self.update()
        self.flush_events()
-       
-       
-    def Update3Plots(self):
-        """This function is just used to draw the update the masks on
-        the three subplots. It is only used by the Hidemask function. 
-        To "show" the masks again when the button is unchecked.
-        """
-        self.ax.draw_artist(self.currplot)
-        self.ax.draw_artist(self.currmask)
-        
-        self.ax2.draw_artist(self.previousplot)
-        self.ax2.draw_artist(self.previousmask)
-        
-        self.ax3.draw_artist(self.nextplot)
-        self.ax3.draw_artist(self.nextmask)
-        
-        self.update()
-        self.flush_events()
-       
+              
         
     def HideMask(self):
-        if self.button_hidemask_check.isChecked():
-            self.ax.draw_artist(self.currplot)
-            self.ax2.draw_artist(self.previousplot)
-            self.ax3.draw_artist(self.nextplot)
-            self.update()
-            self.flush_events()
-            
-        else:
-            self.Update3Plots()
+        self.UpdatePlots()
+#        if self.button_hidemask_check.isChecked():
+#            self.ax.draw_artist(self.currplot)
+#            self.ax2.draw_artist(self.previousplot)
+#            self.ax3.draw_artist(self.nextplot)
+#            self.update()
+#            self.flush_events()
+#            
+#        else:
+#            self.UpdatePlots()
         
                  
     def _getCellCenters(self, plotmask):
@@ -2099,7 +2097,16 @@ class PlotCanvas(FigureCanvas):
             ytemp.append(int(round(meany)))
         return vals, xtemp, ytemp
 
-       
+    
+    def ShowCellNumbers(self):
+        """Checks whether to show cell numbers, and does so if button is 
+        checked"""
+        if self.button_showval_check.isChecked():
+            self.ShowCellNumbersCurr()
+            self.ShowCellNumbersNext()
+            self.ShowCellNumbersPrev()
+        
+    
     def ShowCellNumbersCurr(self):
          """This function is called to display the cell values and it 
          takes 10 random points inside of the cell, computes the mean of these
@@ -2123,11 +2130,11 @@ class PlotCanvas(FigureCanvas):
                      
              self.draw()
              
-         else:
-             for i,a in enumerate(self.ann_list):
-                 a.remove()
-             self.ann_list[:] = []
-             self.updatedata()
+#         else:
+#             for i,a in enumerate(self.ann_list):
+#                 a.remove()
+#             self.ann_list[:] = []
+#             self.updatedata()
                      
              
     def ShowCellNumbersPrev(self):
@@ -2152,17 +2159,17 @@ class PlotCanvas(FigureCanvas):
                       self.ann_list_prev.append(ann)
              self.draw()
              
-         else:
-             for i,a in enumerate(self.ann_list_prev):
-                 a.remove()
-             self.ann_list_prev[:] = []
-
-             self.previousmask.set_data((self.prevplotmask%10+1)*(self.prevplotmask!=0))
-
-             self.ax2.draw_artist(self.previousplot)
-             self.ax2.draw_artist(self.previousmask)
-             self.update()
-             self.flush_events()
+#         else:
+#             for i,a in enumerate(self.ann_list_prev):
+#                 a.remove()
+#             self.ann_list_prev[:] = []
+#
+#             self.previousmask.set_data((self.prevplotmask%10+1)*(self.prevplotmask!=0))
+#
+#             self.ax2.draw_artist(self.previousplot)
+#             self.ax2.draw_artist(self.previousmask)
+#             self.update()
+#             self.flush_events()
              
              
     def ShowCellNumbersNext(self):
@@ -2173,7 +2180,6 @@ class PlotCanvas(FigureCanvas):
          in the mask of the cell.
          This function is just used for the next time subplot.
          """
-        
          for i,a in enumerate(self.ann_list_next):
              a.remove()
          self.ann_list_next[:] = []
@@ -2187,16 +2193,16 @@ class PlotCanvas(FigureCanvas):
                      self.ann_list_next.append(ann)
              self.draw()
              
-         else:
-             for i,a in enumerate(self.ann_list_next):
-                 a.remove()
-             self.ann_list_next[:] = []
-             
-             self.nextmask.set_data((self.nextplotmask%10+1)*(self.nextplotmask!=0))
-             self.ax3.draw_artist(self.nextplot)
-             self.ax3.draw_artist(self.nextmask)
-             self.update()
-             self.flush_events()
+#         else:
+#             for i,a in enumerate(self.ann_list_next):
+#                 a.remove()
+#             self.ann_list_next[:] = []
+#             
+#             self.nextmask.set_data((self.nextplotmask%10+1)*(self.nextplotmask!=0))
+#             self.ax3.draw_artist(self.nextplot)
+#             self.ax3.draw_artist(self.nextmask)
+#             self.update()
+#             self.flush_events()
         
         
     def updateplot(self, posx, posy):
@@ -2214,7 +2220,8 @@ class PlotCanvas(FigureCanvas):
         self.cellval = self.plotmask[ytemp, xtemp]
           
         # drawing the 2x2 square ot of the mouse click
-        if (self.button_newcell_check.isChecked() or self.button_drawmouse_check.isChecked()) and self.cellval == 0:
+        if ((self.button_newcell_check.isChecked() or self.button_drawmouse_check.isChecked()) 
+            and self.cellval == 0):
             self.tempmask[posy:posy+2, posx:posx+2] = 9
         else:
             self.tempmask[posy:posy+2,posx:posx+2] = self.cellval
