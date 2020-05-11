@@ -1285,49 +1285,37 @@ class App(QMainWindow):
         # If the button "Previous time frame" is pressed, this function is called
         self.statusBar.showMessage('Loading the previous frame...')
         self.Disable(self.button_previousframe)
-        if self.Tindex == 1:
-            
-            self.reader.SaveMask(self.Tindex, self.FOVindex, self.m.plotmask)
+        
+        self.reader.SaveMask(self.Tindex, self.FOVindex, self.m.plotmask)
 
-            self.m.nextpicture = self.m.currpicture.copy()
-            self.m.nextplotmask = self.m.plotmask.copy()
+        self.m.nextpicture = self.m.currpicture.copy()
+        self.m.nextplotmask = self.m.plotmask.copy()
+        self.m.currpicture = self.m.prevpicture.copy()
+        self.m.plotmask = self.m.prevplotmask.copy()
             
-            self.m.currpicture = self.m.prevpicture.copy()
-            self.m.plotmask = self.m.prevplotmask.copy()
-            
+        if self.Tindex == 1:
             self.m.prevpicture = np.zeros([self.reader.sizey, self.reader.sizex], dtype = np.uint16)
             self.m.prevplotmask = np.zeros([self.reader.sizey, self.reader.sizex], dtype = np.uint16)
-
-            self.m.UpdateBckgrndPicture()
-            
             self.button_previousframe.setEnabled(False)
             
         else:
-            self.reader.SaveMask(self.Tindex, self.FOVindex, self.m.plotmask)
-            
-            self.m.nextpicture = self.m.currpicture.copy()
-            self.m.nextplotmask = self.m.plotmask.copy()
-            
-            self.m.currpicture = self.m.prevpicture.copy()
-            self.m.plotmask = self.m.prevplotmask.copy()
-
             self.m.prevpicture = self.reader.LoadOneImage(self.Tindex-2, self.FOVindex)
             self.m.prevplotmask = self.reader.LoadMask(self.Tindex-2, self.FOVindex)
-            
-            self.m.UpdateBckgrndPicture()
-            if self.Tindex-1 == self.reader.sizet-2:
-                self.button_nextframe.setEnabled(True)
+
+        self.m.UpdateBckgrndPicture()
+        if self.Tindex-1 == self.reader.sizet-2:
+            self.button_nextframe.setEnabled(True)            
             
         if self.button_showval.isChecked():
             self.m.ShowCellNumbersCurr()
             self.m.ShowCellNumbersNext()
             self.m.ShowCellNumbersPrev()
-            
-        self.Tindex = self.Tindex-1
-        self.UpdateTitleSubplots()
-
+        
         if self.button_hidemask.isChecked():
             self.m.HideMask()
+        
+        self.Tindex -= 1
+        self.UpdateTitleSubplots()
             
         self.Enable(self.button_previousframe)
         
@@ -1545,6 +1533,7 @@ class App(QMainWindow):
             self.m.titleprev.set_text('Previous time index {}'.format(self.Tindex-1))
             self.m.titlenext.set_text('Next time index {}'.format(self.Tindex+1))
             self.m.draw()
+        
         
     def ClickNewCell(self):
         """ 
@@ -2094,6 +2083,22 @@ class PlotCanvas(FigureCanvas):
         else:
             self.Update3Plots()
         
+                 
+    def _getCellCenters(self, plotmask):
+        """Get approximate locations for cell centers"""
+        vals = np.unique(plotmask).astype(int)
+        vals = np.delete(vals,np.where(vals==0)) 
+        xtemp = []
+        ytemp = []
+        for k in vals:
+            y,x = (plotmask==k).nonzero()
+            sample = np.random.choice(len(x), size=20, replace=True)
+            meanx = np.mean(x[sample])
+            meany = np.mean(y[sample])
+            xtemp.append(int(round(meanx)))
+            ytemp.append(int(round(meany)))
+        return vals, xtemp, ytemp
+
        
     def ShowCellNumbersCurr(self):
          """This function is called to display the cell values and it 
@@ -2105,28 +2110,17 @@ class PlotCanvas(FigureCanvas):
          """         
          
          for i,a in enumerate(self.ann_list):
-                 a.remove()
+             a.remove()
          self.ann_list[:] = []
 
          if self.button_showval_check.isChecked():
-             vals = np.unique(self.plotmask)
-             vals = np.delete(vals,np.where(vals==0)) #SJR: for some reason are floats and contains background (0)
-             xtemp = []
-             ytemp = []
-             val = []
-             for k in vals:
-                 y,x = (self.plotmask==k).nonzero() # this was wrong x,y I believe
-                 sample = np.random.choice(len(x), size=20, replace=True)
-                 meanx = np.mean(x[sample])
-                 meany = np.mean(y[sample])
-                 xtemp.append(int(round(meanx)))
-                 ytemp.append(int(round(meany)))
-                 val.append(k)
+             vals, xtemp, ytemp = self._getCellCenters(self.plotmask)
          
              if xtemp:
                  for i in range(0,len(xtemp)):
-                      ann = self.ax.annotate(str(int(val[i])), (xtemp[i], ytemp[i]))
-                      self.ann_list.append(ann)
+                     ann = self.ax.annotate(str(int(vals[i])), (xtemp[i], ytemp[i]))
+                     self.ann_list.append(ann)
+                     
              self.draw()
              
          else:
@@ -2134,7 +2128,7 @@ class PlotCanvas(FigureCanvas):
                  a.remove()
              self.ann_list[:] = []
              self.updatedata()
-             
+                     
              
     def ShowCellNumbersPrev(self):
          """This function is called to display the cell values and it 
@@ -2146,29 +2140,15 @@ class PlotCanvas(FigureCanvas):
          """
          
          for i,a in enumerate(self.ann_list_prev):
-                 a.remove()
+             a.remove()
          self.ann_list_prev[:] = []
          
          if self.button_showval_check.isChecked():
-             maxval = int(np.amax(self.prevplotmask))
-             minval =  1
-             xtemp = []
-             ytemp = []
-             val = []
-             
-             for k in range(minval,maxval + 1):
-                 if k in self.prevplotmask:
-                     indices = np.where(self.prevplotmask == k)
-                     sampley = random.choices(list(indices[0]), k = 10)
-                     samplex = random.choices(list(indices[1]), k = 10)
-                     meanx = np.mean(samplex)
-                     meany = np.mean(sampley)
-                     xtemp.append(int(round(meanx)))
-                     ytemp.append(int(round(meany)))
-                     val.append(k)
+             vals, xtemp, ytemp = self._getCellCenters(self.prevplotmask)
+         
              if xtemp:
                  for i in range(0,len(xtemp)):
-                      ann = self.ax2.annotate(str(val[i]), (xtemp[i], ytemp[i]))
+                      ann = self.ax2.annotate(str(vals[i]), (xtemp[i], ytemp[i]))
                       self.ann_list_prev.append(ann)
              self.draw()
              
@@ -2195,30 +2175,16 @@ class PlotCanvas(FigureCanvas):
          """
         
          for i,a in enumerate(self.ann_list_next):
-                 a.remove()
+             a.remove()
          self.ann_list_next[:] = []
                      
          if self.button_showval_check.isChecked():
-             maxval = int(np.amax(self.nextplotmask))
-             minval =  1
-             xtemp = []
-             ytemp = []
-             val = []
-             for k in range(minval,maxval + 1):
-                 if k in self.nextplotmask:
-                     indices = np.where(self.nextplotmask == k)
-                     sampley = random.choices(list(indices[0]), k = 10)
-                     samplex = random.choices(list(indices[1]), k = 10)
-                     meanx = np.mean(samplex)
-                     meany = np.mean(sampley)
-                     xtemp.append(int(round(meanx)))
-                     ytemp.append(int(round(meany)))
-                     val.append(k)
+             vals, xtemp, ytemp = self._getCellCenters(self.nextplotmask)
                      
              if xtemp:
                  for i in range(0,len(xtemp)):
-                      ann = self.ax3.annotate(str(val[i]), (xtemp[i], ytemp[i]))
-                      self.ann_list_next.append(ann)
+                     ann = self.ax3.annotate(str(vals[i]), (xtemp[i], ytemp[i]))
+                     self.ann_list_next.append(ann)
              self.draw()
              
          else:
