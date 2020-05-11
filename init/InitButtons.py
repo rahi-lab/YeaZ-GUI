@@ -79,6 +79,7 @@ def Init(parent):
     parent.button_home.setStyleSheet("border: 0px" "QPushButton:hover { background-color: blue }" )
     parent.button_home.setShortcut("H")
     parent.button_home.setToolTip("Use H Key for shortcut")
+    parent.button_home.setStatusTip('Reset Zoom')
     parent.buttonlist.append(parent.button_home)
     
     # PREVIOUS SCALE (ZOOM SCALE)
@@ -88,6 +89,7 @@ def Init(parent):
     parent.button_back.setMaximumWidth(30)
     parent.button_back.setMaximumHeight(30)
     parent.button_back.setStyleSheet("border: 0px" "QPushButton:hover { background-color: blue }" )
+    parent.button_back.setStatusTip('Go back to previous zoom scale')
     parent.buttonlist.append(parent.button_back)
     
     # NEXT SCALE (ZOOM SCALE)
@@ -97,6 +99,7 @@ def Init(parent):
     parent.button_forward.setMaximumWidth(30)
     parent.button_forward.setMaximumHeight(30)
     parent.button_forward.setStyleSheet("border: 0px" "QPushButton:hover { background-color: blue }" )
+    parent.button_back.setStatusTip('Go to next zoom scale')
     parent.buttonlist.append(parent.button_forward)
     
     # PAN 
@@ -109,6 +112,7 @@ def Init(parent):
     parent.button_pan.setCheckable(True)
     parent.button_pan.setShortcut("P")
     parent.button_pan.setToolTip("Use P Key for shortcut")
+    parent.button_pan.setStatusTip('Pan')
     parent.buttonlist.append(parent.button_pan)
     
     # SAVE
