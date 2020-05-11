@@ -6,15 +6,14 @@ Created on Sat Dec 21 18:54:10 2019
 """
 import os
 
-from model import *
-from data import *
+from model import unet
+import data
 #from quality_measures import *
-from segment import *
-from data_processing import *
+#from segment import *
+#from data_processing import *
 
 import numpy as np
 import skimage
-from skimage import io
 
 
 def create_directory_if_not_exists(path):
@@ -62,19 +61,14 @@ def prediction(im):
     path_test = './tmp/test/image/'
     create_directory_if_not_exists(path_test)
 
-#    io.imsave(path_test+'0.png',im)
-    # TESTING SET
-#    img_num, resized_shape, original_shape = generate_test_set(im,path_test)
-
     # WHOLE CELL PREDICTION
-    testGene = testGenerator(path_test,
-                             1,
-                             target_size = (2048,2048) )
+    testGene = data.testGenerator(path_test,
+                                  1,
+                                  target_size = (2048,2048))
 
     model = unet(pretrained_weights = None,
                  input_size = (2048,2048,1))
 
-#    model.load_weights('unet/unet_weights_batchsize_25_Nepochs_100_full.hdf5')
     model.load_weights('unet/unet_weights_batchsize_25_Nepochs_100_SJR0_10.hdf5')
 
     results = model.predict_generator(testGene,
