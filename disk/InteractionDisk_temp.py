@@ -7,33 +7,26 @@ This program reads out the images from the nd2 file and creates or
 reads the hdf file containing the segmentation.
 """
 from nd2reader import ND2Reader
-#import matplotlib.pyplot as plt
 import numpy as np
 import re
 import h5py
 import os.path
 import skimage
 import skimage.io
-#import segment as seg
 import neural_network as nn
 import pytiff
-
-
 import hungarian as hu
-# import CellCorrespondance as cc
-# import matplotlib.pyplot as plt
 
 
 class Reader:
     
+    
     def __init__(self, hdfpathname, newhdfname, nd2pathname):
-
         """
         Initializes the data corresponding to the sizes of the pictures,
         the number of different fields of views(Npos) taken in the experiment.
         And it also sets the number of time frames per field of view.
         """
-        
         # Identify filetype of image file
         _, self.extension = os.path.splitext(nd2pathname)
         self.isnd2 = self.extension == '.nd2'
@@ -107,14 +100,13 @@ class Reader:
                     
         # create an new hfd5 file if no one existing already
         self.Inithdf()
-        
+
 
         
     def InitLabels(self):
         """Create two lists containing all the possible fields of view and time
         labels, in order to access the arrays in the hdf5 file.
         """
-        
         for i in range(0, self.Npos):
             self.fovlabels.append('FOV' + str(i))
         
@@ -122,17 +114,12 @@ class Reader:
             self.tlabels.append('T'+ str(j))
     
     
-    
     def Inithdf(self):
         """If the file already exists then it is loaded else 
         a new hdf5 file is created and for every fields of view
         a new group is created in the createhdf method
         """
-        
         newFileExists = os.path.isfile(self.newhdfpath)
-        print(newFileExists)
-        print(self.newhdfpath)
-        print(self.hdfpath)
         if not self.hdfpath and not newFileExists:            
             return self.Createhdf()
              
@@ -147,13 +134,14 @@ class Reader:
                 self.thresholdname = temp + '_thresholded' + '.h5'
                 self.segmentname = temp + '_segmented' + '.h5'
                 self.predictname = temp + '_predicted' + '.h5'
-            #SJR: Mask is a tiff file
+                
             elif extension == '.tiff' or extension == '.tif':
                 #SJR: Careful, self.hdfpath is a tif file
                 im = skimage.io.imread(self.hdfpath)
-                print('Inithdf',im.shape)
                 imdims = im.shape
-                if len(imdims) == 3 and imdims[2] < imdims[0] and imdims[2] < imdims[1]:  # num pages should be smaller than x or y dimension, very unlikely not to be the case
+                
+                # num pages should be smaller than x or y dimension, very unlikely not to be the case
+                if len(imdims) == 3 and imdims[2] < imdims[0] and imdims[2] < imdims[1]:  
                     im = np.moveaxis(im, -1, 0) # move last axis to first
 
                 with h5py.File(filenamewithpath + '.h5', 'w') as hf:
@@ -167,7 +155,6 @@ class Reader:
                             hf.create_dataset('/FOV0/T{}'.format(i), 
                                               data = im[i,:,:], compression = 'gzip')
 
-                #SJR addition:
                 self.thresholdname = filenamewithpath + '_thresholded' + '.h5'
                 hf = h5py.File(self.thresholdname,'w')
                 hf.create_group('FOV0')
@@ -184,10 +171,6 @@ class Reader:
                 hf.close()
 
                 self.hdfpath = filenamewithpath + '.h5'
-
-
-
-
             
             
     def Createhdf(self):
@@ -199,12 +182,7 @@ class Reader:
                     
         self.hdfpath = self.newhdfpath
         
-        templist = self.nd2path.split('/')
-#        for k in range(0, len(templist)-1):
-#            self.hdfpath = self.hdfpath+templist[k]+'/'
-        
-#        self.hdfpath = self.hdfpath + self.newhdfname + '.h5'
-        
+        templist = self.nd2path.split('/')        
         hf = h5py.File(self.hdfpath, 'w')
         
         for i in range(0, self.Npos):
@@ -269,9 +247,6 @@ class Reader:
             return mask
         
         else:
-            
-#            change with Matthias code!
-            
             zeroarray = np.zeros([self.sizey, self.sizex],dtype = np.uint16)
             file.create_dataset('/{}/{}'.format(self.fovlabels[currentFOV], self.tlabels[currentT]), data = zeroarray, compression = 'gzip')
             file.close()
@@ -292,7 +267,6 @@ class Reader:
             return False
         else:
             return False
-    
 
             
     def SaveMask(self, currentT, currentFOV, mask):
@@ -370,7 +344,8 @@ class Reader:
             return True
         if currentT == self.sizet - 1 and currentfov < self.Npos:
             return False
-#    
+
+
     def LoadOneImage(self,currentT, currentfov):
         """This method returns from the nd2 file, the picture requested by the 
         main program as an array. It fixes the fov index and iterates over the 
@@ -405,7 +380,6 @@ class Reader:
             
         # be careful here, the output is converted to 16, not sure it's a good idea.
         outputarray = np.array(im, dtype = np.uint16)
-        print("Time point", currentT, ". Image properties: ", np.mean(outputarray), " (mean), ", np.std(outputarray), " (std), ", np.median(outputarray), " (median).")
         return outputarray
 
             
@@ -414,74 +388,70 @@ class Reader:
         file = h5py.File(self.segmentname, 'r+')
         
         if self.TestTimeExist(currentT,currentFOV,file):
-            mask = np.array(file['/{}/{}'.format(self.fovlabels[currentFOV], self.tlabels[currentT])], dtype = np.uint16)
+            mask = np.array(file['/{}/{}'.format(self.fovlabels[currentFOV], 
+                                                 self.tlabels[currentT])], 
+                            dtype = np.uint16)
             file.close()
             return mask
             
         else:
 
             zeroarray = np.zeros([self.sizey, self.sizex],dtype = np.uint16)
-            file.create_dataset('/{}/{}'.format(self.fovlabels[currentFOV], self.tlabels[currentT]), data = zeroarray, compression = 'gzip', compression_opts = 7)
+            file.create_dataset('/{}/{}'.format(self.fovlabels[currentFOV], 
+                                                self.tlabels[currentT]), 
+                                data = zeroarray, compression = 'gzip', 
+                                compression_opts = 7)
             file.close()
             return zeroarray
         
-    
         
     def LoadThreshold(self, currentT, currentFOV):
-        
-        
         file = h5py.File(self.thresholdname, 'r+')
         
         if self.TestTimeExist(currentT,currentFOV,file):
-
-            mask = np.array(file['/{}/{}'.format(self.fovlabels[currentFOV], self.tlabels[currentT])], dtype = np.uint16)
-            file.close()
-            
+            mask = np.array(file['/{}/{}'.format(self.fovlabels[currentFOV], 
+                                                 self.tlabels[currentT])], 
+                            dtype = np.uint16)
+            file.close()            
             return mask
         
-        
         else:
-
             zeroarray = np.zeros([self.sizey, self.sizex],dtype = np.uint16)
-            file.create_dataset('/{}/{}'.format(self.fovlabels[currentFOV], self.tlabels[currentT]), data = zeroarray, compression = 'gzip', compression_opts = 7)
-
+            file.create_dataset('/{}/{}'.format(self.fovlabels[currentFOV], 
+                                                self.tlabels[currentT]), 
+                                data = zeroarray, compression = 'gzip', 
+                                compression_opts = 7)
             file.close()
             return zeroarray
      
+        
     def Segment(self, segparamvalue, currentT, currentFOV):
-        print(segparamvalue)
-
-#        Check if thresholded version exists
+        # Check if thresholded version exists
         filethr = h5py.File(self.thresholdname, 'r+')
-        fileprediction = h5py.File(self.predictname,'r+')	# SJR: added to read out the prediction as well
+        fileprediction = h5py.File(self.predictname,'r+')
+        
+        if (self.TestTimeExist(currentT, currentFOV, filethr) 
+            and self.TestTimeExist(currentT, currentFOV, fileprediction)):
 
-#        if self.TestTimeExist(currentT, currentFOV, filethr):
-        if self.TestTimeExist(currentT, currentFOV, filethr) and self.TestTimeExist(currentT, currentFOV, fileprediction):	# SJR: added to read out the prediction as well
-
-            tmpthrmask = np.array(filethr['/{}/{}'.format(self.fovlabels[currentFOV], self.tlabels[currentT])])
-            pred = np.array(fileprediction['/{}/{}'.format(self.fovlabels[currentFOV], self.tlabels[currentT])])	# SJR: added to read out the prediction as well
-            fileprediction.close()	# SJR: added to read out the prediction as well
-
-#            segmentedmask = nn.segment(tmpthrmask, segparamvalue)
+            tmpthrmask = np.array(filethr['/{}/{}'.format(self.fovlabels[currentFOV], 
+                                                          self.tlabels[currentT])])
+            pred = np.array(fileprediction['/{}/{}'.format(self.fovlabels[currentFOV], self.tlabels[currentT])])	
+            fileprediction.close()
             segmentedmask = nn.segment(tmpthrmask, pred, segparamvalue)	# SJR: added to read out the prediction as well
             filethr.close()
-
             return segmentedmask
 
         else:
-
             filethr.close()
             return np.zeros([self.sizey,self.sizex], dtype = np.uint16)
 
         
-        
-    def ThresholdPred(self, thvalue, currentT, currentFOV):
-        print(thvalue)
-        
+    def ThresholdPred(self, thvalue, currentT, currentFOV):        
         fileprediction = h5py.File(self.predictname,'r+')
         if self.TestTimeExist(currentT, currentFOV, fileprediction):
             
-            pred = np.array(fileprediction['/{}/{}'.format(self.fovlabels[currentFOV], self.tlabels[currentT])])
+            pred = np.array(fileprediction['/{}/{}'.format(self.fovlabels[currentFOV], 
+                                                           self.tlabels[currentT])])
             fileprediction.close()
             if thvalue == None:
                 thresholdedmask = nn.threshold(pred)
@@ -493,10 +463,8 @@ class Reader:
             fileprediction.close()
             return np.zeros([self.sizey, self.sizex], dtype = np.uint16)
         
-        
     
     def TestPredExisting(self, currentT, currentFOV):
-        
         file = h5py.File(self.predictname, 'r+')
         if self.TestTimeExist(currentT, currentFOV, file):
             file.close()
@@ -506,58 +474,33 @@ class Reader:
             return False
         
         
-        
-        
-        
     def LaunchPrediction(self, currentT, currentFOV):
         
         """It launches the neural neutwork on the current image and creates 
         an hdf file with the prediction for the time T and corresponding FOV. 
         """
 
-        file = h5py.File(self.predictname, 'r+')
-        
-        
+        file = h5py.File(self.predictname, 'r+')        
         im = self.LoadOneImage(currentT, currentFOV)
-        im = skimage.exposure.equalize_adapthist(im)    # I added this recently because this is what is done before training as well!
-
-        im = im*1.0;	# SJR: for some reason has to be float64
+        im = skimage.exposure.equalize_adapthist(im)
+        im = im*1.0;	
         pred = nn.prediction(im)
         file.create_dataset('/{}/{}'.format(self.fovlabels[currentFOV], 
                                     self.tlabels[currentT]), data = pred, compression = 'gzip', 
                                     compression_opts = 7)
         file.close()
-    
-#        if self.isnd2:
-#            with ND2Reader(self.nd2path) as images:
-#                images.default_coords['v'] = currentFOV
-#                images.default_coords['c'] = self.default_channel
-#                images.iter_axes = 't'
-#                temp = images[currentT]
-#                temp = np.array(temp, dtype = np.uint16)
-#                pred = nn.prediction(temp)
-#                file.create_dataset('/{}/{}'.format(self.fovlabels[currentFOV], 
-#                                    self.tlabels[currentT]), data = pred, compression = 'gzip', 
-#                                    compression_opts = 7)
-#        
-#        elif self.istiff:
-#            None
-        
-
-
-
+            
 
     def CellCorrespondance(self, currentT, currentFOV):
-        print('in cell Correspondance')
         filemasks = h5py.File(self.hdfpath, 'r+')
         fileseg = h5py.File(self.segmentname,'r+')
+        
         if self.TestTimeExist(currentT-1, currentFOV, filemasks):
-            
             if self.TestTimeExist(currentT, currentFOV, fileseg):
-                print('inside cellcorerspoindacefunction')
-                prevmask = np.array(filemasks['/{}/{}'.format(self.fovlabels[currentFOV], self.tlabels[currentT-1])])
-                nextmask = np.array(fileseg['/{}/{}'.format(self.fovlabels[currentFOV], self.tlabels[currentT])])             
-                # newmask = cc.CellCorrespondancePlusTheReturn(nextmask, prevmask)
+                prevmask = np.array(filemasks['/{}/{}'.format(self.fovlabels[currentFOV], 
+                                                              self.tlabels[currentT-1])])
+                nextmask = np.array(fileseg['/{}/{}'.format(self.fovlabels[currentFOV],
+                                                            self.tlabels[currentT])])             
                 newmask = hu.correspondance(prevmask, nextmask)
                 filemasks.close()
                 fileseg.close()
@@ -567,15 +510,15 @@ class Reader:
                 filemasks.close()
                 fileseg.close()
                 null = np.zeros([self.sizey, self.sizex])
-                
                 return null
-        else:
             
+        else:
             filemasks.close()
             fileseg.close()
             null = np.zeros([self.sizey, self.sizex])
             return null
                     
+        
     def LoadImageChannel(self,currentT, currentFOV, ch):
         if self.isnd2:
             with ND2Reader(self.nd2path) as images:
