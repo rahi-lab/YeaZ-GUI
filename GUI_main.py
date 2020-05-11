@@ -714,11 +714,7 @@ class App(QMainWindow):
                             tempidx = tempidx + 1
                             book.save(xlsfilename)
 
-                    
-        # Enable again all the buttons          
         self.Enable(self.button_extractfluorescence)
-        
-        # clear the message shown in the status bar
         self.statusBar.clearMessage()
 
 
@@ -1221,7 +1217,6 @@ class App(QMainWindow):
         self.Disable(self.button_nextframe)
 
         if self.Tindex + 1 < self.reader.sizet - 1 :
-            print('if')
             self.reader.SaveMask(self.Tindex, self.FOVindex, self.m.plotmask)
             
             self.m.prevpicture = self.m.currpicture.copy()
@@ -1238,7 +1233,6 @@ class App(QMainWindow):
                 self.button_previousframe.setEnabled(True)
                 
         else:
-            print('else')
             self.reader.SaveMask(self.Tindex, self.FOVindex, self.m.plotmask)
         
             self.m.prevpicture = self.m.currpicture.copy()
@@ -1476,7 +1470,7 @@ class App(QMainWindow):
             self.Enable(self.button_drawmouse)
             self.Enable(self.button_eraser)
             
-            self.statusBar.clearMessage()
+            # self.statusBar.clearMessage()
             
             
     def UpdateTitleSubplots(self):
@@ -2012,40 +2006,7 @@ class PlotCanvas(FigureCanvas):
             
         self.update()
         self.flush_events()
-        
-    
-#    def UpdateBckgrndPicture(self):
-#        """this function can be called to redraw all the pictures and the mask,
-#        so it is called whenever a time index is entered by the user and
-#        the corresponding pictures and masks are updated. And then they are
-#        drawn here. 
-#        When the user changes time frame using the next or previous time frame
-#        buttons, it is also this function which is called.
-#        When the user changes the field of view, it is also
-#        this function which finally draws all the plots.
-#        """        
-#        self.currplot.set_data(self.currpicture)
-#        self.currplot.set_clim(np.amin(self.currpicture), np.amax(self.currpicture))
-#        self.currmask.set_data((self.plotmask%10+1)*(self.plotmask!=0))
-#        self.ax.draw_artist(self.currplot)
-#        self.ax.draw_artist(self.currmask)
-#        
-#        self.previousplot.set_data(self.prevpicture)
-#        self.previousplot.set_clim(np.amin(self.prevpicture), np.amax(self.prevpicture))
-#        self.previousmask.set_data((self.prevplotmask%10+1)*(self.prevplotmask != 0))
-#        
-#        self.ax2.draw_artist(self.previousplot)
-#        self.ax2.draw_artist(self.previousmask)
-#        
-#        self.nextplot.set_data(self.nextpicture)
-#        self.nextplot.set_clim(np.amin(self.nextpicture), np.amax(self.nextpicture))
-#        self.nextmask.set_data((self.nextplotmask % 10 +1 )*(self.nextplotmask != 0))
-#        self.ax3.draw_artist(self.nextplot)
-#        self.ax3.draw_artist(self.nextmask)
-#        
-#        self.update()
-#        self.flush_events()
-        
+                
         
     def updatedata(self, flag=True):
        """
@@ -2072,15 +2033,6 @@ class PlotCanvas(FigureCanvas):
         
     def HideMask(self):
         self.UpdatePlots()
-#        if self.button_hidemask_check.isChecked():
-#            self.ax.draw_artist(self.currplot)
-#            self.ax2.draw_artist(self.previousplot)
-#            self.ax3.draw_artist(self.nextplot)
-#            self.update()
-#            self.flush_events()
-#            
-#        else:
-#            self.UpdatePlots()
         
                  
     def _getCellCenters(self, plotmask):
@@ -2121,21 +2073,14 @@ class PlotCanvas(FigureCanvas):
              a.remove()
          self.ann_list[:] = []
 
-         if self.button_showval_check.isChecked():
-             vals, xtemp, ytemp = self._getCellCenters(self.plotmask)
-         
-             if xtemp:
-                 for i in range(0,len(xtemp)):
-                     ann = self.ax.annotate(str(int(vals[i])), (xtemp[i], ytemp[i]))
-                     self.ann_list.append(ann)
-                     
-             self.draw()
-             
-#         else:
-#             for i,a in enumerate(self.ann_list):
-#                 a.remove()
-#             self.ann_list[:] = []
-#             self.updatedata()
+         vals, xtemp, ytemp = self._getCellCenters(self.plotmask)
+     
+         if xtemp:
+             for i in range(0,len(xtemp)):
+                 ann = self.ax.annotate(str(int(vals[i])), (xtemp[i], ytemp[i]))
+                 self.ann_list.append(ann)
+                 
+         self.draw()
                      
              
     def ShowCellNumbersPrev(self):
@@ -2151,26 +2096,13 @@ class PlotCanvas(FigureCanvas):
              a.remove()
          self.ann_list_prev[:] = []
          
-         if self.button_showval_check.isChecked():
-             vals, xtemp, ytemp = self._getCellCenters(self.prevplotmask)
-         
-             if xtemp:
-                 for i in range(0,len(xtemp)):
-                      ann = self.ax2.annotate(str(vals[i]), (xtemp[i], ytemp[i]))
-                      self.ann_list_prev.append(ann)
-             self.draw()
-             
-#         else:
-#             for i,a in enumerate(self.ann_list_prev):
-#                 a.remove()
-#             self.ann_list_prev[:] = []
-#
-#             self.previousmask.set_data((self.prevplotmask%10+1)*(self.prevplotmask!=0))
-#
-#             self.ax2.draw_artist(self.previousplot)
-#             self.ax2.draw_artist(self.previousmask)
-#             self.update()
-#             self.flush_events()
+         vals, xtemp, ytemp = self._getCellCenters(self.prevplotmask)
+     
+         if xtemp:
+             for i in range(0,len(xtemp)):
+                  ann = self.ax2.annotate(str(vals[i]), (xtemp[i], ytemp[i]))
+                  self.ann_list_prev.append(ann)
+         self.draw()
              
              
     def ShowCellNumbersNext(self):
@@ -2185,25 +2117,13 @@ class PlotCanvas(FigureCanvas):
              a.remove()
          self.ann_list_next[:] = []
                      
-         if self.button_showval_check.isChecked():
-             vals, xtemp, ytemp = self._getCellCenters(self.nextplotmask)
-                     
-             if xtemp:
-                 for i in range(0,len(xtemp)):
-                     ann = self.ax3.annotate(str(vals[i]), (xtemp[i], ytemp[i]))
-                     self.ann_list_next.append(ann)
-             self.draw()
-             
-#         else:
-#             for i,a in enumerate(self.ann_list_next):
-#                 a.remove()
-#             self.ann_list_next[:] = []
-#             
-#             self.nextmask.set_data((self.nextplotmask%10+1)*(self.nextplotmask!=0))
-#             self.ax3.draw_artist(self.nextplot)
-#             self.ax3.draw_artist(self.nextmask)
-#             self.update()
-#             self.flush_events()
+         vals, xtemp, ytemp = self._getCellCenters(self.nextplotmask)
+                 
+         if xtemp:
+             for i in range(0,len(xtemp)):
+                 ann = self.ax3.annotate(str(vals[i]), (xtemp[i], ytemp[i]))
+                 self.ann_list_next.append(ann)
+         self.draw()
         
         
     def updateplot(self, posx, posy):
