@@ -814,10 +814,7 @@ class App(QMainWindow):
                             temp_mask = self.reader.LoadSeg(t, dlg.listfov.row(item))
                             self.reader.SaveMask(t,dlg.listfov.row(item), temp_mask)
             
-            self.ReloadThreeMasks()
-               
-            #once it has iterated over all the fov, the message in 
-            #the status bar is cleared and the buttons are enabled.
+            self.m.UpdatePlots()
             self.ClearStatusBar()
             self.EnableCNNButtons()
    
@@ -1691,7 +1688,7 @@ class App(QMainWindow):
         self.button_exval.setEnabled(False)
         self.button_changecellvalue.setEnabled(False)
         self.button_showval.setEnabled(False)
-    
+
     
     def ButtonSaveMask(self):
         """
