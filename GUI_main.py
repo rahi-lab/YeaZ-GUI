@@ -806,8 +806,8 @@ class App(QMainWindow):
                     
                     # if tracker has been checked then apply it
                     if dlg.tracking_checkbox.isChecked():
-                        if t != 0:
-                            temp_mask = self.reader.CellCorrespondance(t,dlg.listfov.row(item))
+                        if t != time_value1:
+                            temp_mask = self.reader.CellCorrespondance(t, dlg.listfov.row(item))
                             self.reader.SaveMask(t,dlg.listfov.row(item), temp_mask)
                         
                         else:
