@@ -16,6 +16,7 @@ import skimage.io
 import neural_network as nn
 import pytiff
 import hungarian as hu
+from segment import segment
 
 
 class Reader:
@@ -437,7 +438,7 @@ class Reader:
                                                           self.tlabels[currentT])])
             pred = np.array(fileprediction['/{}/{}'.format(self.fovlabels[currentFOV], self.tlabels[currentT])])	
             fileprediction.close()
-            segmentedmask = nn.segment(tmpthrmask, pred, segparamvalue)	# SJR: added to read out the prediction as well
+            segmentedmask = segment(tmpthrmask, pred, segparamvalue)	# SJR: added to read out the prediction as well
             filethr.close()
             return segmentedmask
 
