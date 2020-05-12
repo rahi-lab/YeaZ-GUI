@@ -496,28 +496,35 @@ class Reader:
         fileseg = h5py.File(self.segmentname,'r+')
         
         if self.TestTimeExist(currentT-1, currentFOV, filemasks):
+            prevmask = np.array(filemasks['/{}/{}'.format(self.fovlabels[currentFOV], 
+                                                          self.tlabels[currentT-1])])
+            # A mask exists for both time frames
             if self.TestTimeExist(currentT, currentFOV, fileseg):
-                prevmask = np.array(filemasks['/{}/{}'.format(self.fovlabels[currentFOV], 
-                                                              self.tlabels[currentT-1])])
                 nextmask = np.array(fileseg['/{}/{}'.format(self.fovlabels[currentFOV],
                                                             self.tlabels[currentT])])             
                 newmask = hu.correspondance(prevmask, nextmask)
-                filemasks.close()
-                fileseg.close()
-                return newmask
-            
+                out = newmask
+            # No mask exists for the current timeframe, return empty array
             else:
-                filemasks.close()
-                fileseg.close()
                 null = np.zeros([self.sizey, self.sizex])
-                return null
-            
+                out = null
+        
         else:
-            filemasks.close()
-            fileseg.close()
-            null = np.zeros([self.sizey, self.sizex])
-            return null
+            # Current mask exists, but no previous - returns current mask unchanged
+            if self.TestTimeExist(currentT, currentFOV, fileseg):
+                nextmask = np.array(fileseg['/{}/{}'.format(self.fovlabels[currentFOV],
+                                                            self.tlabels[currentT])]) 
+                out = nextmask
+            
+            # Neither current nor previous mask exists - return empty array
+            else:
+                null = np.zeros([self.sizey, self.sizex])
+                out = null
                     
+        filemasks.close()
+        fileseg.close()
+        return out
+    
         
     def LoadImageChannel(self,currentT, currentFOV, ch):
         if self.isnd2:
