@@ -249,12 +249,13 @@ class Reader:
         
         else:
             zeroarray = np.zeros([self.sizey, self.sizex],dtype = np.uint16)
-            file.create_dataset('/{}/{}'.format(self.fovlabels[currentFOV], self.tlabels[currentT]), data = zeroarray, compression = 'gzip')
+            file.create_dataset('/{}/{}'.format(self.fovlabels[currentFOV], self.tlabels[currentT]), 
+                                data = zeroarray, compression = 'gzip')
             file.close()
             return zeroarray
             
             
-    def TestTimeExist(self,currentT, currentFOV, file):
+    def TestTimeExist(self, currentT, currentFOV, file):
         """This method tests if the array which is requested by LoadMask
         already exists or not in the hdf file.
         """
@@ -481,7 +482,7 @@ class Reader:
         """
 
         file = h5py.File(self.predictname, 'r+') 
-        if not self.TestTimeExists(currentT, currentFOV):
+        if not self.TestTimeExist(currentT, currentFOV):
             im = self.LoadOneImage(currentT, currentFOV)
             im = skimage.exposure.equalize_adapthist(im)
             im = im*1.0;	
