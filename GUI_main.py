@@ -757,6 +757,10 @@ class App(QMainWindow):
         inside of self.PredThreshSeg and it does the prediction of the neural
         network, thresholds this prediction and then segments it.
         """
+        
+        self.WriteStatusBar('Running the neural network...')
+        self.Disable(self.button_cnn)
+
         # creates a dialog window from the LaunchBatchPrediction.py file
         dlg = lbp.CustomDialog(self)
         
@@ -817,7 +821,8 @@ class App(QMainWindow):
             self.m.UpdatePlots()
             self.ClearStatusBar()
             self.EnableCNNButtons()
-   
+            self.Enable(self.button_cnn)
+    
     
     def PredThreshSeg(self, timeindex, fovindex, thr_val, seg_val):
           """
@@ -836,22 +841,22 @@ class App(QMainWindow):
           self.reader.SaveMask(timeindex, fovindex, self.m.SegmentedMask)
     
     
-    def LaunchPrediction(self):
-        """This function is not used in the gui, but it can be used to launch
-        the prediction of one picture, with no thresholding and no segmentation
-        """
-        if not(self.reader.TestPredExisting(self.Tindex, self.FOVindex)):
-            self.WriteStatusBar('Running the neural network...')
-            self.Disable(self.button_cnn)
-            self.reader.LaunchPrediction(self.Tindex, self.FOVindex)
-            
-            self.Enable(self.button_cnn)
-            
-            self.button_cnn.setEnabled(False)
-            self.button_threshold.setEnabled(True)
-            self.button_segment.setEnabled(True)
-            self.button_cellcorespondance.setEnabled(True)
-            self.ClearStatusBar()
+#    def LaunchPrediction(self):
+#        """This function is not used in the gui, but it can be used to launch
+#        the prediction of one picture, with no thresholding and no segmentation
+#        """
+#        if not(self.reader.TestPredExisting(self.Tindex, self.FOVindex)):
+#            self.WriteStatusBar('Running the neural network...')
+#            self.Disable(self.button_cnn)
+#            self.reader.LaunchPrediction(self.Tindex, self.FOVindex)
+#            
+#            self.Enable(self.button_cnn)
+#            
+#            self.button_cnn.setEnabled(False)
+#            self.button_threshold.setEnabled(True)
+#            self.button_segment.setEnabled(True)
+#            self.button_cellcorespondance.setEnabled(True)
+#            self.ClearStatusBar()
         
     
     def SelectChannel(self, index):
