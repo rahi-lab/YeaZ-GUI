@@ -19,6 +19,7 @@ def segment(th, pred, min_distance=10, topology=None):
     """
     dtr = ndi.morphology.distance_transform_edt(th)
     if topology is None:
+        print('topology is none')
         topology = -dtr
     elif callable(topology):
         topology = topology(dtr)
