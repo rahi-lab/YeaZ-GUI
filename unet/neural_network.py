@@ -65,9 +65,10 @@ def prediction(im):
 
     model.load_weights('unet/unet_weights_batchsize_25_Nepochs_100_SJR0_10.hdf5')
 
-    results = model.predict_generator(testGene,
-                                      1,
-                                      verbose=1)
+#    results = model.predict_generator(testGene,
+#                                      1,
+#                                      verbose=1)¨
+    results = model.predict(im[np.newaxis,:,:]/255, batch_size=1)
 
     res = results[0,:,:,0]
     res = res[0:imsize[0],0:imsize[1]] #crop if needed, e.g., im was smaller than 2048x2048
