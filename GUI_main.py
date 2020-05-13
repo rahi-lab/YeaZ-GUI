@@ -757,6 +757,10 @@ class App(QMainWindow):
         inside of self.PredThreshSeg and it does the prediction of the neural
         network, thresholds this prediction and then segments it.
         """
+        
+        self.WriteStatusBar('Running the neural network...')
+        self.Disable(self.button_cnn)
+
         # creates a dialog window from the LaunchBatchPrediction.py file
         dlg = lbp.CustomDialog(self)
         
@@ -814,10 +818,14 @@ class App(QMainWindow):
                             temp_mask = self.reader.LoadSeg(t, dlg.listfov.row(item))
                             self.reader.SaveMask(t,dlg.listfov.row(item), temp_mask)
             
-            self.m.UpdatePlots()
-            self.ClearStatusBar()
-            self.EnableCNNButtons()
-   
+            self.ReloadThreeMasks()
+            
+            
+        self.m.UpdatePlots()
+        self.ClearStatusBar()
+        self.EnableCNNButtons()
+        self.Enable(self.button_cnn)
+    
     
     def PredThreshSeg(self, timeindex, fovindex, thr_val, seg_val):
           """
@@ -833,24 +841,25 @@ class App(QMainWindow):
           self.reader.SaveThresholdMask(timeindex, fovindex, self.m.ThresholdMask)
           self.m.SegmentedMask = self.reader.Segment(seg_val, timeindex,fovindex)
           self.reader.SaveSegMask(timeindex, fovindex, self.m.SegmentedMask)
+          self.reader.SaveMask(timeindex, fovindex, self.m.SegmentedMask)
     
     
-    def LaunchPrediction(self):
-        """This function is not used in the gui, but it can be used to launch
-        the prediction of one picture, with no thresholding and no segmentation
-        """
-        if not(self.reader.TestPredExisting(self.Tindex, self.FOVindex)):
-            self.WriteStatusBar('Running the neural network...')
-            self.Disable(self.button_cnn)
-            self.reader.LaunchPrediction(self.Tindex, self.FOVindex)
-            
-            self.Enable(self.button_cnn)
-            
-            self.button_cnn.setEnabled(False)
-            self.button_threshold.setEnabled(True)
-            self.button_segment.setEnabled(True)
-            self.button_cellcorespondance.setEnabled(True)
-            self.ClearStatusBar()
+#    def LaunchPrediction(self):
+#        """This function is not used in the gui, but it can be used to launch
+#        the prediction of one picture, with no thresholding and no segmentation
+#        """
+#        if not(self.reader.TestPredExisting(self.Tindex, self.FOVindex)):
+#            self.WriteStatusBar('Running the neural network...')
+#            self.Disable(self.button_cnn)
+#            self.reader.LaunchPrediction(self.Tindex, self.FOVindex)
+#            
+#            self.Enable(self.button_cnn)
+#            
+#            self.button_cnn.setEnabled(False)
+#            self.button_threshold.setEnabled(True)
+#            self.button_segment.setEnabled(True)
+#            self.button_cellcorespondance.setEnabled(True)
+#            self.ClearStatusBar()
         
     
     def SelectChannel(self, index):
@@ -1061,19 +1070,19 @@ class App(QMainWindow):
         
      
     def CellCorrespActivation(self):
-            self.Disable(self.button_cellcorespondance)
-            self.WriteStatusBar('Doing the cell correspondance')
+        self.Disable(self.button_cellcorespondance)
+        self.WriteStatusBar('Doing the cell correspondance')
 
-            if self.Tindex != 0:
-                self.m.plotmask = self.reader.CellCorrespondance(self.Tindex, self.FOVindex)
-                self.m.updatedata()
-            else:
-                self.m.plotmask = self.reader.LoadSeg(self.Tindex, self.FOVindex)
-                self.m.updatedata()
+        if self.Tindex != 0:
+            self.m.plotmask = self.reader.CellCorrespondance(self.Tindex, self.FOVindex)
+            self.m.updatedata()
+        else:
+            self.m.plotmask = self.reader.LoadSeg(self.Tindex, self.FOVindex)
+            self.m.updatedata()
 
-            self.Enable(self.button_cellcorespondance)
-            self.button_cellcorespondance.setChecked(False)
-            self.ClearStatusBar()
+        self.Enable(self.button_cellcorespondance)
+        self.button_cellcorespondance.setChecked(False)
+        self.ClearStatusBar()
         
         
     def SegmentBoxCheck(self):

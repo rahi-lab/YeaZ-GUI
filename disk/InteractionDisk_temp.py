@@ -249,12 +249,13 @@ class Reader:
         
         else:
             zeroarray = np.zeros([self.sizey, self.sizex],dtype = np.uint16)
-            file.create_dataset('/{}/{}'.format(self.fovlabels[currentFOV], self.tlabels[currentT]), data = zeroarray, compression = 'gzip')
+            file.create_dataset('/{}/{}'.format(self.fovlabels[currentFOV], self.tlabels[currentT]), 
+                                data = zeroarray, compression = 'gzip')
             file.close()
             return zeroarray
             
             
-    def TestTimeExist(self,currentT, currentFOV, file):
+    def TestTimeExist(self, currentT, currentFOV, file):
         """This method tests if the array which is requested by LoadMask
         already exists or not in the hdf file.
         """
@@ -476,19 +477,19 @@ class Reader:
         
         
     def LaunchPrediction(self, currentT, currentFOV):
-        
         """It launches the neural neutwork on the current image and creates 
         an hdf file with the prediction for the time T and corresponding FOV. 
         """
 
-        file = h5py.File(self.predictname, 'r+')        
-        im = self.LoadOneImage(currentT, currentFOV)
-        im = skimage.exposure.equalize_adapthist(im)
-        im = im*1.0;	
-        pred = nn.prediction(im)
-        file.create_dataset('/{}/{}'.format(self.fovlabels[currentFOV], 
-                                    self.tlabels[currentT]), data = pred, compression = 'gzip', 
-                                    compression_opts = 7)
+        file = h5py.File(self.predictname, 'r+') 
+        if not self.TestTimeExist(currentT, currentFOV, file):
+            im = self.LoadOneImage(currentT, currentFOV)
+            im = skimage.exposure.equalize_adapthist(im)
+            im = im*1.0;	
+            pred = nn.prediction(im)
+            file.create_dataset('/{}/{}'.format(self.fovlabels[currentFOV], 
+                                self.tlabels[currentT]), data = pred, 
+                                compression = 'gzip', compression_opts = 7)
         file.close()
             
 
