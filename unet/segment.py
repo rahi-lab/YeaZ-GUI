@@ -146,6 +146,5 @@ def get_bounding_box(im):
     """Returns bounding box of object in boolean image"""
     coords = np.where(im)
     
-    min0, min1 = coords.min(axis=0)
-    max0, max1 = coords.max(axis=0)
-    return np.array([min0, max0, min1, max1])
+    return np.array([np.min(coords[0]), np.max(coords[0]), 
+                     np.min(coords[1]), np.max(coords[1])])
