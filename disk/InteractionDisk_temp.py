@@ -482,7 +482,7 @@ class Reader:
         """
 
         file = h5py.File(self.predictname, 'r+') 
-        if not self.TestTimeExist(currentT, currentFOV):
+        if not self.TestTimeExist(currentT, currentFOV, file):
             im = self.LoadOneImage(currentT, currentFOV)
             im = skimage.exposure.equalize_adapthist(im)
             im = im*1.0;	
