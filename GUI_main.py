@@ -833,6 +833,7 @@ class App(QMainWindow):
           self.reader.SaveThresholdMask(timeindex, fovindex, self.m.ThresholdMask)
           self.m.SegmentedMask = self.reader.Segment(seg_val, timeindex,fovindex)
           self.reader.SaveSegMask(timeindex, fovindex, self.m.SegmentedMask)
+          self.reader.SaveMask(timeindex, fovindex, self.m.SegmentedMask)
     
     
     def LaunchPrediction(self):
@@ -1061,19 +1062,19 @@ class App(QMainWindow):
         
      
     def CellCorrespActivation(self):
-            self.Disable(self.button_cellcorespondance)
-            self.WriteStatusBar('Doing the cell correspondance')
+        self.Disable(self.button_cellcorespondance)
+        self.WriteStatusBar('Doing the cell correspondance')
 
-            if self.Tindex != 0:
-                self.m.plotmask = self.reader.CellCorrespondance(self.Tindex, self.FOVindex)
-                self.m.updatedata()
-            else:
-                self.m.plotmask = self.reader.LoadSeg(self.Tindex, self.FOVindex)
-                self.m.updatedata()
+        if self.Tindex != 0:
+            self.m.plotmask = self.reader.CellCorrespondance(self.Tindex, self.FOVindex)
+            self.m.updatedata()
+        else:
+            self.m.plotmask = self.reader.LoadSeg(self.Tindex, self.FOVindex)
+            self.m.updatedata()
 
-            self.Enable(self.button_cellcorespondance)
-            self.button_cellcorespondance.setChecked(False)
-            self.ClearStatusBar()
+        self.Enable(self.button_cellcorespondance)
+        self.button_cellcorespondance.setChecked(False)
+        self.ClearStatusBar()
         
         
     def SegmentBoxCheck(self):
