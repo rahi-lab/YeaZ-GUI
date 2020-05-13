@@ -39,10 +39,10 @@ def cell_merge(wsh, pred):
     wshshape=wsh.shape
     
     # masks for the original cells
-    objs = np.zeros((wsh.max()+1,wshshape[0],wshshape[1]))	
+    objs = np.zeros((wsh.max()+1,wshshape[0],wshshape[1]), dtype=bool)	
     
     # masks for dilated cells
-    dil_objs = np.zeros((wsh.max()+1,wshshape[0],wshshape[1]))
+    dil_objs = np.zeros((wsh.max()+1,wshshape[0],wshshape[1]), dtype=bool)
     
     # bounding box coordinates	
     obj_coords = np.zeros((wsh.max()+1,4))
