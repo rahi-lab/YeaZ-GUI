@@ -56,7 +56,7 @@ def prediction(im):
     
     # pad with zeros such that 
     (nrow, ncol) = im.shape
-    padded = np.pad(im, (16-(nrow%16), 16-(ncol%16)))
+    padded = np.pad(im, (32-(nrow%32), 32-(ncol%32)))
     
     # WHOLE CELL PREDICTION
     model = unet(pretrained_weights = None,
