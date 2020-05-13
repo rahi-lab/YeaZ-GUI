@@ -48,36 +48,27 @@ def prediction(im):
     Return:
         res: the predicted distribution of probability of the labels (numpy array)
     """    
-    imsize=im.shape
-    im = im[0:2048,0:2048] #crop image if too large
-    im = np.pad(im,
-                ((0, max(0,2048 - imsize[0])),(0, max(0,2048 -  imsize[1]))),
-                constant_values=0) # pad with zeros if too small
-
-#    path_test = './tmp/test/image/'
-#    create_directory_if_not_exists(path_test)
+#    imsize=im.shape
+#    im = im[0:2048,0:2048] #crop image if too large
+#    im = np.pad(im,
+#                ((0, max(0,2048 - imsize[0])),(0, max(0,2048 -  imsize[1]))),
+#                constant_values=0) # pad with zeros if too small
 
     # WHOLE CELL PREDICTION
-#    testGene = generator(im, target_size = (2048,2048))
-
     model = unet(pretrained_weights = None,
                  input_size = (2048,2048,1))
 
     model.load_weights('unet/unet_weights_batchsize_25_Nepochs_100_SJR0_10.hdf5')
 
-#    results = model.predict_generator(testGene,
-#                                      1,
-#                                      verbose=1)¨
     results = model.predict(im[np.newaxis,:,:,np.newaxis], batch_size=1)
-    print(results.shape)
 
     res = results[0,:,:,0]
-    res = res[0:imsize[0],0:imsize[1]] #crop if needed, e.g., im was smaller than 2048x2048
-    res = np.pad(res,
-                 ((0, max(0,imsize[0] - 2048)),
-                  (0, max(0,imsize[0] - 2048) )),
-                  constant_values=0)	# pad with zeros if too small
-    print(res)
+#    res = res[0:imsize[0],0:imsize[1]] #crop if needed, e.g., im was smaller than 2048x2048
+#    res = np.pad(res,
+#                 ((0, max(0,imsize[0] - 2048)),
+#                  (0, max(0,imsize[0] - 2048) )),
+#                  constant_values=0)	# pad with zeros if too small
+#    print(res)
     return res
 
 
@@ -89,12 +80,3 @@ def generator(im, target_size = (256,256)):
     im2 = np.reshape(im2,(1,)+im2.shape)
     yield im2
 
-#def testGenerator(test_path,num_image = 30,target_size = (256,256),
-#                  flag_multi_class = False,as_gray = True):
-#    for i in range(num_image):
-#        img = io.imread(os.path.join(test_path,"%d.png"%i),as_gray = as_gray)
-#        img = img / 255
-#        img = trans.resize(img,target_size)
-#        img = np.reshape(img,img.shape+(1,)) if (not flag_multi_class) else img
-#        img = np.reshape(img,(1,)+img.shape)
-#        yield img
