@@ -818,10 +818,13 @@ class App(QMainWindow):
                             temp_mask = self.reader.LoadSeg(t, dlg.listfov.row(item))
                             self.reader.SaveMask(t,dlg.listfov.row(item), temp_mask)
             
-            self.m.UpdatePlots()
-            self.ClearStatusBar()
-            self.EnableCNNButtons()
-            self.Enable(self.button_cnn)
+            self.ReloadThreeMasks()
+            
+            
+        self.m.UpdatePlots()
+        self.ClearStatusBar()
+        self.EnableCNNButtons()
+        self.Enable(self.button_cnn)
     
     
     def PredThreshSeg(self, timeindex, fovindex, thr_val, seg_val):
