@@ -56,7 +56,7 @@ def prediction(im):
 
     # WHOLE CELL PREDICTION
     model = unet(pretrained_weights = None,
-                 input_size = (2048,2048,1))
+                 input_size = (None,None,1))
 
     model.load_weights('unet/unet_weights_batchsize_25_Nepochs_100_SJR0_10.hdf5')
 
@@ -71,12 +71,12 @@ def prediction(im):
 #    print(res)
     return res
 
-
-def generator(im, target_size = (256,256)):
-    im2 = im.copy()
-    im2 /= 255
-    im2 = trans.resize(im2,target_size)
-    im2 = np.reshape(im2,im2.shape+(1,))
-    im2 = np.reshape(im2,(1,)+im2.shape)
-    yield im2
-
+#
+#def generator(im, target_size = (256,256)):
+#    im2 = im.copy()
+#    im2 /= 255
+#    im2 = trans.resize(im2,target_size)
+#    im2 = np.reshape(im2,im2.shape+(1,))
+#    im2 = np.reshape(im2,(1,)+im2.shape)
+#    yield im2
+#
