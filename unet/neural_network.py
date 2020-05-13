@@ -53,14 +53,18 @@ def prediction(im):
 #    im = np.pad(im,
 #                ((0, max(0,2048 - imsize[0])),(0, max(0,2048 -  imsize[1]))),
 #                constant_values=0) # pad with zeros if too small
-
+    
+    # pad with zeros such that 
+    (nrow, ncol) = im.shape
+    padded = np.pad(im, (16-(nrow%16), 16-(ncol%16)))
+    
     # WHOLE CELL PREDICTION
     model = unet(pretrained_weights = None,
                  input_size = (None,None,1))
 
     model.load_weights('unet/unet_weights_batchsize_25_Nepochs_100_SJR0_10.hdf5')
 
-    results = model.predict(im[np.newaxis,:,:,np.newaxis], batch_size=1)
+    results = model.predict(padded[np.newaxis,:,:,np.newaxis], batch_size=1)
 
     res = results[0,:,:,0]
 #    res = res[0:imsize[0],0:imsize[1]] #crop if needed, e.g., im was smaller than 2048x2048
@@ -69,7 +73,7 @@ def prediction(im):
 #                  (0, max(0,imsize[0] - 2048) )),
 #                  constant_values=0)	# pad with zeros if too small
 #    print(res)
-    return res
+    return res[:nrow, :ncol]
 
 #
 #def generator(im, target_size = (256,256)):
