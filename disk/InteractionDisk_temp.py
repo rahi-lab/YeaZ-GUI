@@ -476,19 +476,19 @@ class Reader:
         
         
     def LaunchPrediction(self, currentT, currentFOV):
-        
         """It launches the neural neutwork on the current image and creates 
         an hdf file with the prediction for the time T and corresponding FOV. 
         """
 
-        file = h5py.File(self.predictname, 'r+')        
-        im = self.LoadOneImage(currentT, currentFOV)
-        im = skimage.exposure.equalize_adapthist(im)
-        im = im*1.0;	
-        pred = nn.prediction(im)
-        file.create_dataset('/{}/{}'.format(self.fovlabels[currentFOV], 
-                                    self.tlabels[currentT]), data = pred, compression = 'gzip', 
-                                    compression_opts = 7)
+        file = h5py.File(self.predictname, 'r+') 
+        if not self.TestTimeExists(currentT, currentFOV):
+            im = self.LoadOneImage(currentT, currentFOV)
+            im = skimage.exposure.equalize_adapthist(im)
+            im = im*1.0;	
+            pred = nn.prediction(im)
+            file.create_dataset('/{}/{}'.format(self.fovlabels[currentFOV], 
+                                self.tlabels[currentT]), data = pred, 
+                                compression = 'gzip', compression_opts = 7)
         file.close()
             
 
