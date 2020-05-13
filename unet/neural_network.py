@@ -68,7 +68,7 @@ def prediction(im):
 #    results = model.predict_generator(testGene,
 #                                      1,
 #                                      verbose=1)¨
-    results = model.predict(im[np.newaxis,:,:,np.newaxis]/255, batch_size=1)
+    results = model.predict(im[np.newaxis,:,:,np.newaxis], batch_size=1)
     print(results.shape)
 
     res = results[0,:,:,0]
@@ -77,7 +77,7 @@ def prediction(im):
                  ((0, max(0,imsize[0] - 2048)),
                   (0, max(0,imsize[0] - 2048) )),
                   constant_values=0)	# pad with zeros if too small
-
+    print(res)
     return res
 
 
