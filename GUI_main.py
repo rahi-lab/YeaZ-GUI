@@ -841,7 +841,7 @@ class App(QMainWindow):
           self.m.SegmentedMask = self.reader.Segment(seg_val, timeindex,fovindex)
           self.reader.SaveSegMask(timeindex, fovindex, self.m.SegmentedMask)
           self.reader.SaveMask(timeindex, fovindex, self.m.SegmentedMask)
-    
+            
     
     def SelectChannel(self, index):
         """This function is called when the button to select different channels

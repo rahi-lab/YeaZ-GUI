@@ -54,13 +54,11 @@ def prediction(im):
                 ((0, max(0,2048 - imsize[0])),(0, max(0,2048 -  imsize[1]))),
                 constant_values=0) # pad with zeros if too small
 
-    path_test = './tmp/test/image/'
-    create_directory_if_not_exists(path_test)
+#    path_test = './tmp/test/image/'
+#    create_directory_if_not_exists(path_test)
 
     # WHOLE CELL PREDICTION
-    testGene = testGenerator(path_test,
-                             1,
-                             target_size = (2048,2048))
+    testGene = generator(im, target_size = (2048,2048))
 
     model = unet(pretrained_weights = None,
                  input_size = (2048,2048,1))
@@ -81,12 +79,20 @@ def prediction(im):
     return res
 
 
-def testGenerator(test_path,num_image = 30,target_size = (256,256),
-                  flag_multi_class = False,as_gray = True):
-    for i in range(num_image):
-        img = io.imread(os.path.join(test_path,"%d.png"%i),as_gray = as_gray)
-        img = img / 255
-        img = trans.resize(img,target_size)
-        img = np.reshape(img,img.shape+(1,)) if (not flag_multi_class) else img
-        img = np.reshape(img,(1,)+img.shape)
-        yield img
+def generator(im, target_size = (256,256)):
+    im2 = im.copy()
+    im2 /= 255
+    im2 = trans.resize(im2,target_size)
+    im2 = np.reshape(im2,im2.shape+(1,))
+    im2 = np.reshape(im2,(1,)+im2.shape)
+    yield im2
+
+#def testGenerator(test_path,num_image = 30,target_size = (256,256),
+#                  flag_multi_class = False,as_gray = True):
+#    for i in range(num_image):
+#        img = io.imread(os.path.join(test_path,"%d.png"%i),as_gray = as_gray)
+#        img = img / 255
+#        img = trans.resize(img,target_size)
+#        img = np.reshape(img,img.shape+(1,)) if (not flag_multi_class) else img
+#        img = np.reshape(img,(1,)+img.shape)
+#        yield img
