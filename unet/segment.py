@@ -3,7 +3,6 @@ from skimage.feature import peak_local_max
 from skimage.morphology import watershed, dilation
 
 import numpy as np
-# import cv2
 
 
 def segment(th, pred, min_distance=10, topology=None): 
@@ -72,62 +71,43 @@ def cell_merge(wsh, pred):
         print("Processing cell ",obj1+1," of ",wsh.max()," for oversegmentation.")
         dil1 = dil_objs[obj1,:,:]
 
-        if np.sum(dil1) > 0:		#dil1 can be empty because in the loop, maskobj2 can be deleted if it is joined with a (previous) maskobj1
-            objcounter = objcounter + 1
-            orig1 = objs[obj1,:,:]
+        # check if mask has been deleted
+        if np.sum(dil1) == 0:
+            continue
+        
+        objcounter = objcounter + 1
+        orig1 = objs[obj1,:,:]
 
-            for obj2 in range(obj1+1,wsh.max()):
-                dil2 = dil_objs[obj2,:,:]
-            
-                if (do_box_overlap(obj_coords[obj1,:], obj_coords[obj2,:])
-                    and np.sum(dil2) > 0):
-                    border = dil1 * dil2	
+        for obj2 in range(obj1+1,wsh.max()):
+            dil2 = dil_objs[obj2,:,:]
+        
+            # only check border if bounding box overlaps, and second mask 
+            # is not yet deleted
+            if (do_box_overlap(obj_coords[obj1,:], obj_coords[obj2,:])
+                and np.sum(dil2) > 0):
+                
+                border = dil1 * dil2	
+                border_pred = pred[border]
+                
+                # Border is too small to be considered
+                if len(border_pred) < 32:
+                    continue
+                
+                # Sum of top 25% of predicted border values
+                q75 = np.quantile(border_pred, .75)
+                top_border_pred = border_pred[border_pred >= q75]
+                top_border_height = top_border_pred.sum()
+                top_border_area = len(top_border_pred)
+                
+                # merge cells
+                if top_border_height / top_border_area > .99:
+                    orig1 = np.logical_or(orig1, objs[obj2,:,:])
+                    dil_objs[obj1,:,:] = np.logical_or(dil1, dil2)
+                    dil_objs[obj2,:,:] = np.zeros((wshshape[0], wshshape[1]))
+                    obj_coords[obj1,:] = get_bounding_box(dil_objs[obj1,:,:])
+                    print("Merged cell ",obj1+1," and ",obj2+1,".")
                     
-                    border_pred = pred[border]
-                    
-                    # Border is too small to be considered
-                    if len(border_pred) < 32:
-                        continue
-                    
-                    # Sum of top 25% of predicted border values
-                    q75 = np.quantile(border_pred, .75)
-                    top_border_pred = border_pred[border_pred > q75]
-                    top_border_height = top_border_pred.sum()
-                    top_border_area = len(top_border_pred)
-                    
-#                    borderprednonzero = pred[np.nonzero(border)]		# all the prediction values inside the border area
-#                    sortborderprednonzero = sorted(borderprednonzero)		# sort the values
-#                    borderprednonzeroarea = len(borderprednonzero)		# how many values are there?
-#                    quartborderarea = round(borderprednonzeroarea/4)		# take one fourth of the values. there is some subtlety about how round() rounds but doesn't matter
-#                    topborderpred = sortborderprednonzero[quartborderarea:]	# take top 3/4 of the predictions
-#                    topborderheight = np.sum(topborderpred)			# sum over top 3/4 of the predictions
-#                    topborderarea = len(topborderpred)				# area of 3/4 of predictions. In principle equal to 3/4 of borderprednonzeroarea but because of strange rounding, will just measure again
-
-                    # merge cells
-                    if top_border_height / top_border_area > .99:
-                        orig1 = np.logical_or(orig1, objs[obj2,:,:])
-                        dil_objs[obj1,:,:] = np.logical_or(dil1, dil2)
-                        dil_objs[obj2,:,:] = np.zeros((wshshape[0], wshshape[1]))
-                        obj_coords[obj1,:] = get_bounding_box(dil_objs[obj1,:,:])
-                        print("Merged cell ",obj1+1," and ",obj2+1,".")
-                        
-                        
-#                    if topborderarea > 8:	# SJR: Not only must borderarea be greater than 0 but also have a little bit of border to go on.
-#                        #print(obj1+1, obj2+1, topborderheight/topborderarea)
-#                        if topborderheight/topborderarea > 0.99 :	# SJR: We are really deep inside a cell, where the prediction is =1. Won't use: borderheight/borderarea > 0.95. Redundant.
-#                            #print("--")
-#                            #print(objcounter)
-#                            #wsh=np.where(wsh==obj2+1, obj1+1, wsh)
-#                            maskoriobj1       = np.uint8(np.multiply((maskoriobj1 > 0) | (oriobjs[obj2,:,:] > 0),1))		#have to do boolean then integer just to do an 'or'
-#                            dilobjs[obj1,:,:] = np.uint8(np.multiply((maskobj1    > 0) | (maskobj2          > 0),1))		#have to do boolean then integer just to do an 'or'
-#                            dilobjs[obj2,:,:] = np.zeros((wshshape[0],wshshape[1]))
-#                            objcoords[obj1,0] = min(objcoords[obj1,0],objcoords[obj2,0])
-#                            objcoords[obj1,1] = max(objcoords[obj1,1],objcoords[obj2,1])
-#                            objcoords[obj1,2] = min(objcoords[obj1,2],objcoords[obj2,2])
-#                            objcoords[obj1,3] = max(objcoords[obj1,3],objcoords[obj2,3])
-#                            print("Merged cell ",obj1+1," and ",obj2+1,".")
-
-            wshclean = wshclean + orig1*objcounter
+        wshclean = wshclean + orig1*objcounter
             
     return wshclean
 
