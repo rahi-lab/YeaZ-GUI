@@ -47,14 +47,8 @@ def prediction(im):
         im: a numpy array image (numpy array), with max size 2048x2048
     Return:
         res: the predicted distribution of probability of the labels (numpy array)
-    """    
-#    imsize=im.shape
-#    im = im[0:2048,0:2048] #crop image if too large
-#    im = np.pad(im,
-#                ((0, max(0,2048 - imsize[0])),(0, max(0,2048 -  imsize[1]))),
-#                constant_values=0) # pad with zeros if too small
-    
-    # pad with zeros such that 
+    """        
+    # pad with zeros such that is divisible by 16
     (nrow, ncol) = im.shape
     row_add = 16-nrow%16
     col_add = 16-ncol%16
@@ -69,20 +63,5 @@ def prediction(im):
     results = model.predict(padded[np.newaxis,:,:,np.newaxis], batch_size=1)
 
     res = results[0,:,:,0]
-#    res = res[0:imsize[0],0:imsize[1]] #crop if needed, e.g., im was smaller than 2048x2048
-#    res = np.pad(res,
-#                 ((0, max(0,imsize[0] - 2048)),
-#                  (0, max(0,imsize[0] - 2048) )),
-#                  constant_values=0)	# pad with zeros if too small
-#    print(res)
     return res[:nrow, :ncol]
 
-#
-#def generator(im, target_size = (256,256)):
-#    im2 = im.copy()
-#    im2 /= 255
-#    im2 = trans.resize(im2,target_size)
-#    im2 = np.reshape(im2,im2.shape+(1,))
-#    im2 = np.reshape(im2,(1,)+im2.shape)
-#    yield im2
-#
