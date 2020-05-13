@@ -6,9 +6,10 @@ Created on Sat Dec 21 18:54:10 2019
 """
 import os
 from model import unet
-import data
 import numpy as np
 import skimage
+from skimage import io
+import skimage.transform as trans
 
 
 def create_directory_if_not_exists(path):
@@ -57,9 +58,9 @@ def prediction(im):
     create_directory_if_not_exists(path_test)
 
     # WHOLE CELL PREDICTION
-    testGene = data.testGenerator(path_test,
-                                  1,
-                                  target_size = (2048,2048))
+    testGene = testGenerator(path_test,
+                             1,
+                             target_size = (2048,2048))
 
     model = unet(pretrained_weights = None,
                  input_size = (2048,2048,1))
@@ -79,3 +80,13 @@ def prediction(im):
 
     return res
 
+
+def testGenerator(test_path,num_image = 30,target_size = (256,256),
+                  flag_multi_class = False,as_gray = True):
+    for i in range(num_image):
+        img = io.imread(os.path.join(test_path,"%d.png"%i),as_gray = as_gray)
+        img = img / 255
+        img = trans.resize(img,target_size)
+        img = np.reshape(img,img.shape+(1,)) if (not flag_multi_class) else img
+        img = np.reshape(img,(1,)+img.shape)
+        yield img
