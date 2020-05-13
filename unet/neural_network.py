@@ -58,7 +58,7 @@ def prediction(im):
 #    create_directory_if_not_exists(path_test)
 
     # WHOLE CELL PREDICTION
-    testGene = generator(im, target_size = (2048,2048))
+#    testGene = generator(im, target_size = (2048,2048))
 
     model = unet(pretrained_weights = None,
                  input_size = (2048,2048,1))
@@ -68,7 +68,8 @@ def prediction(im):
 #    results = model.predict_generator(testGene,
 #                                      1,
 #                                      verbose=1)¨
-    results = model.predict(im[np.newaxis,:,:]/255, batch_size=1)
+    results = model.predict(im[np.newaxis,:,:,np.newaxis]/255, batch_size=1)
+    print(results.shape)
 
     res = results[0,:,:,0]
     res = res[0:imsize[0],0:imsize[1]] #crop if needed, e.g., im was smaller than 2048x2048
