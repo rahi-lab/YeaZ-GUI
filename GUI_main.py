@@ -820,7 +820,6 @@ class App(QMainWindow):
             
             self.ReloadThreeMasks()
             
-            
         self.m.UpdatePlots()
         self.ClearStatusBar()
         self.EnableCNNButtons()
@@ -843,24 +842,6 @@ class App(QMainWindow):
           self.reader.SaveSegMask(timeindex, fovindex, self.m.SegmentedMask)
           self.reader.SaveMask(timeindex, fovindex, self.m.SegmentedMask)
     
-    
-#    def LaunchPrediction(self):
-#        """This function is not used in the gui, but it can be used to launch
-#        the prediction of one picture, with no thresholding and no segmentation
-#        """
-#        if not(self.reader.TestPredExisting(self.Tindex, self.FOVindex)):
-#            self.WriteStatusBar('Running the neural network...')
-#            self.Disable(self.button_cnn)
-#            self.reader.LaunchPrediction(self.Tindex, self.FOVindex)
-#            
-#            self.Enable(self.button_cnn)
-#            
-#            self.button_cnn.setEnabled(False)
-#            self.button_threshold.setEnabled(True)
-#            self.button_segment.setEnabled(True)
-#            self.button_cellcorespondance.setEnabled(True)
-#            self.ClearStatusBar()
-        
     
     def SelectChannel(self, index):
         """This function is called when the button to select different channels

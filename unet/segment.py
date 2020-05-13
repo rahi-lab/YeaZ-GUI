@@ -68,7 +68,6 @@ def cell_merge(wsh, pred):
     objcounter = 0	# will build up a new watershed mask, have to run a counter because some objects lost
     
     for obj1 in range(wsh.max()):	
-        print("Processing cell ",obj1+1," of ",wsh.max()," for oversegmentation.")
         dil1 = dil_objs[obj1,:,:]
 
         # check if mask has been deleted
@@ -105,7 +104,6 @@ def cell_merge(wsh, pred):
                     dil_objs[obj1,:,:] = np.logical_or(dil1, dil2)
                     dil_objs[obj2,:,:] = np.zeros((wshshape[0], wshshape[1]))
                     obj_coords[obj1,:] = get_bounding_box(dil_objs[obj1,:,:])
-                    print("Merged cell ",obj1+1," and ",obj2+1,".")
                     
         wshclean = wshclean + orig1*objcounter
             
