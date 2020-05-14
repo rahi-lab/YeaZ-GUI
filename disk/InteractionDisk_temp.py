@@ -259,7 +259,7 @@ class Reader:
         """This method tests if the array which is requested by LoadMask
         already exists or not in the hdf file.
         """
-        if currentT <= len(self.tlabels) - 1:
+        if currentT <= len(self.tlabels) - 1 and currentT >= 0:
             for t in file['/{}'.format(self.fovlabels[currentFOV])].keys():
                 # currentT is a number
                 # self.tlabels is some string that indexes the time point? E.g., T0?
