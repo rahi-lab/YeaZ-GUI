@@ -50,6 +50,7 @@ the corresponding picture. This mask can also be corrected using the
 usual buttons (because the Cell Correspondance makes also mistakes). 
 
 """
+import os
 import sys
 import numpy as np
 import pandas as pd
@@ -60,7 +61,7 @@ import h5py
 #from openpyxl import Workbook
 
 # Import everything for the Graphical User Interface from the PyQt5 library.
-from PyQt5.QtWidgets import (QApplication, QMainWindow, QDialog, 
+from PyQt5.QtWidgets import (QApplication, QMainWindow, QDialog, QFileDialog, 
     QMessageBox, QPushButton, QCheckBox, QAction, QStatusBar, QLabel)
 from PyQt5 import QtGui
 
@@ -94,12 +95,6 @@ import DialogFileBrowser as dfb
 #this file contains a window that opens to change the value of one cell. It 
 #is opened as soon as the user presses with the left click on a specific cell.
 import ChangeOneCellValue as cocv
-
-#this file contains a dialog window to browse for the excel file where
-#all the extracted information on the fluoerscence is written. Or to create a 
-#new excel file by typing a name in the text box. It is thought to have one 
-#excel file per field of view.
-import DialogDataBrowser as ddb
 
 #this file contains a dialog window where a time range and the field of views
 #can be selected to then launch a prediction of the neural network on
@@ -153,7 +148,6 @@ class App(QMainWindow):
         # of the boolean variable)
         self.xlsfilename = ''
         self.nd2path = nd2pathstr
-        self.FlagFluoExtraction = False
         
         # Set the indices for the time axis and the field of view index. These
         # indices represent everywhere the current picture (the one that can be
@@ -479,200 +473,19 @@ class App(QMainWindow):
     def ButtonFluo(self):
         """This function is called everytime the Extract Fluorescence button is 
         clicked (self.button_extractfluorescence). 
-        
-        self.FlagFluoExtraction is boolean which is True when the path to the 
-        excel file has already been loaded into self.xlsfilename.
-        This pathname changes for each field of view as it is thought to have
-        one xls file per field of view. 
-        So at the beginning and each time the user changes field of view,
-        self.FlagFluoExtraction is set to False.
-        
-        When it is set to False, this function calls a dialog window where
-        the user is asked to load an already existing xls file for the current
-        field of view or to give a name to create a new xls file for
-        the current field of view. (self.Dialogxls)
-        
-        If it set to true, it means that self.xlsfilename contains the path
-        to the xls file for the current field of view and it is directly given
-        to the function that writes the fluorescence into the xls file.
-        (self.ExtractFluo)
         """        
-        if self.FlagFluoExtraction:
-            self.ExtractFluo(self.xlsfilename)
-        else:
-            self.DialogXls()
-        
-        
-    def DialogXls(self):
-        """This function creates a dialog window which asks for the user to 
-        enter a csv name. 
-        """
-        # creates the window
-        dwind = ddb.FileBrowser()
-
-        # this test is True if the user presses ok in the dialog window, if the 
-        # user presses cancels it returns and nothing happens.
-        if dwind.exec_():
-            xlsname = dwind.xlsname
-            newxlsname = dwind.newxlsentry.text()
-
-            # if the string containing the filepath to an existing xls file 
-            # is not empty then it calls directly the function to write the 
-            # data into this existing xls file and sets self.xlsfilename
-            if xlsname:
-                self.xlsfilename = xlsname
-                self.ExtractFluo(xlsname)
-                
-            # if xlsname is empty then it creates a new pathfilename and puts
-            # the new created xls file into the folder where nd2 is located.
-            # the string containing the nd2 namepath is split
-            else:
-                xlsname = ''
-                templist = self.nd2path.split('/')
-                
-                for k in range(0, len(templist)-1):
-                    
-                    xlsname = xlsname + templist[k] + '/'
-                # this is the new path/filename
-                xlsname = xlsname + newxlsname + '.csv'
-                self.xlsfilename = xlsname
-                
-#                self.CreateXls(xlsname)
-                self.ExtractFluo(xlsname)
-                
-            # this flag is set to true, for the current field of view each
-            # time extract fluorescence is clicked it writes in the file located
-            # at self.xlsfilename.
-#            self.FlagFluoExtraction = True
+        fileName, _ = QFileDialog.getSaveFileName(
+            self,"Specify CSV File for Exporting Fluorescence",
+            "","All Files (*);;Text Files (*.csv)")
+        if fileName:
+            # add .csv if needed
+            _, ext = os.path.splitext(fileName)
+            if ext!='.csv':
+                fileName += '.csv'
             
-        else:
-            return
+            self.ExtractFluo(fileName)
 
-
-
-        
-#    def ExtractFluo(self, xlsfilename):
-#        """This is the function that takes as argument the filepath to the xls
-#        file and writes in the file.
-#        It iterates over the different channels (or the sheets of the file,
-#        each channel has one sheet.), and reads the image corresponding
-#        to the time, field of view and channel index. It reads the already
-#        existing file and makes a copy in which the data will be written in it.
-#        
-#        The first step of calculating the data is to iterate through each
-#        cell/segment of the mask (so each cell is a submatrix of one value
-#        in the matrix of the mask).
-#        For each of these value /cell, the area is extracted as being
-#        the number of pixels corresponding to this cell/value. 
-#        (it is known from the microscope settings how to convert
-#        the pixel in area).
-#        The total intensity is just the value of the pixel and it is added over
-#        all the pixels corresonding to the cell/value.
-#        The mean is then calculated as being the total intensity divided by
-#        the number of pixels (which here is equal to the area also).
-#        With the mean it is then possible to calculate the variance of the 
-#        signal for one cell/value.
-#        
-#        Then, it is checked if the value of the cell (cell number) already
-#        exists in the first column, if it already exists it continues to
-#        find the column corresponding to the time index where the values
-#        should be written. It sets the flag to True such that it does not
-#        write the cell as new one and adds it at the end of the column
-#        
-#        If the value is not found in the cell number column (new cell or
-#        first time writing in the file), the flag is False, thus it adds the 
-#        cell number at the end of the column.
-#        It then saves the xls file.
-#        """
-#        self.Disable(self.button_extractfluorescence)
-#        self.WriteStatusBar('Extracting the fluorescence...')
-#        
-#        # opens the file to read it.
-#        book = load_workbook(self.xlsfilename)
-#
-#
-#        # iterate over all the channels, so over all the sheets in the file
-#        for channel in range(0, self.reader.sizec):
-#            # loads the picture corresponding to the channel, time index and fov
-#            image = self.reader.LoadImageChannel(self.Tindex, self.FOVindex, channel)
-#            
-#            # loads the sheet to read out corresponding to the current channel
-#            sheet = book.worksheets[channel]
-#            
-#            
-#            # this index contains the value of the maximum number of rows in the
-#            # file, it is used to append at the end the cell number column a new
-#            # cell/value, and it is updated each time a new cell is added.
-#            tempidx = sheet.max_row
-#           
-#            # np.unique(array) returns an array which contains all the value
-#            # that appear in self.m.plotmask, so it returns every cell value
-#            # including the background (value 0) present in self.m.plotmask
-#            for val in np.unique(self.m.plotmask):
-#                
-#                # Skip background
-#                if val == 0:
-#                    continue
-#                
-#                # Calculate stats
-#                area = (self.m.plotmask == val).sum()
-#                tot_intensity = image[self.m.plotmask == val].sum()
-#                mean = tot_intensity/area
-#                var = np.var(image[self.m.plotmask==val])
-#
-#                # if flag is false it means that the cell number
-#                # corresponding to val is not present in the xls file, first
-#                # column.
-#                flag = False
-#                
-#                # iterate over all the rows
-#                for row in range(sheet.max_row+1):
-#                     # test if in the first column 0, the number of the cell
-#                     # is already present
-#                     # if sheet.cell_value(row,0) == str(val):
-#                     if sheet.cell(row = row+1, column = 1).value == str(val):
-#                         
-#                         # if is present, the column corresponding to the
-#                         # current time index is by iterating over the cols.
-#                         for col in range(sheet.max_column+1):
-#                             # test if it is the right column
-#                             # if sheet.cell_value(0, col) == 't = {}'.format(self.Tindex):
-#                             if sheet.cell(row = 1, column = col+1).value == 't = {}'.format(self.Tindex):
-#                                 # write in the xls file at the row, col coord
-#                                 sheet.cell(row+1, col+1, str(tot_intensity))
-#                                 sheet.cell(row+1, col+2, str(area))
-#                                 sheet.cell(row+1,col+3, str(mean))
-#                                 sheet.cell(row+1, col+4, str(var))
-#                                 book.save(xlsfilename)
-#
-#                                 # the flag is set to True so that it does
-#                                 # not execute the code where the cell is
-#                                 # added in the xls file in a new row.
-#                                 flag = True
-#                                 
-#                if not flag:
-#                # this lines are executed if a new cell is detected or if
-#                # if it is the first time to write in the file.
-#                    for col in range(sheet.max_column+1):
-#                        if sheet.cell(row = 1, column =  col+1).value == 't = {}'.format(self.Tindex):
-#                            # it write the cell value/cell number in the
-#                            # column
-#                            sheet.cell(tempidx+1,1, str(val))
-#                            
-#                            # writes the data extracted before
-#                            sheet.cell(tempidx+1,col+1,str(tot_intensity))
-#                            sheet.cell(tempidx+1, col+2, str(area))
-#                            sheet.cell(tempidx+1, col+3, str(mean))
-#                            sheet.cell(tempidx+1, col+4, str(var))
-#                            # it updates the number of rows as a new cell
-#                            # has been added, so there is one more row.
-#                            tempidx = tempidx + 1
-#                            book.save(xlsfilename)
-#
-#        self.Enable(self.button_extractfluorescence)
-#        self.ClearStatusBar()
-
-    def ExtractFluo(self, xlsfilename):
+    def ExtractFluo(self, csv_filename):
         """This is the function that takes as argument the filepath to the xls
         file and writes in the file.
         It iterates over the different channels (or the sheets of the file,
@@ -743,7 +556,7 @@ class App(QMainWindow):
         
         # Use Pandas to write csv
         df = pd.DataFrame(cell_list)
-        df.to_csv(self.xlsfilename, index=False)
+        df.to_csv(csv_filename, index=False)
                     
         self.Enable(self.button_extractfluorescence)
         self.ClearStatusBar()
@@ -943,14 +756,7 @@ class App(QMainWindow):
         
         # it updates the fov in the plot with the new index.
         self.ChangeFOV()
-        
-        # the flag of the fluorescence extraction is set to False (such that
-        # if the user extracts fluorescence data in the new field of  view,
-        # there is a dialog box asking to select the corresponding xls file
-        # for this field of view. IF there is no data sheet for this fov, the
-        # user can enter a new name to make a new file.)
-        self.FlagFluoExtraction = False
-        
+                
         
     def ChangeFOV(self):
         """
