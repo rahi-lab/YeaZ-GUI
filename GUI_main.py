@@ -70,6 +70,7 @@ from matplotlib.backends.qt_compat import QtWidgets
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 
 from sklearn.decomposition import PCA
+import imageio
 
 #append all the paths where the modules are stored. Such that this script
 #looks into all of these folders when importing modules.
@@ -112,6 +113,9 @@ import InitLayout
 
 # PlotCanvas for fast plotting
 from PlotCanvas import PlotCanvas
+
+import Extract as extr
+from image_loader import load_image
     
 
 class NavigationToolbar(NavigationToolbar):
@@ -232,7 +236,7 @@ class App(QMainWindow):
         self.button_changecellvalue = QPushButton('Change cell value')
         self.buttonlist.append(self.button_changecellvalue)        
         
-        self.button_extractfluorescence = QPushButton('Extract Fluorescence')
+        self.button_extractfluorescence = QPushButton('Extract')
         self.buttonlist.append(self.button_extractfluorescence)
         
         self.button_hide_show = QPushButton('CNN')
@@ -466,26 +470,70 @@ class App(QMainWindow):
         else:
             self.Enable(self.button_pan)
 
-
-# -----------------------------------------------------------------------------
-# EXTRACTING FLUORESCENCE
             
     def ButtonFluo(self):
         """This function is called everytime the Extract Fluorescence button is 
         clicked (self.button_extractfluorescence). 
         """        
-        fileName, _ = QFileDialog.getSaveFileName(
-            self,"Specify CSV File for Exporting Fluorescence",
-            "","All Files (*);;Text Files (*.csv)")
-        if fileName:
-            # add .csv if needed
-            _, ext = os.path.splitext(fileName)
-            if ext!='.csv':
-                fileName += '.csv'
+        self.Disable(self.button_extractfluorescence)
+        self.WriteStatusBar('Extracting ...')
+        
+        # Get last image with mask
+        for time_index in range(self.reader.sizet, 0, -1):
+            # Test if time has a mask
+            file = h5py.File(self.reader.hdfpath, 'r+')
+            time_exist = self.reader.TestTimeExist(time_index, self.FOVindex, file)
+            file.close()
             
-            self.ExtractFluo(fileName)
+            if not time_exist:
+                continue
+            
+            # load picture and sheet
+            image = self.reader.LoadImageChannel(time_index, self.FOVindex, 
+                                                 self.reader.default_channel)
+            mask = self.reader.LoadMask(time_index, self.FOVindex)
+            
+            # Break if mask is non-empty
+            if mask.sum()>0:
+                break
+        
+        # Launch dialog with last image
+        dlg = extr.Extract(image, mask, self.reader.channel_names)
+        dlg.exec()
+        if dlg.exit_code == 1: # Fluorescence
+            self.ExtractFluo(dlg.cells, dlg.outfile, dlg.file_list)
+        elif dlg.exit_code == 2: # Mask
+            self.ExtractMask(dlg.cells, dlg.outfile)
+            
+        self.Enable(self.button_extractfluorescence)
+        self.ClearStatusBar()
 
-    def ExtractFluo(self, csv_filename):
+
+    def ExtractMask(self, cell_list, outfile):
+        """Extract the mask to the specified tiff file. Only take cells 
+        specified by the cell_list"""
+        
+        mask_list = []
+        for time_index in range(0, self.reader.sizet):
+            
+            # Test if time has a mask
+            file = h5py.File(self.reader.hdfpath, 'r+')
+            time_exist = self.reader.TestTimeExist(time_index, self.FOVindex, file)
+            file.close()
+            
+            if not time_exist:
+                continue
+            
+            mask = self.reader.LoadMask(time_index, self.FOVindex)
+            all_cells = np.unique(mask)
+            for cell in set(all_cells)-set(cell_list):
+                mask[mask==cell] = 0
+            mask_list.append(mask)
+            
+        imageio.mimwrite(outfile, np.array(mask_list, dtype=np.uint16))
+                        
+
+    def ExtractFluo(self, cells_to_use, csv_filename, channel_list):
         """This is the function that takes as argument the filepath to the xls
         file and writes in the file.
         It iterates over the different channels (or the sheets of the file,
@@ -519,15 +567,10 @@ class App(QMainWindow):
         It then saves the xls file.
         
         """
-        
-        self.Disable(self.button_extractfluorescence)
-        self.WriteStatusBar('Extracting the fluorescence...')
-        
         # List of cell properties
         cell_list = []
 
         for time_index in range(0, self.reader.sizet):
-            
             # Test if time has a mask
             file = h5py.File(self.reader.hdfpath, 'r+')
             time_exist = self.reader.TestTimeExist(time_index, self.FOVindex, file)
@@ -536,22 +579,31 @@ class App(QMainWindow):
             if not time_exist:
                 continue
             
-            # Extract statistics for all channels and all cells
-            for channel in range(0, self.reader.sizec):                
-                # load picture and sheet
-                image = self.reader.LoadImageChannel(time_index, self.FOVindex, channel)
-                mask = self.reader.LoadMask(time_index, self.FOVindex)
-               
+            mask = self.reader.LoadMask(time_index, self.FOVindex)
+            
+            for channel in channel_list:
+                # check if channel is in list of nd2 channels
+                try:
+                    channel_ix = self.reader.channel_names.index(channel)
+                    image = self.reader.LoadImageChannel(time_index, self.FOVindex, channel_ix)
+                
+                # channel is a file
+                except ValueError:
+                    image = load_image(channel, ix=time_index)
+                    
                 for val in np.unique(mask):
                     # bg is not cell
                     if val == 0:
+                        continue
+                    # disregard cells not in cell_list
+                    if not (val in cells_to_use):
                         continue
                     
                     # Calculate stats
                     stats = self.cell_statistics(image, mask == val)
                     stats['Time'] = time_index
-                    stats['Channel Index'] = channel
-                    stats['Channel'] = self.reader.channel_names[channel]
+                    stats['Channel'] = channel
+                    stats['Cell'] = val
                     cell_list.append(stats)
         
         # Use Pandas to write csv

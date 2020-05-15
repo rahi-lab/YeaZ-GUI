@@ -5,12 +5,17 @@ GUI to select and deselect cells at extraction time.
 """
 
 import sys
+import os
 import numpy as np
-from PyQt5.QtWidgets import (QApplication, QWidget, QPushButton, 
-                             QHBoxLayout, QVBoxLayout)
+from PyQt5.QtWidgets import (QApplication, QPushButton, QLabel,
+                             QHBoxLayout, QVBoxLayout, QListWidget,
+                             QFileDialog, QMessageBox, QDialog)
+from PyQt5.QtCore import Qt
+
 
 from PIL import Image, ImageDraw
-
+sys.path.append("../disk")
+from image_loader import load_image
 
 #Import from matplotlib to use it to display the pictures and masks.
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
@@ -20,38 +25,74 @@ from matplotlib.colors import LinearSegmentedColormap
 from matplotlib.figure import Figure
 
 
-class Extract(QWidget):
+class Extract(QDialog):
     
     
-    def __init__(self):
-        super(Extract, self).__init__()
-        image, mask = _test_data()
+    def __init__(self, image, mask, channel_names=[]):
+        parent = None
+        super(Extract, self).__init__(parent)
+        self.setWindowFlags(Qt.WindowStaysOnTopHint)
+#        image, mask = _test_data()
         self.pc = PlotCanvas(image, mask)
+        self.file_list = channel_names
         self.init_UI()
         self.exit_code = 0 # 0: Cancel, 1: Fluorescence, 2: Mask
 
     def init_UI(self):
         # Extract Buttons
+        title_extr = QLabel('Extract for selected cells')
         self.extr_mask = _create_button("Extract Mask", self.do_extr_mask)
         self.extr_fluo = _create_button("Extract Fluorescence", self.do_extr_fluo)
         self.done = _create_button("Cancel", self.do_cancel)
+        self.done.setDefault(True)  
         
         extr_box = QVBoxLayout()
+        extr_box.addWidget(title_extr)
         extr_box.addWidget(self.extr_mask)
         extr_box.addWidget(self.extr_fluo)
         extr_box.addWidget(self.done)
+        extr_box.setAlignment(Qt.AlignTop)
         
         # Select Button
-        self.sel_mult = _create_button("Select Multiple", self.do_sel_mult)
-        self.sel_sngl = _create_button("Select Single", self.do_sel_sngl)
-        self.desel_mult = _create_button("Deselect Multiple", self.do_desel_mult)
-        self.desel_sngl = _create_button("Deselect Single", self.do_desel_sngl)
+        title_select = QLabel('Select / Deselect Cells for Extraction')
+        self.sel_mult = _create_button("Select Multiple", self.do_sel_mult,
+                                       "Left-click several times to draw polygon "
+                                       "on image around cells to select, "
+                                       "right-click to confirm")
+        self.sel_sngl = _create_button("Select Single", self.do_sel_sngl,
+                                       "Left-click to select cell, right-click "
+                                       "to abort")
+        self.desel_mult = _create_button("Deselect Multiple", self.do_desel_mult,
+                                       "Left-click several times to draw polygon "
+                                       "on image around cells to deselect, "
+                                       "right-click to confirm")
+        self.desel_sngl = _create_button("Deselect Single", self.do_desel_sngl,
+                                       "Left-click to deselect cell, right-click "
+                                       "to abort")
         
         sel_box = QVBoxLayout()
+        sel_box.addWidget(title_select)
         sel_box.addWidget(self.sel_mult)
         sel_box.addWidget(self.sel_sngl)
         sel_box.addWidget(self.desel_mult)
         sel_box.addWidget(self.desel_sngl)
+        sel_box.setAlignment(Qt.AlignTop)
+        
+        # Additional Fluorescence File
+        file_title = QLabel("Manage files from which to extract fluorescence")
+        self.list_channels = QListWidget()
+        self.add_file = _create_button('Add', self.do_add_file)
+        self.remove_file = _create_button('Remove', self.do_remove_file)
+        
+        add_remove = QHBoxLayout()
+        add_remove.addWidget(self.add_file)
+        add_remove.addWidget(self.remove_file)
+        
+        manage_box = QVBoxLayout()
+        manage_box.addWidget(file_title)
+        manage_box.addWidget(self.list_channels)
+        manage_box.addLayout(add_remove)
+        manage_box.setAlignment(Qt.AlignTop)
         
         # Button list
         self.buttons = [self.extr_mask,
@@ -60,12 +101,15 @@ class Extract(QWidget):
                         self.sel_mult,
                         self.sel_sngl,
                         self.desel_mult,
-                        self.desel_sngl]
+                        self.desel_sngl,
+                        self.add_file,
+                        self.remove_file,
+                        self.list_channels]
         
         # Buttons
         buttons = QHBoxLayout()
         buttons.addLayout(sel_box)
-        buttons.addStretch(.5)
+        buttons.addLayout(manage_box)
         buttons.addLayout(extr_box)
         
         # Plot Canvas
@@ -73,6 +117,9 @@ class Extract(QWidget):
         full.addWidget(self.pc)
         full.addStretch(.5)
         full.addLayout(buttons)
+        
+        # Add channel list
+        self.do_show_list()
 
         self.setLayout(full)    
         self.setGeometry(300, 300, 600, 600)
@@ -80,6 +127,16 @@ class Extract(QWidget):
         self.show()
 
     def do_extr_fluo(self):
+        self.outfile, _ = QFileDialog.getSaveFileName(
+            self,"Specify CSV File for Exporting Fluorescence",
+            "","All Files (*);;Text Files (*.csv)")
+        _, ext = os.path.splitext(self.outfile)
+        if ext == '':
+            self.outfile += '.csv'
+        elif ext != '.csv':
+            QMessageBox.critical(self,'Error','Must specify .csv file')
+            return 
+        
         self.exit_code = 1
         self.cells = self.pc.sellist
         self.close()
@@ -88,6 +145,16 @@ class Extract(QWidget):
         self.close()
     
     def do_extr_mask(self):
+        self.outfile, _ = QFileDialog.getSaveFileName(
+            self,"Specify TIFF File for Exporting Mask",
+            "","All Files (*);;Image File (*.tiff)")
+        _, ext = os.path.splitext(self.outfile)
+        if ext == '':
+            self.outfile += '.tif'
+        elif ext != '.tif' or ext!='.tiff':
+            QMessageBox.critical(self,'Error','Must specify .tif file')
+            return 
+
         self.exit_code = 2
         self.cells = self.pc.sellist
         self.close()
@@ -126,7 +193,8 @@ class Extract(QWidget):
         
     def cells_in_polygon(self):
         """Extracts cells inside of polygon specified by pc.storemouseclicks"""
-        img = Image.new('L', (self.pc.mask.shape), 0)
+        nx, ny = self.pc.mask.shape
+        img = Image.new('L', (ny, nx), 0)
         ImageDraw.Draw(img).polygon(self.pc.storemouseclicks, outline=1, fill=1)
         polygon = np.array(img).astype(bool)
         return set(np.unique(self.pc.mask[polygon]))
@@ -176,6 +244,41 @@ class Extract(QWidget):
     def activate_all(self):
         for b in self.buttons:
             b.setEnabled(True)
+            
+    def do_add_file(self):
+        dlg = QFileDialog()
+        dlg.setProxyModel(None)
+        if dlg.exec():
+            full_files = dlg.selectedFiles()
+            if self.test_file(full_files):
+                self.file_list = self.file_list + full_files
+                self.do_show_list()
+    
+    def do_remove_file(self):
+        item_to_remove = self.list_channels.currentItem()
+        remove_ix = self.list_channels.row(item_to_remove)
+        self.file_list.pop(remove_ix)
+        self.do_show_list()
+    
+    def do_show_list(self):
+        self.list_channels.clear()
+        for file in self.file_list:
+            _, name = os.path.split(file)
+            self.list_channels.addItem(name)
+            
+    def test_file(self, files):
+        """Tests if input image has appropriate size and contains data"""
+        for f in files:
+            try: 
+                im = load_image(f, 0)
+            except ValueError:
+                QMessageBox.critical(self, "Error", "Could not load file")
+                return False
+            if not im.shape == self.pc.mask.shape:
+                QMessageBox.critical(self, "Error", "Loaded image has wrong size")
+                return False
+        return True
+            
     
 
 class PlotCanvas(FigureCanvas):
@@ -321,5 +424,5 @@ def _test_data():
         
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    ex = Extract()
+    ex = Extract(*_test_data())
     sys.exit(app.exec_())
