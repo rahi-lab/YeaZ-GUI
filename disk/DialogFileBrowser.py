@@ -24,11 +24,11 @@ class FileBrowser(QDialog):
         self.button_opennd2.setToolTip("Browse for an image file")
         self.button_opennd2.setMaximumWidth(150)
         
-#        self.button_openfolder = QPushButton('Open image folder')
-#        self.button_openfolder.setEnabled(True)
-#        self.button_openfolder.clicked.connect(self.getfolder)
-#        self.button_openfolder.setToolTip("Browse for folder with images")
-#        self.button_openfolder.setMaximumWidth(150)
+        self.button_openfolder = QPushButton('Open image folder')
+        self.button_openfolder.setEnabled(True)
+        self.button_openfolder.clicked.connect(self.getfolder)
+        self.button_openfolder.setToolTip("Browse for folder with images")
+        self.button_openfolder.setMaximumWidth(150)
         
         self.button_openhdf = QPushButton('Open mask file')
         self.button_openhdf.setEnabled(True)
@@ -66,7 +66,7 @@ class FileBrowser(QDialog):
         self.labelfolder.setText('No folder selected')
         
         flo.addRow(self.labelnd2, self.button_opennd2)
-#        flo.addRow(self.labelfolder, self.button_openfolder)
+        flo.addRow(self.labelfolder, self.button_openfolder)
         flo.addRow(self.labelhdf, self.button_openhdf)
 #        flo.addWidget(self.button_openhdf)
         flo.addRow('If no hdf file already exists, give a name to create a new file', self.newhdfentry)
@@ -79,17 +79,9 @@ class FileBrowser(QDialog):
         
 
     def getnd2path(self):
-#        self.nd2name,_ = QFileDialog.getOpenFileName(self, 'Open image file','', 'Image files (*.nd2 *.tif *.tiff)')
+        self.nd2name,_ = QFileDialog.getOpenFileName(self, 'Open image file','', 'Image files (*.nd2 *.tif *.tiff)')
 #      print(self.nd2name)
 #      print(self.nd2name)
-        
-        dlg = QFileDialog(self, 'Open image file or folder')
-        dlg.setProxyModel(None)
-        if dlg.exec():
-            self.nd2name = dlg.selectedFiles()[0]            
-        else:
-            return
-
         if self.nd2name != '':
             self.labelnd2.setText(self.nd2name)
       
@@ -99,7 +91,7 @@ class FileBrowser(QDialog):
             self.labelhdf.setText(self.hdfname)
             self.newhdfentry.setText("")
         
-#    def getfolder(self):
-#        self.nd2name = QFileDialog.getExistingDirectory(self, ("Select Image Folder"))
-#        if self.nd2name != '':
-#            self.labelnd2.setText(self.nd2name)
+    def getfolder(self):
+        self.nd2name = QFileDialog.getExistingDirectory(self, ("Select Image Folder"))
+        if self.nd2name != '':
+            self.labelnd2.setText(self.nd2name)

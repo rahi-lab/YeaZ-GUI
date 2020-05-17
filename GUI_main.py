@@ -479,7 +479,7 @@ class App(QMainWindow):
         self.WriteStatusBar('Extracting ...')
         
         # Get last image with mask
-        for time_index in range(self.reader.sizet, 0, -1):
+        for time_index in range(self.reader.sizet-1, -1, -1):            
             # Test if time has a mask
             file = h5py.File(self.reader.hdfpath, 'r+')
             time_exist = self.reader.TestTimeExist(time_index, self.FOVindex, file)
@@ -496,6 +496,11 @@ class App(QMainWindow):
             # Break if mask is non-empty
             if mask.sum()>0:
                 break
+            
+            if time_index==0:
+                QMessageBox(self, 'Error', 'No mask found')
+                self.Enable(self.button_extractfluorescence)
+                self.ClearStatusBar()
         
         # Launch dialog with last image
         dlg = extr.Extract(image, mask, self.reader.channel_names)
