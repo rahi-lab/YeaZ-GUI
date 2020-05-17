@@ -139,6 +139,7 @@ class Extract(QDialog):
         
         self.exit_code = 1
         self.cells = self.pc.sellist
+        self.desel_cells = set(np.unique(self.pc.mask)) - set(self.cells)
         self.close()
 
     def do_cancel(self):
@@ -157,6 +158,7 @@ class Extract(QDialog):
 
         self.exit_code = 2
         self.cells = self.pc.sellist
+        self.desel_cells = set(np.unique(self.pc.mask)) - set(self.cells)
         self.close()
                 
     def do_sel_mult(self):

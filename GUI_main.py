@@ -506,15 +506,15 @@ class App(QMainWindow):
         dlg = extr.Extract(image, mask, self.reader.channel_names)
         dlg.exec()
         if dlg.exit_code == 1: # Fluorescence
-            self.ExtractFluo(dlg.cells, dlg.outfile, dlg.file_list)
+            self.ExtractFluo(dlg.cells, dlg.desel_cells, dlg.outfile, dlg.file_list)
         elif dlg.exit_code == 2: # Mask
-            self.ExtractMask(dlg.cells, dlg.outfile)
+            self.ExtractMask(dlg.desel_cells, dlg.outfile)
             
         self.Enable(self.button_extractfluorescence)
         self.ClearStatusBar()
 
 
-    def ExtractMask(self, cell_list, outfile):
+    def ExtractMask(self, desel_cells, outfile):
         """Extract the mask to the specified tiff file. Only take cells 
         specified by the cell_list"""
         
@@ -530,15 +530,14 @@ class App(QMainWindow):
                 continue
             
             mask = self.reader.LoadMask(time_index, self.FOVindex)
-            all_cells = np.unique(mask)
-            for cell in set(all_cells)-set(cell_list):
+            for cell in desel_cells:
                 mask[mask==cell] = 0
             mask_list.append(mask)
             
         imageio.mimwrite(outfile, np.array(mask_list, dtype=np.uint16))
                         
 
-    def ExtractFluo(self, cells_to_use, csv_filename, channel_list):
+    def ExtractFluo(self, sel_cells, desel_cells, csv_filename, channel_list):
         """This is the function that takes as argument the filepath to the xls
         file and writes in the file.
         It iterates over the different channels (or the sheets of the file,
@@ -601,7 +600,7 @@ class App(QMainWindow):
                     if val == 0:
                         continue
                     # disregard cells not in cell_list
-                    if not (val in cells_to_use):
+                    if (val in desel_cells):
                         continue
                     
                     # Calculate stats
@@ -609,6 +608,7 @@ class App(QMainWindow):
                     stats['Time'] = time_index
                     stats['Channel'] = channel
                     stats['Cell'] = val
+                    stats['Disappeared'] = not (val in sel_cells)
                     cell_list.append(stats)
         
         # Use Pandas to write csv
