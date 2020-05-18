@@ -321,6 +321,11 @@ class PlotCanvas(FigureCanvas):
         
             self.nextmask.set_data((self.nextplotmask % 10 +1 )*(self.nextplotmask != 0))
             self.ax3.draw_artist(self.nextmask)
+            
+        else:
+            self.currmask.set_data(np.zeros(self.plotmask.shape))
+            self.previousmask.set_data(np.zeros(self.plotmask.shape))
+            self.nextmask.set_data(np.zeros(self.plotmask.shape))
         
         # Plot cell numbers
         self.ShowCellNumbers()
