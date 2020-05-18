@@ -1,16 +1,16 @@
-install numpy
-install PyQt5
-install matplotlib
-install nd2reader==3.2.1
-install h5py
-install scikit-image
-install openpyxl
-install Tensorflow==1.9.0
-install Keras
-install opencv-python-headless
-install pytiff
-install pandas
-install munkres
-install sklearn
-install imageio
-install Pillow
+numpy
+PyQt5
+matplotlib
+nd2reader==3.2.1
+h5py
+scikit-image
+openpyxl
+Tensorflow==1.9.0
+Keras
+opencv-python-headless
+pytiff
+pandas
+munkres
+sklearn
+imageio
+Pillow
