@@ -211,9 +211,7 @@ def Init(parent):
     parent.button_extractfluorescence.setStatusTip('Extract the total intensity, area and variance of the cells in the different channels')
     
     # SHOW THE VALUES OF THE CELLS
-    parent.button_showval.stateChanged.connect(parent.m.ShowCellNumbersCurr)
-    parent.button_showval.stateChanged.connect(parent.m.ShowCellNumbersPrev)
-    parent.button_showval.stateChanged.connect(parent.m.ShowCellNumbersNext)
+    parent.button_showval.stateChanged.connect(parent.m.UpdatePlots)
     parent.button_showval.setShortcut('V')
     parent.button_showval.setToolTip("Use V Key for shortcut")
         
