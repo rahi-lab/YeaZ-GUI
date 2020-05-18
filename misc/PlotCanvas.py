@@ -321,6 +321,11 @@ class PlotCanvas(FigureCanvas):
         
             self.nextmask.set_data((self.nextplotmask % 10 +1 )*(self.nextplotmask != 0))
             self.ax3.draw_artist(self.nextmask)
+            
+        else:
+            self.currmask.set_data(np.zeros(self.plotmask.shape))
+            self.previousmask.set_data(np.zeros(self.plotmask.shape))
+            self.nextmask.set_data(np.zeros(self.plotmask.shape))
         
         # Plot cell numbers
         self.ShowCellNumbers()
@@ -399,7 +404,8 @@ class PlotCanvas(FigureCanvas):
      
          if xtemp:
              for i in range(0,len(xtemp)):
-                 ann = self.ax.annotate(str(int(vals[i])), (xtemp[i], ytemp[i]))
+                 ann = self.ax.annotate(str(int(vals[i])), (xtemp[i], ytemp[i]),
+                                          ha='center', va='center')
                  self.ann_list.append(ann)
                  
          self.draw()
@@ -422,7 +428,8 @@ class PlotCanvas(FigureCanvas):
      
          if xtemp:
              for i in range(0,len(xtemp)):
-                  ann = self.ax2.annotate(str(vals[i]), (xtemp[i], ytemp[i]))
+                  ann = self.ax2.annotate(str(vals[i]), (xtemp[i], ytemp[i]),
+                                          ha='center', va='center')
                   self.ann_list_prev.append(ann)
          self.draw()
              
@@ -443,7 +450,8 @@ class PlotCanvas(FigureCanvas):
                  
          if xtemp:
              for i in range(0,len(xtemp)):
-                 ann = self.ax3.annotate(str(vals[i]), (xtemp[i], ytemp[i]))
+                 ann = self.ax3.annotate(str(vals[i]), (xtemp[i], ytemp[i]),
+                                          ha='center', va='center')
                  self.ann_list_next.append(ann)
          self.draw()
         
