@@ -324,7 +324,6 @@ class PlotCanvas(FigureCanvas):
         
         # Plot cell numbers
         self.ShowCellNumbers()
-            
         self.update()
         self.flush_events()
                 
@@ -379,6 +378,8 @@ class PlotCanvas(FigureCanvas):
             self.ShowCellNumbersCurr()
             self.ShowCellNumbersNext()
             self.ShowCellNumbersPrev()
+        else:
+            self.clearAnnLists()
         
     
     def ShowCellNumbersCurr(self):
@@ -445,6 +446,18 @@ class PlotCanvas(FigureCanvas):
                  ann = self.ax3.annotate(str(vals[i]), (xtemp[i], ytemp[i]))
                  self.ann_list_next.append(ann)
          self.draw()
+        
+        
+    def clearAnnLists(self):
+        for ann in self.ann_list:
+            ann.remove()
+        self.ann_list = []
+        for ann in self.ann_list_prev:
+            ann.remove()
+        self.ann_list_prev = []
+        for ann in self.ann_list_next:
+            ann.remove()
+        self.ann_list_next = []
         
         
     def updateplot(self, posx, posy):
