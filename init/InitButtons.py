@@ -131,6 +131,11 @@ def Init(parent):
     parent.button_eraser.setMaximumWidth(150)
     parent.button_eraser.setStatusTip('Right click and drag to set values to 0')
     
+    # BRUSHSIZE
+    parent.spinbox_brushsize.setMinimum(1)
+    parent.spinbox_brushsize.setMaximumWidth(100)
+    parent.spinbox_brushsize.setValue(3)
+    
     # EXCHANGE CELL VALUES
     parent.button_exval.toggle()
     parent.button_exval.setEnabled(True)
