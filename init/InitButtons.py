@@ -155,25 +155,25 @@ def Init(parent):
     parent.button_changecellvalue.setStatusTip('Change value of one cell')
     parent.button_changecellvalue.setToolTip('Use left click to select one cell and enter a new value')
         
-    # THRESHOLD THE PREDICTION CHECKBOX
-    parent.button_threshold.setEnabled(False)
-    parent.button_threshold.stateChanged.connect(parent.ThresholdBoxCheck)
+#    # THRESHOLD THE PREDICTION CHECKBOX
+#    parent.button_threshold.setEnabled(False)
+#    parent.button_threshold.stateChanged.connect(parent.ThresholdBoxCheck)
     
-    # TEXT BOX FOR ENTERING THRESHOLD VALUE
-    parent.button_SetThreshold = QLineEdit()
-    parent.button_SetThreshold.setPlaceholderText('Enter a threshold value')
-    parent.button_SetThreshold.setValidator(QtGui.QDoubleValidator())
-    parent.button_SetThreshold.setMaximumWidth(150)
-    parent.button_SetThreshold.returnPressed.connect(parent.ThresholdPrediction)
-    parent.button_SetThreshold.setEnabled(False)
+#    # TEXT BOX FOR ENTERING THRESHOLD VALUE
+#    parent.button_SetThreshold = QLineEdit()
+#    parent.button_SetThreshold.setPlaceholderText('Enter a threshold value')
+#    parent.button_SetThreshold.setValidator(QtGui.QDoubleValidator())
+#    parent.button_SetThreshold.setMaximumWidth(150)
+#    parent.button_SetThreshold.returnPressed.connect(parent.ThresholdPrediction)
+#    parent.button_SetThreshold.setEnabled(False)
     
-    # SAVE BUTTON FOR THE THRESHOLDED PREDICTION
-    parent.button_savethresholdmask = QPushButton('Save Threshold')
-    parent.button_savethresholdmask.toggle()
-    parent.button_savethresholdmask.setEnabled(False)
-    parent.button_savethresholdmask.clicked.connect(parent.ButtonSaveThresholdMask)
-    parent.button_savethresholdmask.setMaximumWidth(150)
-    parent.button_savethresholdmask.setStatusTip('Save the thresholded prediction')
+#    # SAVE BUTTON FOR THE THRESHOLDED PREDICTION
+#    parent.button_savethresholdmask = QPushButton('Save Threshold')
+#    parent.button_savethresholdmask.toggle()
+#    parent.button_savethresholdmask.setEnabled(False)
+#    parent.button_savethresholdmask.clicked.connect(parent.ButtonSaveThresholdMask)
+#    parent.button_savethresholdmask.setMaximumWidth(150)
+#    parent.button_savethresholdmask.setStatusTip('Save the thresholded prediction')
     
     # SEGMENT THE OUTPUT OF THE THRESHOLD
     parent.button_segment.setEnabled(False)

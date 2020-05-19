@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Mon May 11 17:29:47 2020
-
-@author: myfiles
+This file handles the PlotCanvas of the GUI - aka the area where the graphics 
+are shown. 
 """
 
 import numpy as np
@@ -22,6 +21,9 @@ from matplotlib.path import Path
 
 
 class PlotCanvas(FigureCanvas):
+    
+    
+    
     def __init__(self, parent=None):
         """this class defines the canvas. It initializes a figure, which is then
         used to plot our data using imshow.
@@ -30,12 +32,6 @@ class PlotCanvas(FigureCanvas):
         # time index.
         fig, (self.ax2, self.ax, self.ax3) = plt.subplots(1,3, sharex = True, sharey = True)
         
-        # self.ax2.axis('tight')
-        # self.ax.axis('tight')
-        # self.ax3.axis('tight')
-        
-        # plt.gca().xaxis.set_major_locator(plt.NullLocator())
-        # plt.gca().yaxis.set_major_locator(plt.NullLocator())
         fig.subplots_adjust(bottom=0, top=1, left=0, right=1, wspace = 0.05, hspace = 0.05)
         FigureCanvas.__init__(self, fig)
         self.setParent(parent)
@@ -48,7 +44,6 @@ class PlotCanvas(FigureCanvas):
         
         # the self.currpicture attribute takes the original data and will then 
         # contain the updates drawn by the user.
-        
         self.currpicture = parent.currentframe
         self.prevpicture = parent.previousframe
         self.nextpicture = parent.nextframe
@@ -58,14 +53,11 @@ class PlotCanvas(FigureCanvas):
         self.tempmask = self.plotmask.copy()
         self.tempplotmask = self.plotmask.copy()
         
-        self.ThresholdMask = np.zeros([parent.reader.sizey, parent.reader.sizex], dtype = np.uint16)
-        self.SegmentedMask = np.zeros([parent.reader.sizey, parent.reader.sizex], dtype = np.uint16)
-        
         # this line is just here to not attribute a zero value to the plot
         # because if so, then it does not update the plot and it stays blank.
-        # (it is unclear why..if someone finds a better solution)
         self.prevpicture = self.currpicture.copy()
         
+        # Initialize Plots
         self.currplot, self.currmask = self.plot(self.currpicture, self.plotmask, self.ax)
         
         self.previousplot, self.previousmask = self.plot(self.prevpicture, self.prevplotmask, self.ax2)
@@ -73,7 +65,6 @@ class PlotCanvas(FigureCanvas):
         self.prevplotmask = np.zeros([parent.reader.sizey, parent.reader.sizex], dtype =np.uint16)
         
         self.nextplot, self.nextmask = self.plot(self.nextpicture, self.nextplotmask, self.ax3)
-        
         self.previousplot.set_data(self.prevpicture)
         self.previousmask.set_data((self.prevplotmask%10+1)*(self.prevplotmask != 0))
 
@@ -82,6 +73,7 @@ class PlotCanvas(FigureCanvas):
         self.update()
         self.flush_events()
         
+        # Set title labels
         self.titlecurr = self.ax.set_title('Time index {}'.format(parent.Tindex))
         self.titleprev = self.ax2.set_title('No frame {}'.format(''))
         self.titlenext = self.ax3.set_title('Next time index {}'.format(parent.Tindex+1))

@@ -18,13 +18,13 @@ def Init(parent):
 #        LAYOUT FOR THE THRESHOLD BUTTONS
 #        all the buttons of the threshold function are placed in an horizontal 
 #        stack
-        hbox_threshold = QtWidgets.QHBoxLayout()
-        hbox_threshold.addWidget(parent.button_threshold)
-        hbox_threshold.addWidget(parent.button_SetThreshold)
-        hbox_threshold.addWidget(parent.button_savethresholdmask)
-#        if this line is not put, then the buttons are placed along the whole
-#        length of the window, in this way they are all grouped to the left.
-        hbox_threshold.addStretch(1)       
+#        hbox_threshold = QtWidgets.QHBoxLayout()
+#        hbox_threshold.addWidget(parent.button_threshold)
+#        hbox_threshold.addWidget(parent.button_SetThreshold)
+#        hbox_threshold.addWidget(parent.button_savethresholdmask)
+##        if this line is not put, then the buttons are placed along the whole
+##        length of the window, in this way they are all grouped to the left.
+#        hbox_threshold.addStretch(1)       
       
         
         

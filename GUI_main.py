@@ -50,11 +50,11 @@ the corresponding picture. This mask can also be corrected using the
 usual buttons (because the Cell Correspondance makes also mistakes). 
 
 """
-import os
 import sys
 import numpy as np
 import pandas as pd
 import h5py
+import skimage
 
 # For writing excel files
 #from openpyxl import load_workbook
@@ -116,7 +116,11 @@ from PlotCanvas import PlotCanvas
 
 import Extract as extr
 from image_loader import load_image
-    
+from segment import segment
+import neural_network as nn
+
+
+
 
 class NavigationToolbar(NavigationToolbar):
     """This is the standard matplotlib toolbar but only the buttons
@@ -316,10 +320,7 @@ class App(QMainWindow):
         button out of focus when the user clicks somewhere
         on the gui. (to unfocus the buttons)
         """
-        self.button_timeindex.clearFocus()
-        if self.button_SetThreshold.isEnabled():
-            self.button_SetThreshold.clearFocus()
-            
+        self.button_timeindex.clearFocus()            
         if self.button_SetSegmentation.isEnabled():
             self.button_SetSegmentation.clearFocus()
         
@@ -631,7 +632,6 @@ class App(QMainWindow):
             
             # Center of mass
             y,x = mask.nonzero()
-            # sample = np.random.choice(len(x), size=50, replace=True)
             com_x = np.mean(x)
             com_y = np.mean(y)
             
@@ -666,7 +666,6 @@ class App(QMainWindow):
 # -----------------------------------------------------------------------------
 # NEURAL NETWORK
     def ShowHideCNNbuttons(self):
-        
         """hide and show the buttons corresponding to the neural network.
             this function is called by the button CNN which is hidden. But
             if activated in the InitLayout.py then you can have a button
@@ -678,7 +677,6 @@ class App(QMainWindow):
             self.button_segment.setVisible(True)
             self.button_savesegmask.setVisible(True)
             self.button_threshold.setVisible(True)
-            self.button_SetThreshold.setVisible(True)
             self.button_savethresholdmask.setVisible(True)
             self.button_SetSegmentation.setVisible(True)
 
@@ -687,7 +685,6 @@ class App(QMainWindow):
             self.button_segment.setVisible(False)
             self.button_savesegmask.setVisible(False)
             self.button_threshold.setVisible(False)
-            self.button_SetThreshold.setVisible(False)
             self.button_savethresholdmask.setVisible(False)
             self.button_SetSegmentation.setVisible(False)
             
@@ -755,23 +752,18 @@ class App(QMainWindow):
                         seg_val = 10
                     self.PredThreshSeg(t, dlg.listfov.row(item), thr_val, seg_val)
                     
-                    # if tracker has been checked then apply it
+                    # apply tracker if wanted and if not at first time
                     if dlg.tracking_checkbox.isChecked():
-                        if t != time_value1:
-                            temp_mask = self.reader.CellCorrespondance(t, dlg.listfov.row(item))
-                            self.reader.SaveMask(t,dlg.listfov.row(item), temp_mask)
-                        
-                        else:
-                            temp_mask = self.reader.LoadSeg(t, dlg.listfov.row(item))
-                            self.reader.SaveMask(t,dlg.listfov.row(item), temp_mask)
+                        temp_mask = self.reader.CellCorrespondance(t, dlg.listfov.row(item))
+                        self.reader.SaveMask(t,dlg.listfov.row(item), temp_mask)
             
             self.ReloadThreeMasks()
             
         self.m.UpdatePlots()
         self.ClearStatusBar()
-        self.EnableCNNButtons()
         self.Enable(self.button_cnn)
-    
+        self.EnableCNNButtons()
+
     
     def PredThreshSeg(self, timeindex, fovindex, thr_val, seg_val):
           """
@@ -782,12 +774,30 @@ class App(QMainWindow):
           Then it segments the thresholded prediction and saves the
           segmentation. 
           """
-          self.reader.LaunchPrediction(timeindex, fovindex)
-          self.m.ThresholdMask = self.reader.ThresholdPred(thr_val, timeindex,fovindex)
-          self.reader.SaveThresholdMask(timeindex, fovindex, self.m.ThresholdMask)
-          self.m.SegmentedMask = self.reader.Segment(seg_val, timeindex,fovindex)
-          self.reader.SaveSegMask(timeindex, fovindex, self.m.SegmentedMask)
-          self.reader.SaveMask(timeindex, fovindex, self.m.SegmentedMask)
+          im = self.reader.LoadOneImage(timeindex, fovindex)
+          pred = self.LaunchPrediction(im)
+          thresh = self.ThresholdPred(thr_val, pred)
+          seg = segment(thresh, pred, seg_val)
+          self.reader.SaveMask(timeindex, fovindex, seg)
+          
+    def LaunchPrediction(self, im):
+        """It launches the neural neutwork on the current image and creates 
+        an hdf file with the prediction for the time T and corresponding FOV. 
+        """
+        im = skimage.exposure.equalize_adapthist(im)
+        im = im*1.0;	
+        pred = nn.prediction(im)
+        return pred
+
+
+    def ThresholdPred(self, thvalue, pred):     
+        """Thresholds prediction with value"""
+        if thvalue == None:
+            thresholdedmask = nn.threshold(pred)
+        else:
+            thresholdedmask = nn.threshold(pred,thvalue)
+        return thresholdedmask
+
             
     
     def SelectChannel(self, index):
@@ -1047,53 +1057,6 @@ class App(QMainWindow):
         """saves the segmented mask
         """
         self.reader.SaveSegMask(self.Tindex, self.FOVindex, self.m.plotmask)
-    
-        
-    def ThresholdBoxCheck(self):
-        """if the buttons is checked it shows the thresholded version of the 
-        prediction, if it is not available it justs displays a null array.
-        The buttons for the setting a threshold a value and to save it are then
-        activated once this button is enabled.
-        """
-        if self.button_threshold.isChecked():
-            self.Disable(self.button_threshold)
-            self.m.ThresholdMask = self.reader.LoadThreshold(self.Tindex, self.FOVindex)
-            
-            self.m.currmask.set_data(self.m.ThresholdMask)
-            self.m.ax.draw_artist(self.m.currplot)
-            self.m.ax.draw_artist(self.m.currmask)
-            self.m.update()
-            self.m.flush_events()
-            
-            self.button_SetThreshold.setEnabled(True)
-            self.button_savethresholdmask.setEnabled(True)
-            
-        else:
-            self.m.updatedata()
-            self.button_SetThreshold.setEnabled(False)
-            self.button_savethresholdmask.setEnabled(False)
-            self.Enable(self.button_threshold)
-
-
-    def ThresholdPrediction(self):
-        # update the plots to display the thresholded view
-        thresholdvalue = float(self.button_SetThreshold.text())
-        
-        self.m.ThresholdMask = self.reader.ThresholdPred(
-            thresholdvalue, 
-            self.Tindex,self.FOVindex)
-        
-        self.m.currmask.set_data(self.m.ThresholdMask)
-        self.m.ax.draw_artist(self.m.currplot)
-        self.m.ax.draw_artist(self.m.currmask)
-        self.m.update()
-        self.m.flush_events()
-      
-        
-    def ButtonSaveThresholdMask(self):
-        """saves the thresholed mask
-        """
-        self.reader.SaveThresholdMask(self.Tindex, self.FOVindex, self.m.ThresholdMask)
 
         
     def ChangePreviousFrame(self):
@@ -1588,7 +1551,7 @@ class App(QMainWindow):
 
 
     def EnableCNNButtons(self):
-        if self.reader.TestPredExisting(self.Tindex, self.FOVindex):
+        if self.reader.TestTimeExist(self.Tindex, self.FOVindex):
             self.button_threshold.setEnabled(True)
             self.button_segment.setEnabled(True)
             self.button_cellcorespondance.setEnabled(True)
