@@ -83,7 +83,7 @@ sys.path.append("./misc")
 #Import all the other python files
 #this file handles the interaction with the disk, so loading/saving images
 #and masks and it also runs the neural network.
-import InteractionDisk_temp as nd
+import Reader as nd
 
 #this file contains a dialog window that takes two integers as entry to swap
 #two cell values
@@ -1163,7 +1163,6 @@ class App(QMainWindow):
                     
                     # updates the plot to see the modification.
                     self.m.updatedata()
-                    
                     
         self.Enable(self.button_changecellvalue)
         self.button_changecellvalue.setChecked(False)
