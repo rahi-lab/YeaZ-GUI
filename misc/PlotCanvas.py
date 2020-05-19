@@ -126,9 +126,8 @@ class PlotCanvas(FigureCanvas):
             for i in range(0,len(indices[0])):
                 self.plotmask[indices[0][i], indices[1][i]] = val2
             self.updatedata()
-        
         else:
-            return
+            raise ValueError('Cell value does not exist.') 
         
         
     def ReleaseClick(self, event):

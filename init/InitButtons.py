@@ -115,15 +115,6 @@ def Init(parent):
     parent.button_pan.setStatusTip('Pan')
     parent.buttonlist.append(parent.button_pan)
     
-    # SAVE
-    parent.button_savemask.toggle()
-    parent.button_savemask.setEnabled(True)
-    parent.button_savemask.clicked.connect(parent.ButtonSaveMask)
-    parent.button_savemask.setToolTip("Use S Key for shortcut")
-    parent.button_savemask.setMaximumWidth(150)
-    parent.button_savemask.setShortcut("S")
-    parent.button_savemask.setStatusTip('Save the mask')
-
     # BRUSH 
     parent.button_drawmouse.setCheckable(True)
     parent.button_drawmouse.clicked.connect(parent.MouseDraw)
@@ -154,48 +145,7 @@ def Init(parent):
     parent.button_changecellvalue.setMaximumWidth(150)
     parent.button_changecellvalue.setStatusTip('Change value of one cell')
     parent.button_changecellvalue.setToolTip('Use left click to select one cell and enter a new value')
-        
-#    # THRESHOLD THE PREDICTION CHECKBOX
-#    parent.button_threshold.setEnabled(False)
-#    parent.button_threshold.stateChanged.connect(parent.ThresholdBoxCheck)
-    
-#    # TEXT BOX FOR ENTERING THRESHOLD VALUE
-#    parent.button_SetThreshold = QLineEdit()
-#    parent.button_SetThreshold.setPlaceholderText('Enter a threshold value')
-#    parent.button_SetThreshold.setValidator(QtGui.QDoubleValidator())
-#    parent.button_SetThreshold.setMaximumWidth(150)
-#    parent.button_SetThreshold.returnPressed.connect(parent.ThresholdPrediction)
-#    parent.button_SetThreshold.setEnabled(False)
-    
-#    # SAVE BUTTON FOR THE THRESHOLDED PREDICTION
-#    parent.button_savethresholdmask = QPushButton('Save Threshold')
-#    parent.button_savethresholdmask.toggle()
-#    parent.button_savethresholdmask.setEnabled(False)
-#    parent.button_savethresholdmask.clicked.connect(parent.ButtonSaveThresholdMask)
-#    parent.button_savethresholdmask.setMaximumWidth(150)
-#    parent.button_savethresholdmask.setStatusTip('Save the thresholded prediction')
-    
-    # SEGMENT THE OUTPUT OF THE THRESHOLD
-    parent.button_segment.setEnabled(False)
-    parent.button_segment.stateChanged.connect(parent.SegmentBoxCheck)
-    
-    # TEXT BOX FOR THE PARAMETERS OF THE SEGMENTATION
-    parent.button_SetSegmentation = QLineEdit()
-    parent.button_SetSegmentation.setPlaceholderText('Enter param for seg')
-    parent.button_SetSegmentation.setValidator(QtGui.QIntValidator())
-    parent.button_SetSegmentation.setMaximumWidth(80)
-    parent.button_SetSegmentation.returnPressed.connect(parent.SegmentThresholdedPredMask)
-    parent.button_SetSegmentation.setEnabled(False)
-    parent.button_SetSegmentation.setText('10')
-    
-    # SAVE BUTTON FOR THE SEGMENTATION OF THE THRESHOLDED PREDICTION
-    parent.button_savesegmask = QPushButton('Save Seg')
-    parent.button_savesegmask.toggle()
-    parent.button_savesegmask.setEnabled(False)
-    parent.button_savesegmask.clicked.connect(parent.ButtonSaveSegMask)
-    parent.button_savesegmask.setMaximumWidth(150)
-    parent.button_savesegmask.setStatusTip('Save the segmented thresholded prediction')
-        
+                
     # MAKE THE CELL CORRESPONDANCE
     parent.button_cellcorespondance.setEnabled(False)
     parent.button_cellcorespondance.setCheckable(True)
