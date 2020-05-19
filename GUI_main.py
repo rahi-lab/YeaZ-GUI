@@ -50,18 +50,18 @@ the corresponding picture. This mask can also be corrected using the
 usual buttons (because the Cell Correspondance makes also mistakes). 
 
 """
-import os
 import sys
 import numpy as np
 import pandas as pd
 import h5py
+import skimage
 
 # For writing excel files
 #from openpyxl import load_workbook
 #from openpyxl import Workbook
 
 # Import everything for the Graphical User Interface from the PyQt5 library.
-from PyQt5.QtWidgets import (QApplication, QMainWindow, QDialog, QFileDialog, 
+from PyQt5.QtWidgets import (QApplication, QMainWindow, QDialog, 
     QMessageBox, QPushButton, QCheckBox, QAction, QStatusBar, QLabel)
 from PyQt5 import QtGui
 
@@ -83,7 +83,7 @@ sys.path.append("./misc")
 #Import all the other python files
 #this file handles the interaction with the disk, so loading/saving images
 #and masks and it also runs the neural network.
-import InteractionDisk_temp as nd
+import Reader as nd
 
 #this file contains a dialog window that takes two integers as entry to swap
 #two cell values
@@ -116,7 +116,11 @@ from PlotCanvas import PlotCanvas
 
 import Extract as extr
 from image_loader import load_image
-    
+from segment import segment
+import neural_network as nn
+
+
+
 
 class NavigationToolbar(NavigationToolbar):
     """This is the standard matplotlib toolbar but only the buttons
@@ -197,8 +201,8 @@ class App(QMainWindow):
         self.button_add_region = QPushButton("Add region")
         self.buttonlist.append(self.button_add_region)
         
-        self.button_savemask = QPushButton("Save Mask")
-        self.buttonlist.append(self.button_savemask)
+#        self.button_savemask = QPushButton("Save Mask")
+#        self.buttonlist.append(self.button_savemask)
         
         self.button_drawmouse = QPushButton('Brush')
         self.buttonlist.append(self.button_drawmouse)
@@ -224,12 +228,6 @@ class App(QMainWindow):
         self.button_cnn = QPushButton('Launch CNN')
         self.buttonlist.append(self.button_cnn)
         
-        self.button_threshold = QCheckBox('Threshold prediction')
-        self.buttonlist.append(self.button_threshold)
-        
-        self.button_segment = QCheckBox('Segment')
-        self.buttonlist.append(self.button_segment)
-                 
         self.button_cellcorespondance = QPushButton('Tracking')
         self.buttonlist.append(self.button_cellcorespondance)
         
@@ -291,7 +289,7 @@ class App(QMainWindow):
         self.fileMenu = menubar.addMenu('File')   
         self.saveactionmenu = QAction('Save')
         self.fileMenu.addAction(self.saveactionmenu)
-        self.saveactionmenu.triggered.connect(self.ButtonSaveMask)
+        self.saveactionmenu.triggered.connect(self.SaveMask)
         
         # hide the toolbar and instead of the original buttons of matplotlib,
         # QPushbuttons are used and are connected to the functions of the toolbar
@@ -309,20 +307,6 @@ class App(QMainWindow):
                 
         self.show()
                 
-    
-    def mousePressEvent(self, QMouseEvent):
-        """this function is implemented just to have the QLineButtons of the 
-        change time index button, setthreshold button and the setsegmentation
-        button out of focus when the user clicks somewhere
-        on the gui. (to unfocus the buttons)
-        """
-        self.button_timeindex.clearFocus()
-        if self.button_SetThreshold.isEnabled():
-            self.button_SetThreshold.clearFocus()
-            
-        if self.button_SetSegmentation.isEnabled():
-            self.button_SetSegmentation.clearFocus()
-        
         
 # -----------------------------------------------------------------------------
 # FUNCTIONS LINKED TO NAVIGATION
@@ -355,30 +339,8 @@ class App(QMainWindow):
         """
         self.Nvgtlbar.zoom()
         
-        if (self.button_zoom.isChecked() and not(self.button_segment.isChecked() 
-            or self.button_threshold.isChecked())):
+        if (self.button_zoom.isChecked()):
             self.Disable(self.button_zoom)
-            
-        elif self.button_zoom.isChecked() and self.button_segment.isChecked():
-            self.Disable(self.button_zoom)
-            self.button_segment.setEnabled(True)
-            
-        elif self.button_zoom.isChecked() and self.button_threshold.isChecked():
-            self.Disable(self.button_zoom)
-            self.button_threshold.setEnabled(True)
-            
-        elif self.button_zoom.isChecked() == False and self.button_segment.isChecked():
-            self.button_pan.setEnabled(True)
-            self.button_home.setEnabled(True)
-            self.button_back.setEnabled(True)
-            self.button_forward.setEnabled(True)
-            self.EnableCorrectionsButtons()
-            
-        elif self.button_zoom.isChecked() == False and self.button_threshold.isChecked():
-            self.button_pan.setEnabled(True)
-            self.button_home.setEnabled(True)
-            self.button_back.setEnabled(True)
-            self.button_forward.setEnabled(True)
             
         else:
             self.Enable(self.button_zoom)
@@ -400,7 +362,6 @@ class App(QMainWindow):
         """
         self.Nvgtlbar.back()
 
-        
         
     def ForwardTlbar(self):
         """
@@ -440,33 +401,8 @@ class App(QMainWindow):
 
         self.Nvgtlbar.pan()
 
-        if (self.button_pan.isChecked() and not(self.button_segment.isChecked()
-            or self.button_threshold.isChecked())):
+        if (self.button_pan.isChecked()):
             self.Disable(self.button_pan)
-            
-        elif self.button_pan.isChecked() and self.button_segment.isChecked():
-            self.Disable(self.button_pan)
-            self.button_segment.setEnabled(True)
-            
-        elif self.button_pan.isChecked() and self.button_threshold.isChecked():
-            self.Disable(self.button_pan)
-            self.button_threshold.setEnabled(True)
-            
-        elif not(self.button_pan.isChecked()) and self.button_segment.isChecked():
-            
-            self.button_zoom.setEnabled(True)
-            self.button_home.setEnabled(True)
-            self.button_back.setEnabled(True)
-            self.button_forward.setEnabled(True)
-            
-            self.EnableCorrectionsButtons()
-            
-        elif not(self.button_pan.isChecked()) and self.button_threshold.isChecked():
-            self.button_zoom.setEnabled(True)
-            self.button_home.setEnabled(True)
-            self.button_back.setEnabled(True)
-            self.button_forward.setEnabled(True)
-        
         else:
             self.Enable(self.button_pan)
 
@@ -631,7 +567,6 @@ class App(QMainWindow):
             
             # Center of mass
             y,x = mask.nonzero()
-            # sample = np.random.choice(len(x), size=50, replace=True)
             com_x = np.mean(x)
             com_y = np.mean(y)
             
@@ -666,7 +601,6 @@ class App(QMainWindow):
 # -----------------------------------------------------------------------------
 # NEURAL NETWORK
     def ShowHideCNNbuttons(self):
-        
         """hide and show the buttons corresponding to the neural network.
             this function is called by the button CNN which is hidden. But
             if activated in the InitLayout.py then you can have a button
@@ -675,28 +609,16 @@ class App(QMainWindow):
         """
         if self.button_hide_show.isChecked():
             self.button_cnn.setVisible(True)
-            self.button_segment.setVisible(True)
-            self.button_savesegmask.setVisible(True)
-            self.button_threshold.setVisible(True)
-            self.button_SetThreshold.setVisible(True)
-            self.button_savethresholdmask.setVisible(True)
-            self.button_SetSegmentation.setVisible(True)
 
         else:
             self.button_cnn.setVisible(False)
-            self.button_segment.setVisible(False)
-            self.button_savesegmask.setVisible(False)
-            self.button_threshold.setVisible(False)
-            self.button_SetThreshold.setVisible(False)
-            self.button_savethresholdmask.setVisible(False)
-            self.button_SetSegmentation.setVisible(False)
             
 
     def LaunchBatchPrediction(self):
         """This function is called whenever the button Launch CNN is pressed.
         It allows to run the neural network over a time range and selected
         field of views.
-        
+            
         It creates a dialog window with two entries, that define the time range
         and a list where the user can select the desired fields of view.
         
@@ -753,27 +675,24 @@ class App(QMainWindow):
                         seg_val = int(dlg.entry_segmentation.text())
                     else:
                         seg_val = 10
-                    self.PredThreshSeg(t, dlg.listfov.row(item), thr_val, seg_val)
+                    self.PredThreshSeg(t, dlg.listfov.row(item), thr_val, seg_val,
+                                       dlg.pc_checkbox.isChecked())
                     
-                    # if tracker has been checked then apply it
+                    # apply tracker if wanted and if not at first time
                     if dlg.tracking_checkbox.isChecked():
-                        if t != time_value1:
-                            temp_mask = self.reader.CellCorrespondance(t, dlg.listfov.row(item))
-                            self.reader.SaveMask(t,dlg.listfov.row(item), temp_mask)
-                        
-                        else:
-                            temp_mask = self.reader.LoadSeg(t, dlg.listfov.row(item))
-                            self.reader.SaveMask(t,dlg.listfov.row(item), temp_mask)
+                        temp_mask = self.reader.CellCorrespondance(t, dlg.listfov.row(item))
+                        self.reader.SaveMask(t,dlg.listfov.row(item), temp_mask)
             
             self.ReloadThreeMasks()
             
         self.m.UpdatePlots()
         self.ClearStatusBar()
-        self.EnableCNNButtons()
         self.Enable(self.button_cnn)
+        self.EnableCNNButtons()
+
     
-    
-    def PredThreshSeg(self, timeindex, fovindex, thr_val, seg_val):
+    def PredThreshSeg(self, timeindex, fovindex, thr_val, seg_val, 
+                      is_pc):
           """
           This function is called in the LaunchBatchPrediction function.
           This function calls the neural network function in the
@@ -782,12 +701,35 @@ class App(QMainWindow):
           Then it segments the thresholded prediction and saves the
           segmentation. 
           """
-          self.reader.LaunchPrediction(timeindex, fovindex)
-          self.m.ThresholdMask = self.reader.ThresholdPred(thr_val, timeindex,fovindex)
-          self.reader.SaveThresholdMask(timeindex, fovindex, self.m.ThresholdMask)
-          self.m.SegmentedMask = self.reader.Segment(seg_val, timeindex,fovindex)
-          self.reader.SaveSegMask(timeindex, fovindex, self.m.SegmentedMask)
-          self.reader.SaveMask(timeindex, fovindex, self.m.SegmentedMask)
+          im = self.reader.LoadOneImage(timeindex, fovindex)
+          pred = self.LaunchPrediction(im, is_pc)
+          thresh = self.ThresholdPred(thr_val, pred)
+          seg = segment(thresh, pred, seg_val)
+          self.reader.SaveMask(timeindex, fovindex, seg)
+          
+    def LaunchPrediction(self, im, is_pc):
+        """It launches the neural neutwork on the current image and creates 
+        an hdf file with the prediction for the time T and corresponding FOV. 
+        """
+        if is_pc:
+            im = skimage.exposure.equalize_adapthist(im)
+            im = im*1.0;	
+            pred = nn.prediction(im)
+        else:
+            im = skimage.exposure.equalize_adapthist(im)
+            im = im*1.0;	
+            pred = nn.prediction(im)
+        return pred
+
+
+    def ThresholdPred(self, thvalue, pred):     
+        """Thresholds prediction with value"""
+        if thvalue == None:
+            thresholdedmask = nn.threshold(pred)
+        else:
+            thresholdedmask = nn.threshold(pred,thvalue)
+        return thresholdedmask
+
             
     
     def SelectChannel(self, index):
@@ -1004,96 +946,12 @@ class App(QMainWindow):
         self.Enable(self.button_cellcorespondance)
         self.button_cellcorespondance.setChecked(False)
         self.ClearStatusBar()
-        
-        
-    def SegmentBoxCheck(self):
-        if self.button_segment.isChecked():
-            self.Disable(self.button_segment)
-            self.EnableCorrectionsButtons()
-            self.m.SegmentedMask = self.reader.LoadSeg(self.Tindex, self.FOVindex)
-            self.m.tempplotmask = self.m.plotmask.copy()
-            self.m.plotmask = self.m.SegmentedMask.copy()
-            self.m.currmask.set_data((self.m.SegmentedMask%10 + 1)*(self.m.SegmentedMask != 0))
-            self.m.ax.draw_artist(self.m.currplot)
-            self.m.ax.draw_artist(self.m.currmask)
-            self.m.update()
-            self.m.flush_events()
-            
-            # update the graph
-            self.button_SetSegmentation.setEnabled(True)
-            self.button_savesegmask.setEnabled(True)
-            
-        else:
-            self.m.SegmentedMask = self.m.plotmask.copy()
-            self.m.plotmask = self.m.tempplotmask.copy()
-            self.m.updatedata()
-            self.button_SetSegmentation.setEnabled(False)
-            self.button_savesegmask.setEnabled(False)
-            self.Enable(self.button_segment)
-    
-    
-    def SegmentThresholdedPredMask(self):
-        # update the plots to display the segmentation view
-        segparamvalue = int(self.button_SetSegmentation.text())
-        self.m.plotmask = self.reader.Segment(segparamvalue, self.Tindex,self.FOVindex)
-        self.m.currmask.set_data((self.m.plotmask%10 + 1)*(self.m.plotmask != 0))
-        self.m.ax.draw_artist(self.m.currplot)
-        self.m.ax.draw_artist(self.m.currmask)
-        self.m.update()
-        self.m.flush_events()
-    
+
     
     def ButtonSaveSegMask(self):
         """saves the segmented mask
         """
         self.reader.SaveSegMask(self.Tindex, self.FOVindex, self.m.plotmask)
-    
-        
-    def ThresholdBoxCheck(self):
-        """if the buttons is checked it shows the thresholded version of the 
-        prediction, if it is not available it justs displays a null array.
-        The buttons for the setting a threshold a value and to save it are then
-        activated once this button is enabled.
-        """
-        if self.button_threshold.isChecked():
-            self.Disable(self.button_threshold)
-            self.m.ThresholdMask = self.reader.LoadThreshold(self.Tindex, self.FOVindex)
-            
-            self.m.currmask.set_data(self.m.ThresholdMask)
-            self.m.ax.draw_artist(self.m.currplot)
-            self.m.ax.draw_artist(self.m.currmask)
-            self.m.update()
-            self.m.flush_events()
-            
-            self.button_SetThreshold.setEnabled(True)
-            self.button_savethresholdmask.setEnabled(True)
-            
-        else:
-            self.m.updatedata()
-            self.button_SetThreshold.setEnabled(False)
-            self.button_savethresholdmask.setEnabled(False)
-            self.Enable(self.button_threshold)
-
-
-    def ThresholdPrediction(self):
-        # update the plots to display the thresholded view
-        thresholdvalue = float(self.button_SetThreshold.text())
-        
-        self.m.ThresholdMask = self.reader.ThresholdPred(
-            thresholdvalue, 
-            self.Tindex,self.FOVindex)
-        
-        self.m.currmask.set_data(self.m.ThresholdMask)
-        self.m.ax.draw_artist(self.m.currplot)
-        self.m.ax.draw_artist(self.m.currmask)
-        self.m.update()
-        self.m.flush_events()
-      
-        
-    def ButtonSaveThresholdMask(self):
-        """saves the thresholed mask
-        """
-        self.reader.SaveThresholdMask(self.Tindex, self.FOVindex, self.m.ThresholdMask)
 
         
     def ChangePreviousFrame(self):
@@ -1245,8 +1103,7 @@ class App(QMainWindow):
         
         # displaying the instructions on the statusbar
         self.WriteStatusBar((
-            'Select one cell using the left click '
-             'and then enter the desired value in the dialog box.'))
+            'Left-click to select cell, right-click to abort.'))
 
         # disables all the buttons
         self.Disable(self.button_changecellvalue)
@@ -1299,8 +1156,6 @@ class App(QMainWindow):
                     #reads the new value to set and converts it from str to int
                     value = int(dlg.entry1.text())
                     
-                    # self.m.plotmask[newy, newx] the value selected by the user
-                    # self.m.plotmask == self.m.plotmask[newy, newx]
                     # gives the coordinates where it is equal to the value
                     # selected by the user. And it replaces it with the new
                     # value.
@@ -1312,6 +1167,8 @@ class App(QMainWindow):
         self.Enable(self.button_changecellvalue)
         self.button_changecellvalue.setChecked(False)
         self.m.ShowCellNumbers()
+        self.SaveMask()
+        self.ClearStatusBar()
         
         
     def DialogBoxECV(self, s):
@@ -1333,9 +1190,12 @@ class App(QMainWindow):
                 value2 = int(dlg.entry2.text())
                 
                 # calls the function which does the swap
-                self.m.ExchangeCellValue(value1,value2)
+                try:
+                    self.m.ExchangeCellValue(value1,value2)
+                except ValueError as e:
+                    QMessageBox.critical(self, 'Error', str(e))
                 self.m.ShowCellNumbers()
-                
+                self.SaveMask()
         else:
             return
 
@@ -1368,7 +1228,7 @@ class App(QMainWindow):
             self.id3 = self.m.mpl_connect('button_release_event', self.m.ReleaseClick)
 
             pixmap = QtGui.QPixmap('./icons/brush2.png')
-            cursor = QtGui.QCursor(pixmap, -1,-1)
+            cursor = QtGui.QCursor(pixmap, 0,9)
             QApplication.setOverrideCursor(cursor)
         
         elif self.button_eraser.isChecked():
@@ -1383,7 +1243,7 @@ class App(QMainWindow):
             self.id3 = self.m.mpl_connect('button_release_event', self.m.ReleaseClick)
             
             pixmap = QtGui.QPixmap('./icons/eraser.png')
-            cursor = QtGui.QCursor(pixmap, -1, -1)
+            cursor = QtGui.QCursor(pixmap, 5, 24)
             QApplication.setOverrideCursor(cursor)
             
         else:
@@ -1393,7 +1253,7 @@ class App(QMainWindow):
             QApplication.restoreOverrideCursor()
             self.Enable(self.button_drawmouse)
             self.Enable(self.button_eraser)
-            
+            self.SaveMask()
             self.ClearStatusBar()
             
             
@@ -1459,6 +1319,7 @@ class App(QMainWindow):
             self.Enable(self.button_newcell)
             self.m.ShowCellNumbers()
             self.ClearStatusBar()
+            self.SaveMask()
             
             
     def TestSelectedPoints(self):
@@ -1526,6 +1387,7 @@ class App(QMainWindow):
             self.Enable(self.button_add_region)
             self.m.ShowCellNumbers()
             self.ClearStatusBar()
+            self.SaveMask()
             
             
 # -----------------------------------------------------------------------------
@@ -1537,17 +1399,9 @@ class App(QMainWindow):
          index. (next and previous buttons should not be turned on if t = 0 
          or t = lasttimeindex)
          """
-         if self.button_segment.isChecked():
-             self.EnableCorrectionsButtons()
-             self.button_home.setEnabled(True)
-             self.button_zoom.setEnabled(True)
-             self.button_pan.setEnabled(True)
-             self.button_back.setEnabled(True)
-             self.button_forward.setEnabled(True)
-         else:
-             for k in range(0, len(self.buttonlist)):
-                 if button != self.buttonlist[k]:
-                     self.buttonlist[k].setEnabled(True)
+         for k in range(0, len(self.buttonlist)):
+             if button != self.buttonlist[k]:
+                 self.buttonlist[k].setEnabled(True)
                  
          if self.Tindex == 0:
              self.button_previousframe.setEnabled(False)
@@ -1563,39 +1417,17 @@ class App(QMainWindow):
          this functions turns off all the buttons except the one given in 
          argument.
          """
-         flag = False
-         if (button == self.button_add_region 
-             or button == self.button_newcell 
-             or button == self.button_exval 
-             or button == self.button_changecellvalue 
-             or button == self.button_drawmouse 
-             or button == self.button_eraser):
-             if self.button_segment.isChecked():
-                 flag = True
 
          for k in range(0,len(self.buttonlist)):
              if button != self.buttonlist[k]:
                  self.buttonlist[k].setEnabled(False)
-         if flag:
-             self.button_segment.setEnabled(True)
-        
-         if button == self.button_segment or button == self.button_threshold:
-             self.button_home.setEnabled(True)
-             self.button_zoom.setEnabled(True)
-             self.button_pan.setEnabled(True)
-             self.button_back.setEnabled(True)
-             self.button_forward.setEnabled(True)
 
 
     def EnableCNNButtons(self):
-        if self.reader.TestPredExisting(self.Tindex, self.FOVindex):
-            self.button_threshold.setEnabled(True)
-            self.button_segment.setEnabled(True)
+        if self.reader.TestTimeExist(self.Tindex, self.FOVindex):
             self.button_cellcorespondance.setEnabled(True)
             self.button_extractfluorescence.setEnabled(True)
         else:
-            self.button_threshold.setEnabled(False)
-            self.button_segment.setEnabled(False)
             self.button_cellcorespondance.setEnabled(False)
             self.button_extractfluorescence.setEnabled(False)
     
@@ -1620,7 +1452,7 @@ class App(QMainWindow):
         self.button_showval.setEnabled(False)
 
     
-    def ButtonSaveMask(self):
+    def SaveMask(self):
         """
         When this function is called, it saves the current mask
         (self.m.plotmask)
