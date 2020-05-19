@@ -61,7 +61,7 @@ import skimage
 #from openpyxl import Workbook
 
 # Import everything for the Graphical User Interface from the PyQt5 library.
-from PyQt5.QtWidgets import (QApplication, QMainWindow, QDialog, 
+from PyQt5.QtWidgets import (QApplication, QMainWindow, QDialog, QSpinBox,
     QMessageBox, QPushButton, QCheckBox, QAction, QStatusBar, QLabel)
 from PyQt5 import QtGui
 
@@ -209,6 +209,10 @@ class App(QMainWindow):
         
         self.button_eraser = QPushButton('Eraser')
         self.buttonlist.append(self.button_eraser)
+        
+        self.label_brushsize = QLabel('Brush Radius:')
+        self.spinbox_brushsize = QSpinBox()
+        self.buttonlist.append(self.spinbox_brushsize)
         
         self.button_exval = QPushButton('Exchange Cell Values')
         self.buttonlist.append(self.button_exval)
@@ -711,6 +715,7 @@ class App(QMainWindow):
           seg = segment(thresh, pred, seg_val)
           self.reader.SaveMask(timeindex, fovindex, seg)
           
+          
     def LaunchPrediction(self, im, is_pc):
         """It launches the neural neutwork on the current image and creates 
         an hdf file with the prediction for the time T and corresponding FOV. 
@@ -738,7 +743,6 @@ class App(QMainWindow):
             thresholdedmask = nn.threshold(pred,thvalue)
         return thresholdedmask
 
-            
     
     def SelectChannel(self, index):
         """This function is called when the button to select different channels
@@ -1224,36 +1228,34 @@ class App(QMainWindow):
         Same for the eraser button, it sets directly the value of self.cellval
         to 0.
         """
-        if self.button_drawmouse.isChecked():
-            self.WriteStatusBar(('Draw using the brush, right click to select '
-                                 'the cell to draw.'))
-            self.Disable(self.button_drawmouse)
-            
+        do_draw = self.button_drawmouse.isChecked()
+        do_erase = self.button_eraser.isChecked()
+        
+        if do_draw or do_erase:
             self.m.tempmask = self.m.plotmask.copy()
             
-            self.id2 = self.m.mpl_connect('button_press_event', self.m.OneClick)
-            self.id = self.m.mpl_connect('motion_notify_event', self.m.PaintBrush)
+            if do_draw:
+                self.WriteStatusBar(('Draw using the brush, right click to select '
+                                     'the cell to draw.'))
+                self.Disable(self.button_drawmouse)
+                pixmap = QtGui.QPixmap('./icons/brush2.png')
+                
+            elif do_erase:
+                self.WriteStatusBar('Erasing by setting the values to 0.')
+                self.Disable(self.button_eraser)
+                pixmap = QtGui.QPixmap('./icons/eraser.png')
+                self.m.cellval = 0
+            
+            radius = self.spinbox_brushsize.value()
+            self.id2 = self.m.mpl_connect('button_press_event', 
+                                          lambda e: self.m.OneClick(e, radius))
+            self.id = self.m.mpl_connect('motion_notify_event', 
+                                         lambda e: self.m.PaintBrush(e, radius))
             self.id3 = self.m.mpl_connect('button_release_event', self.m.ReleaseClick)
-
-            pixmap = QtGui.QPixmap('./icons/brush2.png')
+                
             cursor = QtGui.QCursor(pixmap, 0,9)
             QApplication.setOverrideCursor(cursor)
-        
-        elif self.button_eraser.isChecked():
-            self.WriteStatusBar('Erasing by setting the values to 0.')
-            self.Disable(self.button_eraser)
-            
-            self.m.tempmask = self.m.plotmask.copy()
-            
-            self.m.cellval = 0
-            self.id2 = self.m.mpl_connect('button_press_event', self.m.OneClick)
-            self.id = self.m.mpl_connect('motion_notify_event', self.m.PaintBrush)
-            self.id3 = self.m.mpl_connect('button_release_event', self.m.ReleaseClick)
-            
-            pixmap = QtGui.QPixmap('./icons/eraser.png')
-            cursor = QtGui.QCursor(pixmap, 5, 24)
-            QApplication.setOverrideCursor(cursor)
-            
+                        
         else:
             self.m.mpl_disconnect(self.id3)
             self.m.mpl_disconnect(self.id2)

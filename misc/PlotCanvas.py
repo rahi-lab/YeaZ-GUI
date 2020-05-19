@@ -6,6 +6,8 @@ are shown.
 """
 
 import numpy as np
+from skimage import morphology as morph
+from skimage import draw
 
 # Import everything for the Graphical User Interface from the PyQt5 library.
 from PyQt5.QtWidgets import QSizePolicy
@@ -98,7 +100,7 @@ class PlotCanvas(FigureCanvas):
         
         # This attribute is used to store the square where the mouse has been
         # in order than to draw lines (Paintbrush function)
-        self.storebrushclicks = [[False,False]]
+        self.storebrushclicks = [False,False]
         
         # self.cellval is the variable which sets the value to the pixel
         # whenever something is drawn.
@@ -138,16 +140,19 @@ class PlotCanvas(FigureCanvas):
         previous mouse drawing/dragging and the new one which then starts.
         """
         if self.ax == event.inaxes:
-            self.storebrushclicks[0] = [False, False]
+            self.storebrushclicks = [False, False]
             self.ShowCellNumbers()
+
         
-        
-    def OneClick(self, event):
+    def OneClick(self, event, radius=3):
         """This method is called when the Brush button is activated. And
         sets the value of self.cellval if the click is a right click, or draws
         a square if the click is a left click. (so if the user does just left
         click but does not drag, there will be only a square which is drawn )
         """
+        selem = morph.disk(radius-1)
+        
+        # Right click selects cell
         if (event.button == 3 
             and (event.xdata != None and event.ydata != None) 
             and (not self.button_eraser_check.isChecked()) 
@@ -155,28 +160,35 @@ class PlotCanvas(FigureCanvas):
             tempx = int(event.xdata)
             tempy = int(event.ydata)
             self.cellval = self.plotmask[tempy, tempx]
-            self.storebrushclicks[0] = [False, False]
+            self.storebrushclicks = [False, False]
             
+        # Left click draws square
         elif (event.button == 1 and 
               (event.xdata != None and event.ydata != None) 
               and self.ax == event.inaxes):
             tempx = int(event.xdata)
             tempy = int(event.ydata)
-            self.plotmask[tempy:tempy+3, tempx:tempx+3] = self.cellval
-            self.storebrushclicks[0] = [tempx,tempy]
+            
+            to_change = np.zeros(self.plotmask.shape, dtype=bool)
+            to_change[tempy, tempx] = True
+            to_change = morph.dilation(to_change, selem)
+            
+            self.plotmask[to_change] = self.cellval
+            self.storebrushclicks = [tempx,tempy]
             self.updatedata()
             
         else:
             return
             
     
-    def PaintBrush(self, event):
+    def PaintBrush(self, event, radius=3):
         """PantBrush is the method to paint using a "brush" and it is based
         on the mouse event in matplotlib "motion notify event". However it can 
         not record every pixel that the mouse has hovered over (it is too fast).
         So, in order to not only draw points (happens when the mouse is dragged
         too quickly), these points are interpolated here with lines.
         """
+        selem = morph.disk(radius-1)
         if (event.button == 1 
             and (event.xdata != None and event.ydata != None) 
             and self.ax == event.inaxes):
@@ -184,39 +196,19 @@ class PlotCanvas(FigureCanvas):
             newy = int(event.ydata)
             # when a new cell value is set, there is no point to interpolate, to
             # draw a line between the points. 
-            if self.storebrushclicks[0][0] == False :
-                self.plotmask[newy:newy+3,newx:newx+3] = self.cellval
-                self.storebrushclicks[0] = [newx,newy]
+            if self.storebrushclicks[0] == False :
+                self.storebrushclicks = [newx,newy]
                 
             else:
-                oldx = self.storebrushclicks[0][0]
-                oldy = self.storebrushclicks[0][1]
+                oldx, oldy = self.storebrushclicks
                 
-                if newx != oldx:
-                    slope = (oldy-newy)/(oldx-newx)
-                    offset = (newy*oldx-newx*oldy)/(oldx-newx)
-                    
-                    if newx > oldx:
-                        for xtemp in range(oldx+1, newx+1):
-                            ytemp = int(slope*xtemp + offset)
-                            self.plotmask[ytemp:ytemp + 3, xtemp:xtemp+3] = self.cellval
-                            
-                    else:
-                        for xtemp in range(oldx-1,newx-1,-1):
-                            ytemp = int(slope*xtemp + offset)
-                            self.plotmask[ytemp:ytemp+3, xtemp:xtemp+3] = self.cellval
-                            
-                else:
-                    if newy > oldy:
-                        for ytemp in range(oldy+1,newy+1):
-                            self.plotmask[ytemp:ytemp+3, newx:newx+3] = self.cellval
-                            
-                    else:
-                        for ytemp in range(oldy-1,newy-1,-1):
-                            self.plotmask[ytemp:ytemp+3, newx:newx+3] = self.cellval
-
-            self.storebrushclicks[0][0] = newx
-            self.storebrushclicks[0][1] = newy
+                rr, cc, _ = draw.line_aa(newy, newx, oldy, oldx)
+                to_change = np.zeros(self.plotmask.shape, dtype=bool)
+                to_change[rr,cc] = True
+                to_change = morph.dilation(to_change, selem)
+                self.plotmask[to_change] = self.cellval
+                
+            self.storebrushclicks = [newx, newy]
             self.updatedata()
             
             
