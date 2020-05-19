@@ -40,6 +40,7 @@ class CustomDialog(QDialog):
         self.entry_segmentation.setText('10')
         
         self.tracking_checkbox = QCheckBox()
+        self.tracking_checkbox.setChecked(True)
         
         flo = QFormLayout()
         flo.addWidget(self.labeltime)
