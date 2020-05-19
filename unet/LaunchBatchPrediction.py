@@ -42,6 +42,9 @@ class CustomDialog(QDialog):
         self.tracking_checkbox = QCheckBox()
         self.tracking_checkbox.setChecked(True)
         
+        self.pc_checkbox = QCheckBox()
+        self.pc_checkbox.setChecked(True)
+        
         flo = QFormLayout()
         flo.addWidget(self.labeltime)
         flo.addRow('Lower Boundary for time axis', self.entry1)
@@ -50,6 +53,7 @@ class CustomDialog(QDialog):
         flo.addRow('Enter a threshold value', self.entry_threshold)
         flo.addRow('Enter a segmentation value', self.entry_segmentation)
         flo.addRow('Apply Cell Tracker', self.tracking_checkbox)
+        flo.addRow('Image is Phase Contrast', self.pc_checkbox)
         
         QBtn = QDialogButtonBox.Ok | QDialogButtonBox.Cancel
         

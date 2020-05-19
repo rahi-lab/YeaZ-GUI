@@ -675,7 +675,8 @@ class App(QMainWindow):
                         seg_val = int(dlg.entry_segmentation.text())
                     else:
                         seg_val = 10
-                    self.PredThreshSeg(t, dlg.listfov.row(item), thr_val, seg_val)
+                    self.PredThreshSeg(t, dlg.listfov.row(item), thr_val, seg_val,
+                                       dlg.pc_checkbox.isChecked())
                     
                     # apply tracker if wanted and if not at first time
                     if dlg.tracking_checkbox.isChecked():
@@ -690,7 +691,8 @@ class App(QMainWindow):
         self.EnableCNNButtons()
 
     
-    def PredThreshSeg(self, timeindex, fovindex, thr_val, seg_val):
+    def PredThreshSeg(self, timeindex, fovindex, thr_val, seg_val, 
+                      is_pc):
           """
           This function is called in the LaunchBatchPrediction function.
           This function calls the neural network function in the
@@ -700,18 +702,23 @@ class App(QMainWindow):
           segmentation. 
           """
           im = self.reader.LoadOneImage(timeindex, fovindex)
-          pred = self.LaunchPrediction(im)
+          pred = self.LaunchPrediction(im, is_pc)
           thresh = self.ThresholdPred(thr_val, pred)
           seg = segment(thresh, pred, seg_val)
           self.reader.SaveMask(timeindex, fovindex, seg)
           
-    def LaunchPrediction(self, im):
+    def LaunchPrediction(self, im, is_pc):
         """It launches the neural neutwork on the current image and creates 
         an hdf file with the prediction for the time T and corresponding FOV. 
         """
-        im = skimage.exposure.equalize_adapthist(im)
-        im = im*1.0;	
-        pred = nn.prediction(im)
+        if is_pc:
+            im = skimage.exposure.equalize_adapthist(im)
+            im = im*1.0;	
+            pred = nn.prediction(im)
+        else:
+            im = skimage.exposure.equalize_adapthist(im)
+            im = im*1.0;	
+            pred = nn.prediction(im)
         return pred
 
 
@@ -1222,7 +1229,7 @@ class App(QMainWindow):
             self.id3 = self.m.mpl_connect('button_release_event', self.m.ReleaseClick)
 
             pixmap = QtGui.QPixmap('./icons/brush2.png')
-            cursor = QtGui.QCursor(pixmap, -1,-1)
+            cursor = QtGui.QCursor(pixmap, 0,9)
             QApplication.setOverrideCursor(cursor)
         
         elif self.button_eraser.isChecked():
@@ -1237,7 +1244,7 @@ class App(QMainWindow):
             self.id3 = self.m.mpl_connect('button_release_event', self.m.ReleaseClick)
             
             pixmap = QtGui.QPixmap('./icons/eraser.png')
-            cursor = QtGui.QCursor(pixmap, -1, -1)
+            cursor = QtGui.QCursor(pixmap, 5, 24)
             QApplication.setOverrideCursor(cursor)
             
         else:
