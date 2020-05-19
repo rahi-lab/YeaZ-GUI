@@ -626,6 +626,12 @@ class App(QMainWindow):
         inside of self.PredThreshSeg and it does the prediction of the neural
         network, thresholds this prediction and then segments it.
         """
+        def reset():
+            self.m.UpdatePlots()
+            self.ClearStatusBar()
+            self.Enable(self.button_cnn)
+            self.EnableCNNButtons()
+        
         
         self.WriteStatusBar('Running the neural network...')
         self.Disable(self.button_cnn)
@@ -639,6 +645,7 @@ class App(QMainWindow):
             # if not it ignores and returns.
             if not (dlg.entry1.text()!= '' and dlg.entry2.text() != ''):
                 QMessageBox.critical(self, "Error", "No Time Specified")
+                reset()
                 return 
             
             # reads out the entry given by the user and converts the index
@@ -651,6 +658,7 @@ class App(QMainWindow):
             # and time_value2 the upper boundary of the range.
             if time_value1 > time_value2 :
                 QMessageBox.critical(self, "Error", 'Invalid Time Constraints')
+                reset()
                 return
             
             # displays that the neural network is running
@@ -684,11 +692,7 @@ class App(QMainWindow):
                         self.reader.SaveMask(t,dlg.listfov.row(item), temp_mask)
             
             self.ReloadThreeMasks()
-            
-        self.m.UpdatePlots()
-        self.ClearStatusBar()
-        self.Enable(self.button_cnn)
-        self.EnableCNNButtons()
+        reset()
 
     
     def PredThreshSeg(self, timeindex, fovindex, thr_val, seg_val, 
@@ -716,6 +720,10 @@ class App(QMainWindow):
             im = im*1.0;	
             pred = nn.prediction(im)
         else:
+            QMessageBox(self, 'Warning', 
+                        'Brightfield support is not implemented yet. '
+                        'Using the same neural network as for phase '
+                        'contrast.')
             im = skimage.exposure.equalize_adapthist(im)
             im = im*1.0;	
             pred = nn.prediction(im)
