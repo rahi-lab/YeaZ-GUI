@@ -58,13 +58,8 @@ def cell_merge(wsh, pred):
         
         # bounding box
         obj_coords[obj1,:] = get_bounding_box(dil_objs[obj1,:,:])
-#        objallpixels = np.where(dilobjs[obj1,:,:] != 0)
-#        objcoords[obj1,0]=np.min(objallpixels[0])
-#        objcoords[obj1,1]=np.max(objallpixels[0])
-#        objcoords[obj1,2]=np.min(objallpixels[1])
-#        objcoords[obj1,3]=np.max(objallpixels[1])
     
-    objcounter = 0	# will build up a new watershed mask, have to run a counter because some objects lost
+    objcounter = 0	# counter for new watershed objects
     
     for obj1 in range(wsh.max()):	
         dil1 = dil_objs[obj1,:,:]
