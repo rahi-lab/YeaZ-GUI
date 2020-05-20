@@ -30,7 +30,7 @@ class CustomDialog(QDialog):
         for f in range(0, app.reader.Npos):
             self.listfov.addItem('Field of View {}'.format(f+1))
 
-        self.labeltime = QLabel("Enter range ({}-{}) for time axis".format(0, app.reader.sizet-1))
+        self.labeltime = QLabel("Enter range of frames ({}-{}) to segment".format(0, app.reader.sizet-1))
         
         self.entry_threshold = QLineEdit()
         self.entry_threshold.setValidator(QtGui.QDoubleValidator())
@@ -42,15 +42,15 @@ class CustomDialog(QDialog):
                 
         flo = QFormLayout()
         flo.addWidget(self.labeltime)
-        flo.addRow('Lower boundary for time axis', self.entry1)
-        flo.addRow('Upper boundary for time axis', self.entry2)        
-        flo.addRow('Select field(s) of fiew from  the list', self.listfov)
-        flo.addRow('Enter a threshold value', self.entry_threshold)
-        flo.addRow('Enter a segmentation value', self.entry_segmentation)
+        flo.addRow('Start from frame:', self.entry1)
+        flo.addRow('End at frame:', self.entry2)        
+        flo.addRow('Select field(s) of view:', self.listfov)
+        flo.addRow('Threshold value:', self.entry_threshold)
+        flo.addRow('Min. distance between seeds:', self.entry_segmentation)
         
         self.radiobuttons = QButtonGroup()
-        self.buttonBF = QRadioButton('Image is brightfield')
-        self.buttonPC = QRadioButton('Image is phase contrast')
+        self.buttonBF = QRadioButton('Images are bright-field')
+        self.buttonPC = QRadioButton('Images are phase contrast')
         self.buttonPC.setChecked(True)
         self.radiobuttons.addButton(self.buttonBF, id=0)
         self.radiobuttons.addButton(self.buttonPC, id=1)

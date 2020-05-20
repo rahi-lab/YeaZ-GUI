@@ -1,6 +1,6 @@
 # YeaZ
 
-This is the user manual for the graphical interface for yeast segmentation using a state of the art convolutional neural network with U-Net architecture. As for now, the convolutional neural network is trained for phase contrast images. Compatability with brightfield images will come soon. You can find the training set with the annotated images here: https://www.epfl.ch/labs/lpbs/data-and-software/. 
+This is the user manual for the graphical interface for yeast segmentation using a state of the art convolutional neural network with U-Net architecture. As for now, the convolutional neural network is trained for phase contrast images. Compatability with brightfield images will come soon. You can find the training set with the annotated images here: https://www.quantsysbio.com/data-and-software/. 
 
 Want to try out the neural network first? Check out our online segmentation tool at https://lpbs-nn.epfl.ch/.
 
@@ -80,11 +80,11 @@ After the CNN has run, it is possible to correct the mistakes it has made. This 
 
 `Eraser`: This can be used to remove a region from a cell. The use is the same as for `Brush`.
 
-`Exchange Cell Values`: This allows to correct the cell values by switching two cells. 
+`Exchange cell IDs`: This allows to correct the cell values by switching two cells. 
 
-`Change Cell Value`: This allows to change the value of a cell. **Important: **If you change the number to the number of another cell, those two cells will from now on be considered as one single cell. This is useful for fusing cells that were oversegmented, but has to be used with care.
+`Change cell ID`: This allows to change the value of a cell. **Important: **If you change the number to the number of another cell, those two cells will from now on be considered as one single cell. This is useful for fusing cells that were oversegmented, but has to be used with care.
 
-`Retracking`: After having made edits to a frame, the cell numbers may no longer correspond in the next frame. This can be automatically fixed by navigating to the next frame and clicking the retracking button.
+`Retrack`: After having made edits to a frame, the cell numbers may no longer correspond in the next frame. This can be automatically fixed by navigating to the next frame and clicking the retracking button.
 
 ### Extracting the results
 

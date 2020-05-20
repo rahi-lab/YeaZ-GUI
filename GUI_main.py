@@ -207,32 +207,32 @@ class App(QMainWindow):
         self.button_eraser = QPushButton('Eraser')
         self.buttonlist.append(self.button_eraser)
         
-        self.label_brushsize = QLabel('Brush/Eraser Radius:')
+        self.label_brushsize = QLabel('Brush/Eraser radius:')
         self.spinbox_brushsize = QSpinBox()
         self.buttonlist.append(self.spinbox_brushsize)
         
-        self.button_exval = QPushButton('Exchange Cell Values')
+        self.button_exval = QPushButton('Exchange cell IDs')
         self.buttonlist.append(self.button_exval)
         
-        self.button_showval = QCheckBox('Show Cell Values')
+        self.button_showval = QCheckBox('Show cell IDs')
         self.buttonlist.append(self.button_showval)
         
-        self.button_hidemask = QCheckBox('Hide Mask')
+        self.button_hidemask = QCheckBox('Hide mask')
         self.buttonlist.append(self.button_hidemask)
         
-        self.button_nextframe = QPushButton("Next Time Frame")
+        self.button_nextframe = QPushButton("Next time frame")
         self.buttonlist.append(self.button_nextframe)
         
-        self.button_previousframe = QPushButton("Previous Time Frame")
+        self.button_previousframe = QPushButton("Previous time frame")
         self.buttonlist.append(self.button_previousframe)
         
         self.button_cnn = QPushButton('Launch CNN')
         self.buttonlist.append(self.button_cnn)
         
-        self.button_cellcorespondance = QPushButton('Retracking')
+        self.button_cellcorespondance = QPushButton('Retrack')
         self.buttonlist.append(self.button_cellcorespondance)
         
-        self.button_changecellvalue = QPushButton('Change cell value')
+        self.button_changecellvalue = QPushButton('Change cell ID')
         self.buttonlist.append(self.button_changecellvalue)        
         
         self.button_extractfluorescence = QPushButton('Extract')

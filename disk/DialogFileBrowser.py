@@ -96,4 +96,4 @@ class FileBrowser(QDialog):
     def getfolder(self):
         self.nd2name = QFileDialog.getExistingDirectory(self, ("Select Image Folder"))
         if self.nd2name != '':
-            self.labelnd2.setText(self.nd2name)
+            self.labelfolder.setText(self.nd2name)

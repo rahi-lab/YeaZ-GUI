@@ -40,9 +40,9 @@ class Extract(QDialog):
 
     def init_UI(self):
         # Extract Buttons
-        title_extr = QLabel('Extract for selected cells')
-        self.extr_mask = _create_button("Extract Mask", self.do_extr_mask)
-        self.extr_fluo = _create_button("Extract Fluorescence", self.do_extr_fluo)
+        title_extr = QLabel('Extract:')
+        self.extr_mask = _create_button("Extract mask", self.do_extr_mask)
+        self.extr_fluo = _create_button("Extract values", self.do_extr_fluo)
         self.done = _create_button("Cancel", self.do_cancel)
         self.done.setDefault(True)  
         
@@ -54,21 +54,19 @@ class Extract(QDialog):
         extr_box.setAlignment(Qt.AlignTop)
         
         # Select Button
-        title_select = QLabel('Select / Deselect Cells for Extraction')
-        self.sel_mult = _create_button("Select Multiple", self.do_sel_mult,
-                                       "Left-click several times to draw polygon "
-                                       "on image around cells to select, "
-                                       "right-click to confirm")
-        self.sel_sngl = _create_button("Select Single", self.do_sel_sngl,
+        title_select = QLabel('Select cells:')
+        self.sel_mult = _create_button("Select multiple cells", self.do_sel_mult,
+                                       "Left-click to define the corners of a polygon around cells, "
+                                       "right-click to confirm.")
+        self.sel_sngl = _create_button("Select single cell", self.do_sel_sngl,
                                        "Left-click to select cell, right-click "
-                                       "to abort")
-        self.desel_mult = _create_button("Deselect Multiple", self.do_desel_mult,
-                                       "Left-click several times to draw polygon "
-                                       "on image around cells to deselect, "
-                                       "right-click to confirm")
-        self.desel_sngl = _create_button("Deselect Single", self.do_desel_sngl,
+                                       "to abort.")
+        self.desel_mult = _create_button("Deselect multiple cells", self.do_desel_mult,
+                                       "Left-click to define the corners of a polygon around cells, "
+                                       "right-click to confirm.")
+        self.desel_sngl = _create_button("Deselect single cell", self.do_desel_sngl,
                                        "Left-click to deselect cell, right-click "
-                                       "to abort")
+                                       "to abort.")
         
         sel_box = QVBoxLayout()
         sel_box.addWidget(title_select)
@@ -79,7 +77,7 @@ class Extract(QDialog):
         sel_box.setAlignment(Qt.AlignTop)
         
         # Additional Fluorescence File
-        file_title = QLabel("Manage files from which to extract fluorescence")
+        file_title = QLabel("Manage files and channels for extraction:")
         self.list_channels = QListWidget()
         self.add_file = _create_button('Add', self.do_add_file)
         self.remove_file = _create_button('Remove', self.do_remove_file)
@@ -123,13 +121,13 @@ class Extract(QDialog):
 
         self.setLayout(full)    
         self.setGeometry(300, 300, 600, 600)
-        self.setWindowTitle('Extracting')    
+        self.setWindowTitle('Extract geometries, fluorescence, masks')
         self.show()
 
     def do_extr_fluo(self):
         self.outfile, _ = QFileDialog.getSaveFileName(
-            self,"Specify CSV File for Exporting Fluorescence",
-            "","All Files (*);;Text Files (*.csv)")
+            self,"Specify CSV file for exporting values",
+            "","All files (*);;Text files (*.csv)")
         _, ext = os.path.splitext(self.outfile)
         if ext == '':
             self.outfile += '.csv'
@@ -147,8 +145,8 @@ class Extract(QDialog):
     
     def do_extr_mask(self):
         self.outfile, _ = QFileDialog.getSaveFileName(
-            self,"Specify TIFF File for Exporting Mask",
-            "","All Files (*);;Image File (*.tiff)")
+            self,"Specify TIFF file for exporting mask",
+            "","All files (*);;Image file (*.tiff)")
         _, ext = os.path.splitext(self.outfile)
         if ext == '':
             self.outfile += '.tif'
