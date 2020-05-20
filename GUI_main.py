@@ -232,7 +232,7 @@ class App(QMainWindow):
         self.button_cnn = QPushButton('Launch CNN')
         self.buttonlist.append(self.button_cnn)
         
-        self.button_cellcorespondance = QPushButton('Tracking')
+        self.button_cellcorespondance = QPushButton('Retracking')
         self.buttonlist.append(self.button_cellcorespondance)
         
         self.button_changecellvalue = QPushButton('Change cell value')
