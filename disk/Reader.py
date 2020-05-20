@@ -71,7 +71,6 @@ class Reader:
                 self.sizey, self.sizex = im.shape
                 self.sizet = 1
                 
-            print(self.sizet, self.sizey, self.sizex)
             self.Npos = 1
             self.channel_names = ['Channel1']
                 
@@ -319,7 +318,7 @@ class Reader:
             return self.LoadOneImage(currentT, currentFOV)
 
 
-    def CellCorrespondance(self, currentT, currentFOV):
+    def CellCorrespondence(self, currentT, currentFOV):
         """Performs tracking, handles loading of the images. If the image to 
         track has no precedent, returns unaltered mask. If no mask exists
         for the current timeframe, returns zero array."""
@@ -332,7 +331,7 @@ class Reader:
             if self.TestTimeExist(currentT, currentFOV, filemasks):
                 nextmask = np.array(filemasks['/{}/{}'.format(self.fovlabels[currentFOV],
                                                               self.tlabels[currentT])])             
-                newmask = hu.correspondance(prevmask, nextmask)
+                newmask = hu.correspondence(prevmask, nextmask)
                 out = newmask
             # No mask exists for the current timeframe, return empty array
             else:

@@ -39,15 +39,15 @@ display the segmentation of the thresholded prediction.
 At this stage, one can correct the segmentation of the prediction using
 the functions (New Cell, Add Region, etc..) by selecting the Segment
 checkbox and then save them using the Save Seg button.
-If the user is happy with the segmentation, the Cell Correspondance button 
+If the user is happy with the segmentation, the Cell Correspondence button 
 can be clicked. Until then, the cells get random numbers attributed by
 the segmentation algorithm. In order to keep track of the cell through time,
 the same cells should have the same number between two different time pictures.
-This can be (with some errors) achieved by the Cell Correspondance button,
+This can be (with some errors) achieved by the Cell Correspondence button,
 which tries to attribute the same number to corresponding cells in time.
 After that, the final mask is saved and it is always visible when you go on
 the corresponding picture. This mask can also be corrected using the 
-usual buttons (because the Cell Correspondance makes also mistakes). 
+usual buttons (because the Cell Correspondence makes also mistakes). 
 
 """
 import sys
@@ -137,7 +137,7 @@ class App(QMainWindow):
 
     def __init__(self, nd2pathstr, hdfpathstr, newhdfstr):
         super().__init__()
-        self.title = 'YeaZ 1.0'
+        self.setWindowTitle('YeaZ')
 
         # all these ids are integers which are used to set a connection between
         # the button and the function that this button calls.
@@ -286,11 +286,11 @@ class App(QMainWindow):
         # MENU, TOOLBAR AND STATUS BAR
         # creates a menu just in case, some other functions can be added later
         # in this menu.
-        menubar = self.menuBar()
-        self.fileMenu = menubar.addMenu('File')   
-        self.saveactionmenu = QAction('Save')
-        self.fileMenu.addAction(self.saveactionmenu)
-        self.saveactionmenu.triggered.connect(self.SaveMask)
+#        menubar = self.menuBar()
+#        self.fileMenu = menubar.addMenu('File')   
+#        self.saveactionmenu = QAction('Save')
+#        self.fileMenu.addAction(self.saveactionmenu)
+#        self.saveactionmenu.triggered.connect(self.SaveMask)
         
         # hide the toolbar and instead of the original buttons of matplotlib,
         # QPushbuttons are used and are connected to the functions of the toolbar
@@ -699,7 +699,7 @@ class App(QMainWindow):
                                        is_pc)
                     
                     # apply tracker if wanted and if not at first time
-                    temp_mask = self.reader.CellCorrespondance(t, dlg.listfov.row(item))
+                    temp_mask = self.reader.CellCorrespondence(t, dlg.listfov.row(item))
                     self.reader.SaveMask(t,dlg.listfov.row(item), temp_mask)
             
             self.ReloadThreeMasks()
@@ -716,11 +716,13 @@ class App(QMainWindow):
           Then it segments the thresholded prediction and saves the
           segmentation. 
           """
+          print('--------- Segmenting field of view:',fovindex,'Time point:',timeindex)
           im = self.reader.LoadOneImage(timeindex, fovindex)
           pred = self.LaunchPrediction(im, is_pc)
           thresh = self.ThresholdPred(thr_val, pred)
           seg = segment(thresh, pred, seg_val)
           self.reader.SaveMask(timeindex, fovindex, seg)
+          print('--------- Finished segmenting.')
           
           
     def LaunchPrediction(self, im, is_pc):
@@ -955,10 +957,10 @@ class App(QMainWindow):
      
     def CellCorrespActivation(self):
         self.Disable(self.button_cellcorespondance)
-        self.WriteStatusBar('Doing the cell correspondance')
+        self.WriteStatusBar('Doing the cell correspondence')
 
         if self.Tindex != 0:
-            self.m.plotmask = self.reader.CellCorrespondance(self.Tindex, self.FOVindex)
+            self.m.plotmask = self.reader.CellCorrespondence(self.Tindex, self.FOVindex)
             self.m.updatedata()
         else:
             self.m.plotmask = self.reader.LoadSeg(self.Tindex, self.FOVindex)

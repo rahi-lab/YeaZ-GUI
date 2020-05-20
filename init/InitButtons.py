@@ -20,28 +20,28 @@ def Init(parent):
     parent.button_hide_show.setCheckable(True)    
     parent.button_hide_show.setMaximumWidth(150)
     parent.button_hide_show.clicked.connect(parent.ShowHideCNNbuttons)
-    parent.button_hide_show.setStatusTip('Press to hide and show neural network buttons')
+    parent.button_hide_show.setStatusTip('Press to hide and show neural network buttons.')
 
     # ADD REGION
     parent.button_add_region.setCheckable(True)
     parent.button_add_region.setMaximumWidth(150)
     parent.button_add_region.clicked.connect(parent.clickmethod)
     parent.button_add_region.setShortcut("R")
-    parent.button_add_region.setToolTip("Use R Key for shortcut")
-    parent.button_add_region.setStatusTip('The first left click sets the value for the next clicks, then draw polygons')
+    parent.button_add_region.setToolTip("Shortcut: R key")
+    parent.button_add_region.setStatusTip('First left click identifies the ID value for the cell (or background) to be extended, then left-click to specify a polygon.')
     
     # NEW CELL
     parent.button_newcell.setCheckable(True)
     parent.button_newcell.setMaximumWidth(150)
     parent.button_newcell.setShortcut("N")
-    parent.button_newcell.setToolTip("Use N Key for shortcut")
+    parent.button_newcell.setToolTip("Shortcut: N key")
     parent.button_newcell.clicked.connect(parent.ClickNewCell)
-    parent.button_newcell.setStatusTip('Use the left click to produce a polygon with a new cell value')
+    parent.button_newcell.setStatusTip('Use left clicks to produce a polygon with a new cell ID value.')
     
     # NEXT FRAME (TIME AXIS)
     parent.button_nextframe.toggle()
     parent.button_nextframe.pressed.connect(parent.ChangeNextFrame)
-    parent.button_nextframe.setToolTip("Use right arrow key for shortcut")
+    parent.button_nextframe.setToolTip("Shortcut: right arrow (->)")
     parent.button_nextframe.setMaximumWidth(150)
     parent.button_nextframe.setShortcut(Qt.Key_Right)
     
@@ -53,7 +53,7 @@ def Init(parent):
     parent.button_previousframe.setEnabled(False)
     parent.button_previousframe.toggle()
     parent.button_previousframe.pressed.connect(parent.ChangePreviousFrame)
-    parent.button_previousframe.setToolTip("Use left arrow key for shortcut")
+    parent.button_previousframe.setToolTip("Shortcut: left arrow (<-)")
     parent.button_previousframe.setMaximumWidth(150)
     parent.button_previousframe.setShortcut(Qt.Key_Left)
     parent.button_previousframe.move(100,100)
@@ -67,7 +67,8 @@ def Init(parent):
     parent.button_zoom.setStyleSheet("QPushButton:hover { background-color: blue }" )
     parent.button_zoom.setCheckable(True)
     parent.button_zoom.setShortcut("Z")
-    parent.button_zoom.setToolTip("Use Z Key for shortcut")
+    parent.button_zoom.setToolTip("Shortcut: Z")
+    parent.button_zoom.setStatusTip('Zoom (draw rectangle with right mouse button to zoom out)')
     parent.buttonlist.append(parent.button_zoom)
     
     # HOME
@@ -78,8 +79,8 @@ def Init(parent):
     parent.button_home.setMaximumHeight(30)
     parent.button_home.setStyleSheet("QPushButton:hover { background-color: blue }" )
     parent.button_home.setShortcut("H")
-    parent.button_home.setToolTip("Use H Key for shortcut")
-    parent.button_home.setStatusTip('Reset Zoom')
+    parent.button_home.setToolTip("Shortcut: H")
+    parent.button_home.setStatusTip('Reset zoom')
     parent.buttonlist.append(parent.button_home)
     
     # PREVIOUS SCALE (ZOOM SCALE)
@@ -89,7 +90,7 @@ def Init(parent):
     parent.button_back.setMaximumWidth(30)
     parent.button_back.setMaximumHeight(30)
     parent.button_back.setStyleSheet("QPushButton:hover { background-color: blue }" )
-    parent.button_back.setStatusTip('Go back to previous zoom scale')
+    parent.button_back.setStatusTip('Go back to previous view (undo).')
     parent.buttonlist.append(parent.button_back)
     
     # NEXT SCALE (ZOOM SCALE)
@@ -99,7 +100,7 @@ def Init(parent):
     parent.button_forward.setMaximumWidth(30)
     parent.button_forward.setMaximumHeight(30)
     parent.button_forward.setStyleSheet("QPushButton:hover { background-color: blue }")
-    parent.button_back.setStatusTip('Go to next zoom scale')
+    parent.button_forward.setStatusTip('Go to next view (redo).')
     parent.buttonlist.append(parent.button_forward)
     
     # PAN 
@@ -111,25 +112,25 @@ def Init(parent):
     parent.button_pan.setStyleSheet("QPushButton:hover { background-color: blue }")
     parent.button_pan.setCheckable(True)
     parent.button_pan.setShortcut("P")
-    parent.button_pan.setToolTip("Use P Key for shortcut")
+    parent.button_pan.setToolTip("Shortcut: P")
     parent.button_pan.setStatusTip('Pan')
     parent.buttonlist.append(parent.button_pan)
     
     # BRUSH 
     parent.button_drawmouse.setCheckable(True)
     parent.button_drawmouse.clicked.connect(parent.MouseDraw)
-    parent.button_drawmouse.setToolTip("Use B Key for shortcut")
+    parent.button_drawmouse.setToolTip("Shortcut: B")
     parent.button_drawmouse.setShortcut("B")
     parent.button_drawmouse.setMaximumWidth(150)
-    parent.button_drawmouse.setStatusTip('Right click to select cell value and then left click and drag to draw')
+    parent.button_drawmouse.setStatusTip('Right click to select a cell ID value, then draw with left mouse button.')
     
     # ERASER
     parent.button_eraser.setCheckable(True)
     parent.button_eraser.clicked.connect(parent.MouseDraw)
-    parent.button_eraser.setToolTip("Use E Key for shortcut")
+    parent.button_eraser.setToolTip("Shortcut: E")
     parent.button_eraser.setShortcut("E")
     parent.button_eraser.setMaximumWidth(150)
-    parent.button_eraser.setStatusTip('Right click and drag to set values to 0')
+    parent.button_eraser.setStatusTip('Drag to set values to background (=0).')
     
     # BRUSHSIZE
     parent.spinbox_brushsize.setMinimum(1)
@@ -141,37 +142,39 @@ def Init(parent):
     parent.button_exval.setEnabled(True)
     parent.button_exval.clicked.connect(parent.DialogBoxECV)
     parent.button_exval.setMaximumWidth(150)
-    parent.button_exval.setStatusTip('Exchange values between two cells')
+    parent.button_exval.setStatusTip('Start dialog box for exchanging ID values between two cells.')
 
     # CHANGE CELL VALUE
     parent.button_changecellvalue.setCheckable(True)
     parent.button_changecellvalue.setEnabled(True)
     parent.button_changecellvalue.clicked.connect(parent.ChangeOneValue)
     parent.button_changecellvalue.setMaximumWidth(150)
-    parent.button_changecellvalue.setStatusTip('Change value of one cell')
-    parent.button_changecellvalue.setToolTip('Use left click to select one cell and enter a new value')
+#    parent.button_changecellvalue.setStatusTip('')
+    parent.button_changecellvalue.setStatusTip('Change ID value of one cell. Use left click to select one cell and enter a new ID value.')
                 
-    # MAKE THE CELL CORRESPONDANCE
+    # MAKE THE CELL Correspondence
     parent.button_cellcorespondance.setEnabled(False)
     parent.button_cellcorespondance.setCheckable(True)
     parent.button_cellcorespondance.clicked.connect(parent.CellCorrespActivation)
     parent.button_cellcorespondance.setMaximumWidth(150)
-    parent.button_cellcorespondance.setStatusTip('Recalculate the cell correspondance to the previous time frame')
+    parent.button_cellcorespondance.setStatusTip('Retrack cell ID numbers based on the previous frame.')
     
     # EXTRACT FLUORESCENCE IN DIFFERENT CHANNELS    
     parent.button_extractfluorescence.setEnabled(False)
     parent.button_extractfluorescence.toggle()
     parent.button_extractfluorescence.clicked.connect(parent.ButtonFluo)
     parent.button_extractfluorescence.setMaximumWidth(150)
-    parent.button_extractfluorescence.setStatusTip('Extract the total intensity, area and variance of the cells in the different channels')
+    parent.button_extractfluorescence.setStatusTip('Start the dialog box for exporting cell geometries and fluorescence for different channels.')
     
     # SHOW THE VALUES OF THE CELLS
     parent.button_showval.stateChanged.connect(parent.m.UpdatePlots)
     parent.button_showval.setShortcut('V')
-    parent.button_showval.setToolTip("Use V Key for shortcut")
+    parent.button_showval.setToolTip("Shortcut: V")
         
     # HIDE/SHOW THE MASK
     parent.button_hidemask.stateChanged.connect(parent.m.HideMask)    
+    parent.button_hidemask.setShortcut('M')
+    parent.button_hidemask.setToolTip("Shortcut: M")
     
     # CHANGE TIME INDEX
     parent.button_timeindex = QLineEdit()
@@ -201,7 +204,7 @@ def Init(parent):
     # NEURAL NETWORK BUTTON
     parent.button_cnn.setCheckable(True)
     parent.button_cnn.pressed.connect(parent.LaunchBatchPrediction)
-    parent.button_cnn.setToolTip("Launches the CNN on a range of images")
+    parent.button_cnn.setStatusTip("Start the dialog box for segmenting images.")
     parent.button_cnn.setMaximumWidth(150)
     parent.EnableCNNButtons()
         

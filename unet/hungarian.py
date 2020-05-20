@@ -5,9 +5,9 @@ from sklearn.preprocessing import scale
 from sklearn.metrics.pairwise import euclidean_distances
 
 
-def correspondance(prev, curr):
+def correspondence(prev, curr):
     """
-    Corrects correspondance between previous and current mask, returns current
+    Corrects correspondence between previous and current mask, returns current
     mask with corrected cell values. New cells are given the unique identifier
     starting at max(prev)+1. 
     

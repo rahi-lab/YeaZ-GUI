@@ -38,7 +38,7 @@ If small buds aren't recognized as cells in your image, this is likely linked to
 
 ### I just want the CNN, but not the GUI
 
-In case you only want to use the functionalities of the convolutional neural network and the segmentation, but not the full GUI, you only need the files `unet/model.py`, `unet/neural_network.py` (for making predictions), `unet/segment.py` (for doing watershed segmentation) and `unet/hungarian.py` (for tracking), as well as the weights for the neural network which have to be in the same folder. You can create predictions using the `prediction` function in `neural_network.py`, obtain the segmentations with the `segment` function in `segment.py`, and do tracking between two frames using the `correspondance` function in `hungarian.py`. 
+In case you only want to use the functionalities of the convolutional neural network and the segmentation, but not the full GUI, you only need the files `unet/model.py`, `unet/neural_network.py` (for making predictions), `unet/segment.py` (for doing watershed segmentation) and `unet/hungarian.py` (for tracking), as well as the weights for the neural network which have to be in the same folder. You can create predictions using the `prediction` function in `neural_network.py`, obtain the segmentations with the `segment` function in `segment.py`, and do tracking between two frames using the `correspondence` function in `hungarian.py`. 
 
 ### CNN does badly on bright-field images
 
@@ -102,9 +102,9 @@ We guide you step-by-step through the demo:
 
 1. In the startup dialog, click `Open image folder` and select the `example_data` folder in the file dialog.
 2. Give a name to the h5 file, such as example_data.h5. Press `OK` to confirm.
-3. We want to predict the segmentation. Click `Launch CNN`. In the pop-up dialog enter 0 and 4 as the time bounds. Select the Field of View 1 by clicking it. Press `OK`. 
+3. We want to predict the segmentation. Click `Launch CNN`. In the pop-up dialog enter 0 and 0 as the time bounds. Select the Field of View 1 by clicking it. Press `OK`. 
 4. Wait for the neural network to predict. This takes about 1min on a standard computer. 
-5. Now go through the images to verify the predictions and correct mistakes as needed. Instructions about how to use every tool is shown in the status bar at the bottom when you hover over a tool button. 
+5. Now go through the image to verify the predictions and correct mistakes as needed. Instructions about how to use every tool is shown in the status bar at the bottom when you hover over a tool button. 
 6. Click `Extract` as soon as you're satisfied. Extract the mask or the cell statistics, specify a file name, and you're done! In case you wanted additional fluorescence channels or only extract a subset of cells, you could also do this here using the corresponding buttons.
 
 
