@@ -201,16 +201,13 @@ class App(QMainWindow):
         self.button_add_region = QPushButton("Add region")
         self.buttonlist.append(self.button_add_region)
         
-#        self.button_savemask = QPushButton("Save Mask")
-#        self.buttonlist.append(self.button_savemask)
-        
         self.button_drawmouse = QPushButton('Brush')
         self.buttonlist.append(self.button_drawmouse)
         
         self.button_eraser = QPushButton('Eraser')
         self.buttonlist.append(self.button_eraser)
         
-        self.label_brushsize = QLabel('Brush Radius:')
+        self.label_brushsize = QLabel('Brush/Eraser Radius:')
         self.spinbox_brushsize = QSpinBox()
         self.buttonlist.append(self.spinbox_brushsize)
         
@@ -232,7 +229,7 @@ class App(QMainWindow):
         self.button_cnn = QPushButton('Launch CNN')
         self.buttonlist.append(self.button_cnn)
         
-        self.button_cellcorespondance = QPushButton('Tracking')
+        self.button_cellcorespondance = QPushButton('Retracking')
         self.buttonlist.append(self.button_cellcorespondance)
         
         self.button_changecellvalue = QPushButton('Change cell value')
@@ -544,15 +541,19 @@ class App(QMainWindow):
                         continue
                     
                     # Calculate stats
-                    stats = self.cell_statistics(image, mask == val)
-                    stats['Time'] = time_index
-                    stats['Channel'] = channel
-                    stats['Cell'] = val
-                    stats['Disappeared'] = not (val in sel_cells)
+                    stats = {'Cell': val,
+                             'Time': time_index,
+                             'Channel': channel}
+                    
+                    stats = {**stats,
+                             **self.cell_statistics(image, mask == val)}
+                    stats['Disappeared in video'] = not (val in sel_cells)
                     cell_list.append(stats)
+                    
         
         # Use Pandas to write csv
         df = pd.DataFrame(cell_list)
+        df = df.sort_values(['Cell', 'Time'])
         df.to_csv(csv_filename, index=False)
                     
         self.Enable(self.button_extractfluorescence)
@@ -580,27 +581,33 @@ class App(QMainWindow):
                 pc1_x, pc1_y = pca.components_[0,:]
                 angle = np.arctan(pc1_y / pc1_x) / np.pi * 360
                 v1, v2 = pca.explained_variance_
-                roundness = v2 / v1
+                
+                len_maj = 4*np.sqrt(v1)
+                len_min = 4*np.sqrt(v2)
             else:
                 angle = 0
-                roundness = 1
+                len_maj = 1
+                len_min = 1
             
         else:
             mean = 0
-            var = 0
+            var = np.nan
             tot_intensity = 0
-            com_x = 0
-            com_y = 0
-            angle = 0
-            roundness = 0
+            com_x = np.nan
+            com_y = np.nan
+            angle = np.nan
+            len_maj = np.nan
+            len_min = np.nan
         
-        return {'Mean': mean,
+        return {'Area': area,
+                'Mean': mean,
                 'Variance': var,
                 'Total Intensity': tot_intensity,
                 'Center of Mass X': com_x,
                 'Center of Mass Y': com_y,
-                'Cell Angle': angle,
-                'Roundness': roundness}
+                'Angle of Major Axis': angle,
+                'Length Major Axis': len_maj,
+                'Length Minor Axis': len_min}
 
 # -----------------------------------------------------------------------------
 # NEURAL NETWORK
@@ -687,13 +694,13 @@ class App(QMainWindow):
                         seg_val = int(dlg.entry_segmentation.text())
                     else:
                         seg_val = 10
+                    is_pc = dlg.radiobuttons.checkedId() == 1
                     self.PredThreshSeg(t, dlg.listfov.row(item), thr_val, seg_val,
-                                       dlg.pc_checkbox.isChecked())
+                                       is_pc)
                     
                     # apply tracker if wanted and if not at first time
-                    if dlg.tracking_checkbox.isChecked():
-                        temp_mask = self.reader.CellCorrespondance(t, dlg.listfov.row(item))
-                        self.reader.SaveMask(t,dlg.listfov.row(item), temp_mask)
+                    temp_mask = self.reader.CellCorrespondance(t, dlg.listfov.row(item))
+                    self.reader.SaveMask(t,dlg.listfov.row(item), temp_mask)
             
             self.ReloadThreeMasks()
         reset()
@@ -725,10 +732,12 @@ class App(QMainWindow):
             im = im*1.0;	
             pred = nn.prediction(im)
         else:
-            QMessageBox(self, 'Warning', 
+            QMessageBox.critical(self, 'Warning', 
                         'Brightfield support is not implemented yet. '
-                        'Using the same neural network as for phase '
-                        'contrast.')
+                        'Using the same neural net as for phase contrast. '
+                        'We recommend choosing a high threshold when '
+                        'predicting brightfield images, around 0.95 '
+                        'seems to work reasonably well.')
             im = skimage.exposure.equalize_adapthist(im)
             im = im*1.0;	
             pred = nn.prediction(im)

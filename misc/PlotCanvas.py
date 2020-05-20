@@ -18,7 +18,9 @@ import matplotlib.pyplot as plt
 
 from matplotlib import cm
 from matplotlib.colors import ListedColormap
-from matplotlib.path import Path
+#from matplotlib.path import Path
+
+from PIL import Image, ImageDraw
 
 
 
@@ -105,10 +107,6 @@ class PlotCanvas(FigureCanvas):
         # self.cellval is the variable which sets the value to the pixel
         # whenever something is drawn.
         self.cellval = 0
-        
-        # These are the codes used to create a polygon in the new cell/addregion
-        # functions, which should be fed into the Path function
-        self.codes_drawoneline = [Path.MOVETO, Path.LINETO]
         
         # These are lists storing all the annotations which are used to
         # show the values of the cells on the plots.
@@ -233,7 +231,7 @@ class PlotCanvas(FigureCanvas):
             newy = int(event.ydata)
             
             # stores the coordinates of the click
-            self.storemouseclicks.append([newx, newy])
+            self.storemouseclicks.append((newx, newy))
             
             # draws in the figure a small square (4x4 pixels) to
             # visualize where the user has clicked
@@ -336,7 +334,7 @@ class PlotCanvas(FigureCanvas):
        self.ax.draw_artist(self.currplot)
        self.ax.draw_artist(self.currmask)
        self.update()
-       self.flush_events()
+       # self.flush_events()
               
         
     def HideMask(self):
@@ -508,59 +506,14 @@ class PlotCanvas(FigureCanvas):
             return
         
         else:
-            # add the first point because to use the path function, one has to close 
-            # the path by returning to the initial point.
-            self.storemouseclicks.append(self.storemouseclicks[0])
-
-            # codes are requested by the path function in order to make a polygon
-            # out of the points that have been selected.
-            codes = np.zeros(len(self.storemouseclicks))
-            codes[0] = Path.MOVETO
-            codes[len(codes)-1]= Path.CLOSEPOLY
-            codes[1:len(codes)-1] = Path.LINETO
-            codes = list(codes)
-            
-            # out of the coordinates of the mouse clicks and of the code, it makes
-            # a path/contour which corresponds to the added region/new cell.
-            path = Path(self.storemouseclicks, codes)
-            
-            self.storemouseclicks = np.array(self.storemouseclicks)
-          
-            # Take a square around the drawn region, where the drawn region fits inside.
-            minx = min(self.storemouseclicks[:,0])
-            maxx = max(self.storemouseclicks[:,0])
-            miny = min(self.storemouseclicks[:,1])
-            maxy= max(self.storemouseclicks[:,1])
-          
-            # creates arrays of coordinates of the whole square surrounding
-            # the drawn region
-            array_x = np.arange(minx, maxx, 1)
-            array_y = np.arange(miny, maxy, 1)
-
-            array_coord = []
-            # takes all the coordinates to couple them and store them in array_coord
-            for xi in range(0,len(array_x)):
-               for yi in range(0,len(array_y)):
-                  array_coord.append((array_x[xi], array_y[yi]))
-          
-            # path_contains_points returns an array of bool values
-            # where for each coordinates it tests if it is inside the path
-            pix_inside_path = path.contains_points(array_coord)
-
-            # for each coordinate where the contains_points method returned true
-            # the value of the self.currpicture matrix is changed, it draws the region
-            # defined by the user
-            for j in range(0,len(pix_inside_path)):
-                if pix_inside_path[j]:
-                    x,y = array_coord[j]
-                    self.plotmask[y,x]= self.cellval
-            
-            # once the self.currpicture has been updated it is drawn by callinf the
-            # updatedata method.
+            # Draw polygon, fill it with cell values
+            nx, ny = self.plotmask.shape
+            img = Image.new('L', (ny, nx), 0)
+            ImageDraw.Draw(img).polygon(self.storemouseclicks, outline=1, fill=1)
+            polygon = np.array(img).astype(bool)
+            self.plotmask[polygon] = self.cellval
             self.updatedata()
             
-        self.storemouseclicks = list(self.storemouseclicks)
-
         # empty the lists ready for the next region to be drawn.
-        self.storemouseclicks.clear()
+        self.storemouseclicks = []
         

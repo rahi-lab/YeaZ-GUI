@@ -56,9 +56,9 @@ def Init(parent):
     hboxcellval = QtWidgets.QHBoxLayout()
     hboxcellval.addWidget(parent.button_exval)
     hboxcellval.addWidget(parent.button_changecellvalue)
+    hboxcellval.addWidget(parent.button_cellcorespondance)
     hboxcellval.addStretch(1)
     hboxcellval.addWidget(parent.button_cnn)
-    hboxcellval.addWidget(parent.button_cellcorespondance)
     hboxcellval.addWidget(parent.button_extractfluorescence)
     layout.addLayout(hboxcellval)
 

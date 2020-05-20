@@ -4,7 +4,8 @@ Created on Tue Nov 19 17:38:58 2019
 """
 
 from PyQt5.QtWidgets import (QDialog, QDialogButtonBox, QLineEdit, QFormLayout, 
-                             QLabel, QListWidget, QAbstractItemView, QCheckBox)
+                             QLabel, QListWidget, QAbstractItemView, QCheckBox,
+                             QButtonGroup, QRadioButton)
 from PyQt5 import QtGui
 
 
@@ -37,23 +38,24 @@ class CustomDialog(QDialog):
         
         self.entry_segmentation = QLineEdit()
         self.entry_segmentation.setValidator(QtGui.QIntValidator())
-        self.entry_segmentation.setText('10')
-        
-        self.tracking_checkbox = QCheckBox()
-        self.tracking_checkbox.setChecked(True)
-        
-        self.pc_checkbox = QCheckBox()
-        self.pc_checkbox.setChecked(True)
-        
+        self.entry_segmentation.setText('5')
+                
         flo = QFormLayout()
         flo.addWidget(self.labeltime)
-        flo.addRow('Lower Boundary for time axis', self.entry1)
-        flo.addRow('Upper Boundary for time axis', self.entry2)        
-        flo.addRow('Select Field(s) of fiew from  the list', self.listfov)
+        flo.addRow('Lower boundary for time axis', self.entry1)
+        flo.addRow('Upper boundary for time axis', self.entry2)        
+        flo.addRow('Select field(s) of fiew from  the list', self.listfov)
         flo.addRow('Enter a threshold value', self.entry_threshold)
         flo.addRow('Enter a segmentation value', self.entry_segmentation)
-        flo.addRow('Apply Cell Tracker', self.tracking_checkbox)
-        flo.addRow('Image is Phase Contrast', self.pc_checkbox)
+        
+        self.radiobuttons = QButtonGroup()
+        self.buttonBF = QRadioButton('Image is brightfield')
+        self.buttonPC = QRadioButton('Image is phase contrast')
+        self.buttonPC.setChecked(True)
+        self.radiobuttons.addButton(self.buttonBF, id=0)
+        self.radiobuttons.addButton(self.buttonPC, id=1)
+        flo.addWidget(self.buttonBF)
+        flo.addWidget(self.buttonPC)
         
         QBtn = QDialogButtonBox.Ok | QDialogButtonBox.Cancel
         

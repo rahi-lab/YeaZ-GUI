@@ -156,7 +156,7 @@ def Init(parent):
     parent.button_cellcorespondance.setCheckable(True)
     parent.button_cellcorespondance.clicked.connect(parent.CellCorrespActivation)
     parent.button_cellcorespondance.setMaximumWidth(150)
-    parent.button_cellcorespondance.setStatusTip('Do the cell correspondance with the previous time frame')
+    parent.button_cellcorespondance.setStatusTip('Recalculate the cell correspondance to the previous time frame')
     
     # EXTRACT FLUORESCENCE IN DIFFERENT CHANNELS    
     parent.button_extractfluorescence.setEnabled(False)
