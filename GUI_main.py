@@ -687,13 +687,13 @@ class App(QMainWindow):
                         seg_val = int(dlg.entry_segmentation.text())
                     else:
                         seg_val = 10
+                    is_pc = dlg.radiobuttons.checkedId() == 1
                     self.PredThreshSeg(t, dlg.listfov.row(item), thr_val, seg_val,
-                                       dlg.pc_checkbox.isChecked())
+                                       is_pc)
                     
                     # apply tracker if wanted and if not at first time
-                    if dlg.tracking_checkbox.isChecked():
-                        temp_mask = self.reader.CellCorrespondance(t, dlg.listfov.row(item))
-                        self.reader.SaveMask(t,dlg.listfov.row(item), temp_mask)
+                    temp_mask = self.reader.CellCorrespondance(t, dlg.listfov.row(item))
+                    self.reader.SaveMask(t,dlg.listfov.row(item), temp_mask)
             
             self.ReloadThreeMasks()
         reset()
@@ -725,10 +725,12 @@ class App(QMainWindow):
             im = im*1.0;	
             pred = nn.prediction(im)
         else:
-            QMessageBox(self, 'Warning', 
+            QMessageBox.critical(self, 'Warning', 
                         'Brightfield support is not implemented yet. '
-                        'Using the same neural network as for phase '
-                        'contrast.')
+                        'Using the same neural net as for phase contrast. '
+                        'We recommend choosing a high threshold when '
+                        'predicting brightfield images, around 0.95 '
+                        'seems to work reasonably well.')
             im = skimage.exposure.equalize_adapthist(im)
             im = im*1.0;	
             pred = nn.prediction(im)
