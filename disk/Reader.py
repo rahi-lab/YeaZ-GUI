@@ -29,8 +29,10 @@ class Reader:
         # Identify filetype of image file
         _, self.extension = os.path.splitext(nd2pathname)
         self.isnd2 = self.extension == '.nd2'
-        self.istiff = self.extension == '.tif' or self.extension == '.tiff'
         self.isfolder = self.extension == ''
+        self.issingle = self.extension in ['.tif','.tiff',
+                                            '.jpg','.jpeg','.png','.bmp',
+                                           '.pbm','.pgm','.ppm','.pxm','.pnm','.jp2']
         
         self.nd2path = nd2pathname # path name is nd2path for legacy reasons
         self.hdfpath = hdfpathname
@@ -55,7 +57,7 @@ class Reader:
                     self.Npos  = 1
                 self.channel_names = images.metadata['channels']
                 
-        elif self.istiff:
+        elif self.issingle:
 #            with pytiff.Tiff(self.nd2path) as handle:
 #                self.sizey, self.sizex = handle.shape #SJR: changed by me
 #                self.sizec = 1
@@ -68,6 +70,8 @@ class Reader:
             else:
                 self.sizey, self.sizex = im.shape
                 self.sizet = 1
+                
+            print(self.sizet, self.sizey, self.sizex)
             self.Npos = 1
             self.channel_names = ['Channel1']
                 
@@ -272,7 +276,7 @@ class Reader:
                 images.iter_axes = 't'
                 im = images[currentT]
                 
-        elif self.istiff:
+        elif self.issingle:
 #            with pytiff.Tiff(self.nd2path) as handle:
 #                handle.set_page(currentT)
 #                im = handle[:]
@@ -308,7 +312,7 @@ class Reader:
                 im = images[ch]
                 return np.array(im)
         
-        elif self.istiff:
+        elif self.issingle:
             return self.LoadOneImage(currentT, currentFOV)
                 
         elif self.isfolder:

@@ -79,7 +79,9 @@ class FileBrowser(QDialog):
         
 
     def getnd2path(self):
-        self.nd2name,_ = QFileDialog.getOpenFileName(self, 'Open image file','', 'Image files (*.nd2 *.tif *.tiff)')
+        self.nd2name,_ = QFileDialog.getOpenFileName(self, 'Open image file','', 
+            'Image files (*.nd2 *.tif *.tiff *.tiff *.jpg *.jpeg *.png *.bmp '
+                          '*.pbm *.pgm *.ppm *.pxm *.pnm *.jp2)')
 #      print(self.nd2name)
 #      print(self.nd2name)
         if self.nd2name != '':
