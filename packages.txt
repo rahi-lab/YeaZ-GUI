@@ -5,7 +5,7 @@ nd2reader==3.2.1
 h5py
 scikit-image
 openpyxl
-Tensorflow==1.9.0
+Tensorflow==1.15.2
 Keras
 opencv-python-headless
 pytiff
