@@ -16,8 +16,6 @@ Want to try out the neural network first? Check out our online segmentation tool
 
 ## Troubleshooting / FAQ
 
-## Troubleshooting / FAQ
-
 ### Running CNN makes program crash
 
 Using the neural network to make predictions is very memory intensive. This can lead the computer to run out of memory, which in turn causes the program to abort. However, the amount of memory that is needed depends on the size of the image. So cropping the images into several smaller images, removing space without cells around the colonies, or lowering the image resolutoin will allow you to run the program even without access to a super-computer. For instance, using a 2015 MacBook Pro with 8GB of RAM and a 2.9GHz Intel Core i5 CPU, we were able to predict images of size 700 x 500 pixels.
