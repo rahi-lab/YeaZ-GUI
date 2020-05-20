@@ -277,7 +277,11 @@ class Reader:
 #                handle.set_page(currentT)
 #                im = handle[:]
             full = skimage.io.imread(self.nd2path)
-            im = full[currentT]
+            if full.ndim==2:
+                im = full
+            elif full.ndim==3:
+                im = full[currentT]
+
                                 
         elif self.isfolder:
             filelist = sorted(os.listdir(self.nd2path))
