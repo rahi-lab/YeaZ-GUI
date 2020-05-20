@@ -10,7 +10,7 @@ Want to try out the neural network first? Check out our online segmentation tool
 
 The software requires a standard computer with enough RAM to be able to make the image predictions. 8GB RAM is enough to predict the 700 x 500px images provided as the test data. The RAM requirements scales linearly with the amount of image pixels.
 
-It was tested on OS X High Sierra (10.13.6) and Ubuntu 18.04.4.
+It was tested on OS X High Sierra (10.13.6), Windows 10 Educatoin and Ubuntu 18.04.4.
 
 Package dependencies: The convolutional neural network relies on Keras with TensorFlow. The hungarian algorithm is implemented in the munkres package. Other than this, standard image processing and scientific computing libraries are used. 
 
