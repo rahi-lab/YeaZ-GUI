@@ -13,7 +13,7 @@ import h5py
 import os.path
 import skimage
 import skimage.io
-import pytiff
+#import pytiff
 import hungarian as hu
 
 
@@ -56,12 +56,20 @@ class Reader:
                 self.channel_names = images.metadata['channels']
                 
         elif self.istiff:
-            with pytiff.Tiff(self.nd2path) as handle:
-                self.sizey, self.sizex = handle.shape #SJR: changed by me
-                self.sizec = 1
-                self.sizet = handle.number_of_pages
-                self.Npos = 1
-                self.channel_names = ['Channel1']
+#            with pytiff.Tiff(self.nd2path) as handle:
+#                self.sizey, self.sizex = handle.shape #SJR: changed by me
+#                self.sizec = 1
+#                self.sizet = handle.number_of_pages
+#                self.Npos = 1
+#                self.channel_names = ['Channel1']
+            im = skimage.io.imread(self.nd2path)
+            if im.ndim==3:
+                self.sizet, self.sizey, self.sizex = im.shape
+            else:
+                self.sizey, self.sizex = im.shape
+                self.sizet = 1
+            self.Npos = 1
+            self.channel_names = ['Channel1']
                 
         elif self.isfolder:
             filelist = sorted(os.listdir(self.nd2path))            
@@ -265,9 +273,11 @@ class Reader:
                 im = images[currentT]
                 
         elif self.istiff:
-            with pytiff.Tiff(self.nd2path) as handle:
-                handle.set_page(currentT)
-                im = handle[:]
+#            with pytiff.Tiff(self.nd2path) as handle:
+#                handle.set_page(currentT)
+#                im = handle[:]
+            full = skimage.io.imread(self.nd2path)
+            im = full[currentT]
                                 
         elif self.isfolder:
             filelist = sorted(os.listdir(self.nd2path))
