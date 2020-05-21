@@ -1,8 +1,8 @@
 # YeaZ
 
-This is the user manual for the graphical interface for yeast segmentation using a state of the art convolutional neural network with U-Net architecture. As for now, the convolutional neural network is trained for phase contrast images. Compatability with brightfield images will come soon. You can find the training set with the annotated images here: https://www.quantsysbio.com/data-and-software/. 
+This is the user manual for the graphical interface for yeast segmentation using a state of the art convolutional neural network with U-Net architecture. You can find the training set with the annotated images here: https://www.quantsysbio.com/data-and-software/. 
 
-Want to try out the neural network first? Check out our online segmentation tool at https://lpbs-nn.epfl.ch/.
+Want to try out the neural network without installing any software? Check out our online segmentation tool at https://lpbs-nn.epfl.ch/.
 
 ## Installation
 
@@ -19,12 +19,11 @@ Installation time is less than 5 minutes.
 ### Installation Steps
 
 1. Clone this repository.
-2. Download the weights of the neural network under the following link: https://drive.google.com/file/d/1UTivmx_aEMpeGdOkCZO1CS9mcdJ3zmw2/edit. Put it in the folder `/unet`.
-3. If you don't have conda or miniconda installed, download it from https://docs.conda.io/en/latest/miniconda.html.
-4. In the command line, create a virtual environment with python 3.6.8 with the command `conda create -n YeaZ python=3.6.8`. 
-5. Activate that environment using `conda activate YeaZ`. 
-6. Install the necessary packages using `pip install -r requirements.txt`.
-7. Run the program from your command line with `python GUI_main.py`
+2. If you don't have conda or miniconda installed, download it from https://docs.conda.io/en/latest/miniconda.html.
+3. In the command line, create a virtual environment with python 3.6.8 with the command `conda create -n YeaZ python=3.6.8`. 
+4. Activate that environment using `conda activate YeaZ`. 
+5. Install the necessary packages using `pip install -r requirements.txt`.
+6. Run the program from your command line with `python GUI_main.py`
 
 ## Troubleshooting / FAQ
 
