@@ -1,6 +1,6 @@
 # YeaZ
 
-This is the user manual for the graphical interface for yeast segmentation using a state of the art convolutional neural network with U-Net architecture. You can find the training set with the annotated images here: https://www.quantsysbio.com/data-and-software/. 
+This is the user manual for the graphical interface for segmenting yeast images using the YeaZ convolutional neural network. You can find the training set with the segmented training images here: https://www.quantsysbio.com/data-and-software/. 
 
 Want to try out the neural network without installing any software? Check out our online segmentation tool at https://lpbs-nn.epfl.ch/.
 
@@ -8,18 +8,18 @@ Want to try out the neural network without installing any software? Check out ou
 
 ### System requirements
 
-The software requires a standard computer with enough RAM to be able to make the image predictions. 8GB RAM is enough to predict the 700 x 500px images provided as the test data. The RAM requirements scales linearly with the amount of image pixels.
+The software requires a standard computer with enough RAM to apply the neural network. 8 GB RAM is enough to predict the 700 x 500 px image provided as the test data. The RAM requirements scales linearly with the number of image pixels.
 
 It was tested on OS X High Sierra (10.13.6), Windows 10 Education and Ubuntu 18.04.4.
 
-Package dependencies: The convolutional neural network relies on Keras with TensorFlow. The hungarian algorithm is implemented in the munkres package. Other than this, standard image processing and scientific computing libraries are used. 
+Package dependencies: The convolutional neural network relies on Keras with TensorFlow. The Hungarian algorithm is implemented in the munkres package. In addition, standard image processing and scientific computing libraries are used. 
 
 Installation time is less than 5 minutes. 
 
 ### Installation Steps
 
-1. Clone this repository.
-2. Download the weights of the neural network under the following link: https://drive.google.com/file/d/1UTivmx_aEMpeGdOkCZO1CS9mcdJ3zmw2. Put it in the folder `/unet`.
+1. Clone this repository ("git clone https://github.com/lpbsscientist/YeaZ-GUI").
+2. Download the weights of the neural network under the following link: https://drive.google.com/file/d/1UTivmx_aEMpeGdOkCZO1CS9mcdJ3zmw2. Put the file in the folder `/unet`.
 3. If you don't have conda or miniconda installed, download it from https://docs.conda.io/en/latest/miniconda.html.
 4. In the command line, create a virtual environment with python 3.6.8 with the command `conda create -n YeaZ python=3.6.8`. 
 5. Activate that environment using `conda activate YeaZ`. 
