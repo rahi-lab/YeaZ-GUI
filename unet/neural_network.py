@@ -58,7 +58,8 @@ def prediction(im):
     model = unet(pretrained_weights = None,
                  input_size = (None,None,1))
 
-    model.load_weights('unet/unet_weights_batchsize_25_Nepochs_100_SJR0_10.hdf5')
+#    model.load_weights('unet/unet_weights_batchsize_25_Nepochs_100_SJR0_10.hdf5')
+    model.load_weights('unet/unet_weights_BF_batchsize_10_Nepochs_100_SJR_0_1.hdf5')
 
     results = model.predict(padded[np.newaxis,:,:,np.newaxis], batch_size=1)
 

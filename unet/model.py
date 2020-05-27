@@ -1,6 +1,9 @@
 """
 Source of the code: https://github.com/zhixuhao/unet
 """
+# Turn off GPU access so can train and use the YeaZ-GUI
+import os
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
 # Import tensorflow differently depending on version
 from tensorflow import __version__ as tf_version
