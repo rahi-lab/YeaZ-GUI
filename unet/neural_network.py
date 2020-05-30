@@ -59,9 +59,14 @@ def prediction(im, is_pc):
                  input_size = (None,None,1))
 
     if is_pc:
-        model.load_weights('unet/unet_weights_batchsize_25_Nepochs_100_SJR0_10.hdf5')
+        path = 'unet/unet_weights_batchsize_25_Nepochs_100_SJR0_10.hdf5'
     else:
-        model.load_weights('unet/unet_weights_BF_batchsize_10_Nepochs_100_SJR_0_1.hdf5')
+        path = 'unet/unet_weights_BF_batchsize_10_Nepochs_100_SJR_0_1.hdf5'
+    
+    if not os.path.exists(path):
+        raise ValueError('Path does not exist')
+    
+    model.load_weights(path)
 
     results = model.predict(padded[np.newaxis,:,:,np.newaxis], batch_size=1)
 

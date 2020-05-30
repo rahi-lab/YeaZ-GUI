@@ -708,21 +708,30 @@ class App(QMainWindow):
     
     def PredThreshSeg(self, timeindex, fovindex, thr_val, seg_val, 
                       is_pc):
-          """
-          This function is called in the LaunchBatchPrediction function.
-          This function calls the neural network function in the
-          InteractionDisk.py file and then thresholds the result
-          of the prediction, saves this thresholded prediction.
-          Then it segments the thresholded prediction and saves the
-          segmentation. 
-          """
-          print('--------- Segmenting field of view:',fovindex,'Time point:',timeindex)
-          im = self.reader.LoadOneImage(timeindex, fovindex)
-          pred = self.LaunchPrediction(im, is_pc)
-          thresh = self.ThresholdPred(thr_val, pred)
-          seg = segment(thresh, pred, seg_val)
-          self.reader.SaveMask(timeindex, fovindex, seg)
-          print('--------- Finished segmenting.')
+        """
+        This function is called in the LaunchBatchPrediction function.
+        This function calls the neural network function in the
+        InteractionDisk.py file and then thresholds the result
+        of the prediction, saves this thresholded prediction.
+        Then it segments the thresholded prediction and saves the
+        segmentation. 
+        """
+        print('--------- Segmenting field of view:',fovindex,'Time point:',timeindex)
+        im = self.reader.LoadOneImage(timeindex, fovindex)
+        try:
+            pred = self.LaunchPrediction(im, is_pc)
+        except ValueError:
+            QMessageBox.critical(self, 'Error',
+                                 'The neural network weight files could not '
+                                 'be found. Make sure to download them from '
+                                 'the link in the readme and put them into '
+                                 'the folder unet')
+            return
+
+        thresh = self.ThresholdPred(thr_val, pred)
+        seg = segment(thresh, pred, seg_val)
+        self.reader.SaveMask(timeindex, fovindex, seg)
+        print('--------- Finished segmenting.')
           
           
     def LaunchPrediction(self, im, is_pc):
@@ -731,7 +740,7 @@ class App(QMainWindow):
         """
         im = skimage.exposure.equalize_adapthist(im)
         im = im*1.0;	
-        pred = nn.prediction(im, is_pc)
+        pred = nn.prediction(im, is_pc)                        
         return pred
 
 
