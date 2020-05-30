@@ -40,7 +40,7 @@ def threshold(im,th = None):
     return bi
 
 
-def prediction(im):
+def prediction(im, is_pc):
     """
     Calculate the prediction of the label corresponding to image im
     Param:
@@ -58,8 +58,10 @@ def prediction(im):
     model = unet(pretrained_weights = None,
                  input_size = (None,None,1))
 
-#    model.load_weights('unet/unet_weights_batchsize_25_Nepochs_100_SJR0_10.hdf5')
-    model.load_weights('unet/unet_weights_BF_batchsize_10_Nepochs_100_SJR_0_1.hdf5')
+    if is_pc:
+        model.load_weights('unet/unet_weights_batchsize_25_Nepochs_100_SJR0_10.hdf5')
+    else:
+        model.load_weights('unet/unet_weights_BF_batchsize_10_Nepochs_100_SJR_0_1.hdf5')
 
     results = model.predict(padded[np.newaxis,:,:,np.newaxis], batch_size=1)
 

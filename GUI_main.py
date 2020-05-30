@@ -729,20 +729,9 @@ class App(QMainWindow):
         """It launches the neural neutwork on the current image and creates 
         an hdf file with the prediction for the time T and corresponding FOV. 
         """
-        if is_pc:
-            im = skimage.exposure.equalize_adapthist(im)
-            im = im*1.0;	
-            pred = nn.prediction(im)
-        else:
-            QMessageBox.critical(self, 'Warning', 
-                        'Brightfield support is not implemented yet. '
-                        'Using the same neural net as for phase contrast. '
-                        'We recommend choosing a high threshold when '
-                        'predicting brightfield images, around 0.95 '
-                        'seems to work reasonably well.')
-            im = skimage.exposure.equalize_adapthist(im)
-            im = im*1.0;	
-            pred = nn.prediction(im)
+        im = skimage.exposure.equalize_adapthist(im)
+        im = im*1.0;	
+        pred = nn.prediction(im, is_pc)
         return pred
 
 
