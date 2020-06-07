@@ -168,8 +168,8 @@ def Init(parent):
     
     # SHOW THE VALUES OF THE CELLS
     parent.button_showval.stateChanged.connect(parent.m.UpdatePlots)
-    parent.button_showval.setShortcut('V')
-    parent.button_showval.setToolTip("Shortcut: V")
+    parent.button_showval.setShortcut('S')
+    parent.button_showval.setToolTip("Shortcut: S")
         
     # HIDE/SHOW THE MASK
     parent.button_hidemask.stateChanged.connect(parent.m.HideMask)    

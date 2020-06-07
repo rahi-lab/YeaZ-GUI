@@ -965,6 +965,7 @@ class App(QMainWindow):
             self.m.updatedata()
 
         self.Enable(self.button_cellcorespondance)
+        self.m.UpdatePlots()
         self.button_cellcorespondance.setChecked(False)
         self.ClearStatusBar()
 
@@ -1264,6 +1265,7 @@ class App(QMainWindow):
                 
             cursor = QtGui.QCursor(pixmap, 0,9)
             QApplication.setOverrideCursor(cursor)
+            print('GUI_main if')
                         
         else:
             self.m.mpl_disconnect(self.id3)
@@ -1274,6 +1276,8 @@ class App(QMainWindow):
             self.Enable(self.button_eraser)
             self.SaveMask()
             self.ClearStatusBar()
+            print('GUI_main else')
+
             
             
     def UpdateTitleSubplots(self):
