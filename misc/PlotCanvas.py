@@ -333,6 +333,7 @@ class PlotCanvas(FigureCanvas):
        # to use as it only redraws the array itself, and not everything else.
        self.ax.draw_artist(self.currplot)
        self.ax.draw_artist(self.currmask)
+       self.ShowCellNumbers()
        self.update()
        # self.flush_events()
               

@@ -965,7 +965,6 @@ class App(QMainWindow):
             self.m.updatedata()
 
         self.Enable(self.button_cellcorespondance)
-        self.m.UpdatePlots()
         self.button_cellcorespondance.setChecked(False)
         self.ClearStatusBar()
 
