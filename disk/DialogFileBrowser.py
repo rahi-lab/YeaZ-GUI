@@ -3,11 +3,10 @@
 Created on Tue Nov 19 17:38:58 2019
 """
 
-from PyQt5.QtWidgets import QApplication, QMainWindow, QMenu, QVBoxLayout, QSizePolicy, QMessageBox, QWidget, QPushButton, QShortcut, QComboBox, QDialog, QDialogButtonBox, QInputDialog, QLineEdit, QFormLayout, QFileDialog, QLabel
-from PyQt5 import QtGui
-#from PyQt5.QtGui import QIcon, QKeySequence
-from PyQt5.QtCore import pyqtSignal, QObject, Qt
-#import PyQt package, allows for GUI interactions
+from PyQt5.QtWidgets import (QPushButton, QDialog, QDialogButtonBox, 
+                             QLineEdit, QFormLayout, 
+                             QFileDialog, QLabel)
+
 
 class FileBrowser(QDialog):
 
@@ -16,7 +15,6 @@ class FileBrowser(QDialog):
         
         self.setWindowTitle("Open Files")
         self.setGeometry(100,100, 800,200)
-        
         
         self.button_opennd2 = QPushButton('Open image file')
         self.button_opennd2.setEnabled(True)
@@ -37,17 +35,11 @@ class FileBrowser(QDialog):
         self.button_openhdf.setMaximumWidth(150)
         
         self.newhdfentry = QLineEdit()
-#        self.newhdfentry(Qt.AlignLeft)
         self.newhdfentry.setText("newmaskfile")
-
-
 
         self.nd2name = ''
         self.hdfname = ''
-#        
         flo = QFormLayout()
-#        flo.addRow('Enter Cell value 1 (integer):', self.entry1)
-                
         
         QBtn = QDialogButtonBox.Ok | QDialogButtonBox.Cancel
         
@@ -68,7 +60,6 @@ class FileBrowser(QDialog):
         flo.addRow(self.labelnd2, self.button_opennd2)
         flo.addRow(self.labelfolder, self.button_openfolder)
         flo.addRow(self.labelhdf, self.button_openhdf)
-#        flo.addWidget(self.button_openhdf)
         flo.addRow('If no hdf file already exists, give a name to create a new file', self.newhdfentry)
         
         flo.addWidget(self.buttonBox)
@@ -82,8 +73,6 @@ class FileBrowser(QDialog):
         self.nd2name,_ = QFileDialog.getOpenFileName(self, 'Open image file','', 
             'Image files (*.nd2 *.tif *.tiff *.tiff *.jpg *.jpeg *.png *.bmp '
                           '*.pbm *.pgm *.ppm *.pxm *.pnm *.jp2)')
-#      print(self.nd2name)
-#      print(self.nd2name)
         if self.nd2name != '':
             self.labelnd2.setText(self.nd2name)
             self.labelfolder.setText('')
