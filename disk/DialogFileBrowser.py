@@ -4,8 +4,9 @@ Created on Tue Nov 19 17:38:58 2019
 """
 
 from PyQt5.QtWidgets import (QPushButton, QDialog, QDialogButtonBox, 
-                             QLineEdit, QFormLayout, 
+                             QLineEdit, QFormLayout, QMessageBox, 
                              QFileDialog, QLabel)
+import os
 
 
 class FileBrowser(QDialog):
@@ -80,6 +81,7 @@ class FileBrowser(QDialog):
     def gethdfpath(self):
         self.hdfname,_ = QFileDialog.getOpenFileName(self,'Open mask file','', 'Mask files (*.h5 *.tif *.tiff)')
         if self.hdfname != '':
+            self.check_hdfpath()
             self.labelhdf.setText(self.hdfname)
             self.newhdfentry.setText("")
         
@@ -88,3 +90,15 @@ class FileBrowser(QDialog):
         if self.nd2name != '':
             self.labelfolder.setText(self.nd2name)
             self.labelnd2.setText('')
+            
+    def check_hdfpath(self):
+        """Checks if hdf path already exists when loading tiff, to avoid 
+        data loss"""
+        path, ext = os.path.splitext(self.hdfname)
+        if ext=='.tiff' or ext=='.tif':
+            if os.path.isfile(path+'.h5'):
+                QMessageBox.critical(self, 'Warning',
+                                 'A .h5 file with the same name as the loaded '
+                                 'tiff exists already and will be overwritten.'
+                                 ' Rename either the tif or the h5 file to '
+                                 'avoid data loss.')
