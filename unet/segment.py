@@ -1,6 +1,7 @@
 from scipy import ndimage as ndi
 from skimage.feature import peak_local_max
 from skimage.morphology import watershed, dilation
+from skimage.filters import gaussian
 
 import numpy as np
 
@@ -9,8 +10,8 @@ def segment(th, pred, min_distance=10, topology=None):
     """
     Performs watershed segmentation on thresholded image. Seeds have to
     have minimal distance of min_distance. topology defines the watershed
-    topology to be used, default is the negative distance transform. Can
-    either be an array with the same size af th, or a function that will
+    topology to be used, default is the negative distance transform. 
+    Can either be an array with the same size af th, or a function that will
     be applied to the distance transform.
     
     After watershed, the borders found by watershed will be evaluated in terms
@@ -26,8 +27,25 @@ def segment(th, pred, min_distance=10, topology=None):
     m = peak_local_max(-topology, min_distance, indices=False)
     m_lab = ndi.label(m)[0]
     wsh = watershed(topology, m_lab, mask=th)
-    return cell_merge(wsh, pred)
+    merged = cell_merge(wsh, pred)
+    return correct_artefacts(merged)
     
+    
+def correct_artefacts(wsh):
+    """
+    Sometimes artefacts arise with 3 or less pixels which are surrounded entirely
+    by another cell. Those are removed here.
+    """
+    unique, count = np.unique(wsh, return_counts=True)
+    to_remove = unique[count<=3]
+    for rem in to_remove:
+        rem_im = wsh==rem
+        rem_cont = dilation(rem_im) & ~rem_im
+        vals, val_counts = np.unique(wsh[rem_cont], return_counts=True)
+        replace_val = vals[np.argmax(val_counts)]
+        wsh[rem_im] = int(replace_val)
+    return wsh
+
 
 def cell_merge(wsh, pred):
     """
