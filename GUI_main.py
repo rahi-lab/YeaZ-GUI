@@ -1265,7 +1265,6 @@ class App(QMainWindow):
                 
             cursor = QtGui.QCursor(pixmap, 0,9)
             QApplication.setOverrideCursor(cursor)
-            print('GUI_main if')
                         
         else:
             self.m.mpl_disconnect(self.id3)
@@ -1276,7 +1275,6 @@ class App(QMainWindow):
             self.Enable(self.button_eraser)
             self.SaveMask()
             self.ClearStatusBar()
-            print('GUI_main else')
 
             
             
