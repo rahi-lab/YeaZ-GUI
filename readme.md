@@ -40,7 +40,7 @@ If small buds aren't recognized as cells in your image, this is likely linked to
 
 ### I just want the CNN, but not the GUI
 
-In case you only want to use the functionalities of the convolutional neural network and the segmentation, but not the full GUI, you only need the files `unet/model.py`, `unet/neural_network.py` (for making predictions), `unet/segment.py` (for doing watershed segmentation) and `unet/hungarian.py` (for tracking), as well as the weights for the neural network which have to be in the same folder. You can create predictions using the `prediction` function in `neural_network.py`, obtain the segmentations with the `segment` function in `segment.py`, and do tracking between two frames using the `correspondence` function in `hungarian.py`. 
+In case you only want to use the functionalities of the convolutional neural network and the segmentation, but not the full GUI, you only need the files `unet/model.py`, `unet/neural_network.py` (for making predictions), `unet/segment.py` (for doing watershed segmentation) and `unet/hungarian.py` (for tracking), as well as the weights for the neural network which have to be in the same folder. You can create predictions using the `prediction` function in `neural_network.py` (note that before making predictions, you have to use the function `equalize_adapthist` from `skimage.exposure` on the image). The segmentations can be obtained with the `segment` function in `segment.py`, and tracking between two frames is done using the `correspondence` function in `hungarian.py`. 
 
 ### CNN performs less well on bright-field images
 
