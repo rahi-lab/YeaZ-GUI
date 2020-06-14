@@ -43,7 +43,8 @@ def correct_artefacts(wsh):
         rem_cont = dilation(rem_im) & ~rem_im
         vals, val_counts = np.unique(wsh[rem_cont], return_counts=True)
         replace_val = vals[np.argmax(val_counts)]
-        wsh[rem_im] = int(replace_val)
+        if replace_val != 0:
+            wsh[rem_im] = int(replace_val)
     return wsh
 
 
