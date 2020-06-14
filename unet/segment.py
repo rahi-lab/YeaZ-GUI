@@ -2,6 +2,7 @@ from scipy import ndimage as ndi
 from skimage.feature import peak_local_max
 from skimage.morphology import watershed, dilation
 from skimage.filters import gaussian
+from skimage.measure import label
 
 import numpy as np
 
@@ -25,8 +26,12 @@ def segment(th, pred, min_distance=10, topology=None):
         topology = topology(dtr)
 
     m = peak_local_max(-topology, min_distance, indices=False)
-    m_lab = ndi.label(m)[0]
-    wsh = watershed(topology, m_lab, mask=th)
+    
+    # Uncomment to start with cross for every pixel instead of single pixel
+    m_lab = label(m) #comment this
+    #m_dil = dilation(m)
+    #m_lab = label(m_dil)
+    wsh = watershed(topology, m_lab, mask=th, connectivity=2)
     merged = cell_merge(wsh, pred)
     return correct_artefacts(merged)
     
