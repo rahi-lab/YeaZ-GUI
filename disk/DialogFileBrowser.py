@@ -86,6 +86,7 @@ class FileBrowser(QDialog):
 #      print(self.nd2name)
         if self.nd2name != '':
             self.labelnd2.setText(self.nd2name)
+            self.labelfolder.setText('')
       
     def gethdfpath(self):
         self.hdfname,_ = QFileDialog.getOpenFileName(self,'Open mask file','', 'Mask files (*.h5 *.tif *.tiff)')
@@ -97,3 +98,4 @@ class FileBrowser(QDialog):
         self.nd2name = QFileDialog.getExistingDirectory(self, ("Select Image Folder"))
         if self.nd2name != '':
             self.labelfolder.setText(self.nd2name)
+            self.labelnd2.setText('')
