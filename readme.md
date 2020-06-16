@@ -21,7 +21,7 @@ Installation time is less than 5 minutes.
 1. Clone this repository ("git clone https://github.com/lpbsscientist/YeaZ-GUI").
 2. Download the parameters for the neural network:
 2.1. Download the parameters for segmenting phase contrast images from: https://drive.google.com/file/d/1UTivmx_aEMpeGdOkCZO1CS9mcdJ3zmw2. Put the file in the folder `/unet`.
-2.2. Download the parameters for segmenting bright-field images from: https://drive.google.com/file/d/1y1WvOgY5HH9wqEKOwSt-es8WT0SzdAGs. Put the file in the folder `/unet`.
+2.2. Download the parameters for segmenting bright-field images from: https://drive.google.com/file/d/16SRF-bDkxXO4nYzEPk9bxXaDjZsNcP5n. Put the file in the folder `/unet`.
 3. If you don't have conda or miniconda installed, download it from https://docs.conda.io/en/latest/miniconda.html.
 4. In the command line, create a virtual environment with python 3.6.8 with the command `conda create -n YeaZ python=3.6.8`. 
 5. Activate that environment using `conda activate YeaZ`. 
