@@ -32,7 +32,10 @@ class Reader:
         self.isfolder = self.extension == ''
         self.issingle = self.extension in ['.tif','.tiff',
                                             '.jpg','.jpeg','.png','.bmp',
-                                           '.pbm','.pgm','.ppm','.pxm','.pnm','.jp2']
+                                           '.pbm','.pgm','.ppm','.pxm','.pnm','.jp2',
+                                           '.TIF','.TIFF',
+                                            '.JPG','.JPEG','.PNG','.BMP',
+                                           '.PBM','.PGM','.PPM','.PXM','.PNM','.JP2']
         
         self.nd2path = nd2pathname # path name is nd2path for legacy reasons
         self.hdfpath = hdfpathname
@@ -83,7 +86,8 @@ class Reader:
             self.sizex = 0
             
             # filter filelist for supported image files
-            filelist = [f for f in filelist if re.search(r".png|.tif|.jpg|.bmp|.jpeg|.pbm|.pgm|.ppm|.pxm|.pnm|.jp2", f)]
+            filelist = [f for f in filelist if re.search(r".png|.tif|.jpg|.bmp|.jpeg|.pbm|.pgm|.ppm|.pxm|.pnm|.jp2"
+                                                         "|.PNG|.TIF|.JPG|.BMP|.JPEG|.PBM|.PGM|.PPM|.PXM|.PNM|.jp2, f)]
             
             for f in filelist:
                 im = skimage.io.imread(self.nd2path + '/' + f)
@@ -133,7 +137,8 @@ class Reader:
             filenamewithpath, extension = os.path.splitext(self.hdfpath)
                 
             # If mask file is a tiff file
-            if extension == '.tiff' or extension == '.tif':
+            if extension == '.tiff' or extension == '.tif' OR 
+               extension == '.TIFF' or extension == '.TIF':
                 im = skimage.io.imread(self.hdfpath)
                 imdims = im.shape
                 
