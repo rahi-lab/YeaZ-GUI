@@ -1248,13 +1248,16 @@ class App(QMainWindow):
                                      'the cell to draw.'))
                 self.Disable(self.button_drawmouse)
                 pixmap = QtGui.QPixmap('./icons/brush2.png')
+                cursor = QtGui.QCursor(pixmap, 0,25)
                 
             elif do_erase:
                 self.WriteStatusBar('Erasing by setting the values to 0.')
                 self.Disable(self.button_eraser)
                 pixmap = QtGui.QPixmap('./icons/eraser.png')
+                cursor = QtGui.QCursor(pixmap, 0,26)
                 self.m.cellval = 0
             
+            self.m.setCursor(cursor)
             radius = self.spinbox_brushsize.value()
             self.id2 = self.m.mpl_connect('button_press_event', 
                                           lambda e: self.m.OneClick(e, radius))
@@ -1262,8 +1265,6 @@ class App(QMainWindow):
                                          lambda e: self.m.PaintBrush(e, radius))
             self.id3 = self.m.mpl_connect('button_release_event', self.m.ReleaseClick)
                 
-            cursor = QtGui.QCursor(pixmap, 0,9)
-            QApplication.setOverrideCursor(cursor)
                         
         else:
             self.m.mpl_disconnect(self.id3)
