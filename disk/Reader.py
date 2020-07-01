@@ -137,8 +137,8 @@ class Reader:
             filenamewithpath, extension = os.path.splitext(self.hdfpath)
                 
             # If mask file is a tiff file
-            if extension == '.tiff' or extension == '.tif' OR 
-               extension == '.TIFF' or extension == '.TIF':
+            if (extension == '.tiff' or extension == '.tif' or 
+               extension == '.TIFF' or extension == '.TIF'):
                 im = skimage.io.imread(self.hdfpath)
                 imdims = im.shape
                 
