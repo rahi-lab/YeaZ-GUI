@@ -4,7 +4,6 @@
 This file handles the PlotCanvas of the GUI - aka the area where the graphics 
 are shown. 
 """
-
 import numpy as np
 from skimage import morphology as morph
 from skimage import draw
@@ -295,21 +294,16 @@ class PlotCanvas(FigureCanvas):
         # Plot masks
         if not self.button_hidemask_check.isChecked():
             self.currmask.set_data((self.plotmask%10+1)*(self.plotmask!=0))
-            self.ax.draw_artist(self.currmask)
-        
             self.previousmask.set_data((self.prevplotmask%10+1)*(self.prevplotmask != 0))
-            self.ax2.draw_artist(self.previousmask)
-        
             self.nextmask.set_data((self.nextplotmask % 10 +1 )*(self.nextplotmask != 0))
-            self.ax3.draw_artist(self.nextmask)
             
         else:
             self.currmask.set_data(np.zeros(self.plotmask.shape))
             self.previousmask.set_data(np.zeros(self.plotmask.shape))
             self.nextmask.set_data(np.zeros(self.plotmask.shape))
         
-        # Plot cell numbers
         self.ShowCellNumbers()
+        self.draw()
         self.update()
         self.flush_events()
                 
@@ -381,16 +375,13 @@ class PlotCanvas(FigureCanvas):
          for i,a in enumerate(self.ann_list):
              a.remove()
          self.ann_list[:] = []
-
+         
          vals, xtemp, ytemp = self._getCellCenters(self.plotmask)
-     
          if xtemp:
              for i in range(0,len(xtemp)):
                  ann = self.ax.annotate(str(int(vals[i])), (xtemp[i], ytemp[i]),
                                           ha='center', va='center')
                  self.ann_list.append(ann)
-                 
-         self.draw()
                      
              
     def ShowCellNumbersPrev(self):
