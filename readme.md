@@ -102,7 +102,7 @@ The output csv contains one line for every combination of cells, timeframe, and 
 
 We guide you step-by-step through the demo:
 
-1. In the startup dialog, click `Open image folder` and select the `example_data` folder in the file dialog.
+1. In the startup dialog, click `Open image file` and select the file in the `example_data` folder from within the file dialog.
 2. Give a name to the h5 mask file, such as example_data.h5. Press `OK` to confirm.
 3. We want to predict the segmentation. Click `Launch CNN`. In the pop-up dialog. Enter 0 and 0 as the time bounds. Select the Field of View 1 by clicking on it. Press `OK`. 
 4. Wait for the neural network to predict. This takes about 1 min on a standard computer. 
