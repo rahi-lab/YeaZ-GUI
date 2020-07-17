@@ -68,7 +68,11 @@ class Reader:
 #                self.Npos = 1
 #                self.channel_names = ['Channel1']
             im = skimage.io.imread(self.nd2path)
+
             if im.ndim==3:
+                # num pages should be smaller than x or y dimension, very unlikely not to be the case
+                if im.shape[2] < im.shape[0] and im.shape[2] < im.shape[1]:  
+                    im = np.moveaxis(im, -1, 0) # move last axis to first
                 self.sizet, self.sizey, self.sizex = im.shape
             else:
                 self.sizey, self.sizex = im.shape
@@ -288,6 +292,9 @@ class Reader:
             if full.ndim==2:
                 im = full
             elif full.ndim==3:
+                # num pages should be smaller than x or y dimension, very unlikely not to be the case
+                if full.shape[2] < full.shape[0] and full.shape[2] < full.shape[1]:  
+                    full = np.moveaxis(full, -1, 0) # move last axis to first
                 im = full[currentT]
 
                                 
