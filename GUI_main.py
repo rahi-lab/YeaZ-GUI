@@ -120,6 +120,13 @@ from segment import segment
 import neural_network as nn
 
 
+if getattr(sys, 'frozen', False):
+    path_icons = os.path.join(sys._MEIPASS, "icons/")
+    path_weights  = os.path.join(sys._MEIPASS, 'unet/')
+    
+else:
+    path_icons = './icons/'
+    path_weights = './unet/'
 
 
 class NavigationToolbar(NavigationToolbar):
@@ -1247,13 +1254,13 @@ class App(QMainWindow):
                 self.WriteStatusBar(('Draw using the brush, right click to select '
                                      'the cell to draw.'))
                 self.Disable(self.button_drawmouse)
-                pixmap = QtGui.QPixmap('./icons/brush2.png')
+                pixmap = QtGui.QPixmap(path_icons+'brush2.png')
                 cursor = QtGui.QCursor(pixmap, 0,25)
                 
             elif do_erase:
                 self.WriteStatusBar('Erasing by setting the values to 0.')
                 self.Disable(self.button_eraser)
-                pixmap = QtGui.QPixmap('./icons/eraser.png')
+                pixmap = QtGui.QPixmap(path_icons+'eraser.png')
                 cursor = QtGui.QCursor(pixmap, 0,26)
                 self.m.cellval = 0
             
