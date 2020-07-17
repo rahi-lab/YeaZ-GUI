@@ -5,12 +5,18 @@ Created on Sat Dec 21 18:54:10 2019
 
 """
 import os
+import sys
 from model import unet
 import numpy as np
 import skimage
 from skimage import io
 import skimage.transform as trans
 
+if getattr(sys, 'frozen', False):
+    path_weights  = os.path.join(sys._MEIPASS, 'unet/')
+    
+else:
+    path_weights = './unet/'
 
 def create_directory_if_not_exists(path):
     """
@@ -59,9 +65,9 @@ def prediction(im, is_pc):
                  input_size = (None,None,1))
 
     if is_pc:
-        path = 'unet/unet_weights_batchsize_25_Nepochs_100_SJR0_10.hdf5'
+        path = path_weights + 'unet_weights_batchsize_25_Nepochs_100_SJR0_10.hdf5'
     else:
-        path = 'unet/unet_weights_BF_batchsize_25_Nepochs_100_SJR_0_1.hdf5'
+        path = path_weights + 'unet_weights_BF_batchsize_25_Nepochs_100_SJR_0_1.hdf5'
     
     if not os.path.exists(path):
         raise ValueError('Path does not exist')
