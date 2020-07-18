@@ -150,7 +150,7 @@ class Extract(QDialog):
         _, ext = os.path.splitext(self.outfile)
         if ext == '':
             self.outfile += '.tif'
-        elif ext != '.tif' or ext!='.tiff':
+        elif ext != '.tif' and ext!='.tiff' and ext!='.TIF' and ext!='.TIFF':
             QMessageBox.critical(self,'Error','Must specify .tif file')
             return 
 
