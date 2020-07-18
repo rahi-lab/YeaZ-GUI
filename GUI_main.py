@@ -236,8 +236,8 @@ class App(QMainWindow):
         self.button_cnn = QPushButton('Launch CNN')
         self.buttonlist.append(self.button_cnn)
         
-        self.button_cellcorespondance = QPushButton('Retrack')
-        self.buttonlist.append(self.button_cellcorespondance)
+        self.button_cellcorrespondence = QPushButton('Retrack')
+        self.buttonlist.append(self.button_cellcorrespondence)
         
         self.button_changecellvalue = QPushButton('Change cell ID')
         self.buttonlist.append(self.button_changecellvalue)        
@@ -961,7 +961,7 @@ class App(QMainWindow):
         
      
     def CellCorrespActivation(self):
-        self.Disable(self.button_cellcorespondance)
+        self.Disable(self.button_cellcorrespondence)
         self.WriteStatusBar('Doing the cell correspondence')
 
         if self.Tindex != 0:
@@ -971,8 +971,8 @@ class App(QMainWindow):
             self.m.plotmask = self.reader.LoadSeg(self.Tindex, self.FOVindex)
             self.m.updatedata()
 
-        self.Enable(self.button_cellcorespondance)
-        self.button_cellcorespondance.setChecked(False)
+        self.Enable(self.button_cellcorrespondence)
+        self.button_cellcorrespondence.setChecked(False)
         self.ClearStatusBar()
 
     
@@ -1453,10 +1453,10 @@ class App(QMainWindow):
 
     def EnableCNNButtons(self):
         if self.reader.TestTimeExist(self.Tindex, self.FOVindex):
-            self.button_cellcorespondance.setEnabled(True)
+            self.button_cellcorrespondence.setEnabled(True)
             self.button_extractfluorescence.setEnabled(True)
         else:
-            self.button_cellcorespondance.setEnabled(False)
+            self.button_cellcorrespondence.setEnabled(False)
             self.button_extractfluorescence.setEnabled(False)
     
     

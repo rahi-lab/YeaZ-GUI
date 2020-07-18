@@ -162,11 +162,11 @@ def Init(parent):
     parent.button_changecellvalue.setStatusTip('Change ID value of one cell. Use left click to select one cell and enter a new ID value.')
                 
     # MAKE THE CELL Correspondence
-    parent.button_cellcorespondance.setEnabled(False)
-    parent.button_cellcorespondance.setCheckable(True)
-    parent.button_cellcorespondance.clicked.connect(parent.CellCorrespActivation)
-    parent.button_cellcorespondance.setMaximumWidth(150)
-    parent.button_cellcorespondance.setStatusTip('Retrack cell ID numbers based on the previous frame.')
+    parent.button_cellcorrespondence.setEnabled(False)
+    parent.button_cellcorrespondence.setCheckable(True)
+    parent.button_cellcorrespondence.clicked.connect(parent.CellCorrespActivation)
+    parent.button_cellcorrespondence.setMaximumWidth(150)
+    parent.button_cellcorrespondence.setStatusTip('Retrack cell ID numbers based on the previous frame.')
     
     # EXTRACT FLUORESCENCE IN DIFFERENT CHANNELS    
     parent.button_extractfluorescence.setEnabled(False)
