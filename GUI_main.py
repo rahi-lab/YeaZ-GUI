@@ -1254,17 +1254,17 @@ class App(QMainWindow):
                 self.WriteStatusBar(('Draw using the brush, right click to select '
                                      'the cell to draw.'))
                 self.Disable(self.button_drawmouse)
-                pixmap = QtGui.QPixmap(path_icons+'brush2.png')
-                cursor = QtGui.QCursor(pixmap, 0,25)
+                #pixmap = QtGui.QPixmap(path_icons+'brush2.png')
+                #cursor = QtGui.QCursor(pixmap, 0,25)
                 
             elif do_erase:
                 self.WriteStatusBar('Erasing by setting the values to 0.')
                 self.Disable(self.button_eraser)
-                pixmap = QtGui.QPixmap(path_icons+'eraser.png')
-                cursor = QtGui.QCursor(pixmap, 0,26)
+                #pixmap = QtGui.QPixmap(path_icons+'eraser.png')
+                #cursor = QtGui.QCursor(pixmap, 0,26)
                 self.m.cellval = 0
             
-            self.m.setCursor(cursor)
+            #self.m.setCursor(cursor)
             radius = self.spinbox_brushsize.value()
             self.id2 = self.m.mpl_connect('button_press_event', 
                                           lambda e: self.m.OneClick(e, radius))
