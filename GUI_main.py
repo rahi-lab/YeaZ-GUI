@@ -963,13 +963,13 @@ class App(QMainWindow):
     def CellCorrespActivation(self):
         self.Disable(self.button_cellcorrespondence)
         self.WriteStatusBar('Doing the cell correspondence')
-
-        if self.Tindex != 0:
+        if self.Tindex > 0:
             self.m.plotmask = self.reader.CellCorrespondence(self.Tindex, self.FOVindex)
             self.m.updatedata()
         else:
-            self.m.plotmask = self.reader.LoadSeg(self.Tindex, self.FOVindex)
-            self.m.updatedata()
+            pass
+            #self.m.plotmask = self.reader.LoadSeg(self.Tindex, self.FOVindex)
+            #self.m.updatedata()
 
         self.Enable(self.button_cellcorrespondence)
         self.button_cellcorrespondence.setChecked(False)
