@@ -23,7 +23,7 @@ def load_image(path, ix=None):
     if ext=='':
         filelist = sorted(os.listdir(path)) 
         filelist = [f for f in filelist if 
-                    re.search(r".png|.tif|.jpg|.bmp|.jpeg|.pbm|.pgm|.ppm|.pxm|.pnm|.jp2", f)]
+                    re.search(r".png|.tif|.jpg|.bmp|.jpeg|.pbm|.pgm|.ppm|.pxm|.pnm|.jp2|.PNG|.TIF|.JPG|.BMP|.JPEG|.PBM|.PGM|.PPM|.PXM|.PNM|.JP2", f)]
         filelist = [os.path.join(path, f) for f in filelist]
         
         if len(filelist)==0:

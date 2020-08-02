@@ -72,8 +72,10 @@ class FileBrowser(QDialog):
 
     def getnd2path(self):
         self.nd2name,_ = QFileDialog.getOpenFileName(self, 'Open image file','', 
-            'Image files (*.nd2 *.tif *.tiff *.tiff *.jpg *.jpeg *.png *.bmp '
-                          '*.pbm *.pgm *.ppm *.pxm *.pnm *.jp2)')
+            'Image files (*.nd2 *.tif *.tiff *.jpg *.jpeg *.png *.bmp '
+                          '*.pbm *.pgm *.ppm *.pxm *.pnm *.jp2 '
+                          '*.TIF *.TIFF *.JPG *.JPEG *.PNG *.BMP '
+                          '*.PBM *.PGM *.PPM *.PXM *.PNM *.JP2)')
         if self.nd2name != '':
             self.labelnd2.setText(self.nd2name)
             self.labelfolder.setText('')
@@ -95,10 +97,10 @@ class FileBrowser(QDialog):
         """Checks if hdf path already exists when loading tiff, to avoid 
         data loss"""
         path, ext = os.path.splitext(self.hdfname)
-        if ext=='.tiff' or ext=='.tif':
+        if ext=='.tiff' or ext=='.tif' or ext=='.TIFF' or ext=='.TIF':
             if os.path.isfile(path+'.h5'):
                 QMessageBox.critical(self, 'Warning',
                                  'A .h5 file with the same name as the loaded '
-                                 'tiff exists already and will be overwritten.'
+                                 'tif exists already and will be overwritten.'
                                  ' Rename either the tif or the h5 file to '
                                  'avoid data loss.')
