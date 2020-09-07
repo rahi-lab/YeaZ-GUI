@@ -91,7 +91,7 @@ class Reader:
             
             # filter filelist for supported image files
             filelist = [f for f in filelist if re.search(r".png|.tif|.jpg|.bmp|.jpeg|.pbm|.pgm|.ppm|.pxm|.pnm|.jp2"
-                                                         "|.PNG|.TIF|.JPG|.BMP|.JPEG|.PBM|.PGM|.PPM|.PXM|.PNM|.jp2", f)]
+                                                         "|.PNG|.TIF|.JPG|.BMP|.JPEG|.PBM|.PGM|.PPM|.PXM|.PNM|.JP2", f)]
             
             for f in filelist:
                 im = skimage.io.imread(self.nd2path + '/' + f)
