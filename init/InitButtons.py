@@ -160,7 +160,14 @@ def Init(parent):
     parent.button_changecellvalue.setMaximumWidth(150)
 #    parent.button_changecellvalue.setStatusTip('')
     parent.button_changecellvalue.setStatusTip('Change ID value of one cell. Use left click to select one cell and enter a new ID value.')
-                
+
+    # EXCHANGE CELL VALUES
+    parent.button_split.toggle()
+    parent.button_split.setEnabled(True)
+    parent.button_split.clicked.connect(parent.SelectSplitCell)
+    parent.button_split.setMaximumWidth(150)
+    parent.button_split.setStatusTip('')
+
     # MAKE THE CELL Correspondence
     parent.button_cellcorrespondence.setEnabled(False)
     parent.button_cellcorrespondence.setCheckable(True)

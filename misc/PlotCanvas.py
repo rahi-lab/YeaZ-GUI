@@ -176,6 +176,24 @@ class PlotCanvas(FigureCanvas):
             
         else:
             return
+        
+        
+    def multiple_click(self, event, call_after):
+        """Function to keep track of multiple left clicks, confirmed with 
+        a right click. After right click, the function call_after is called"""        
+        
+        if (event.button == 1  # left click
+            and (event.xdata != None and event.ydata != None) 
+            and self.ax == event.inaxes):
+            
+            newx = int(event.xdata)
+            newy = int(event.ydata)
+            self.storemouseclicks.append((newx, newy))
+            #self.draw_click(newx, newy)
+        
+        elif (event.button == 3): # right click
+            call_after()
+
             
     
     def PaintBrush(self, event, radius=3):
