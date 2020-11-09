@@ -1287,6 +1287,8 @@ class App(QMainWindow):
     def SelectSplitCell(self):
         self.cell_to_split=-1
         self.Disable(self.button_split)
+        self.WriteStatusBar('Select cell to split with left click, right '
+                            'click to abort')
         
         def sel_cell(e):
             if e.button != 1:
@@ -1303,9 +1305,13 @@ class App(QMainWindow):
 
 
     def ClickSplitCell(self):
+        self.WriteStatusBar('Draw polygon around a subset of the cell which'
+                            'will be considered as a new cell. Right click '
+                            'to confirm.')
         if self.cell_to_split == -1:
             return
         
+        self.m.tempmask = self.m.plotmask.copy()
         self.m.storemouseclicks = [] 
         self.id = self.m.mpl_connect('button_press_event', 
                                      lambda e: self.m.multiple_click(e, self.DoSplitCell))
@@ -1322,6 +1328,9 @@ class App(QMainWindow):
         self.m.plotmask[selected_mask & polygon] = replace_cell
         self.Enable(self.button_split)
         self.m.UpdatePlots()
+        self.ClearStatusBar()
+        self.SaveMask()
+        self.m.storemouseclicks = []
         
         
     def UpdateTitleSubplots(self):
