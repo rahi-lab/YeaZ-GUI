@@ -1285,23 +1285,30 @@ class App(QMainWindow):
             
     
     def SelectSplitCell(self):
-        self.cell_to_split=-1
-        self.Disable(self.button_split)
-        self.WriteStatusBar('Select cell to split with left click, right '
-                            'click to abort')
-        
-        def sel_cell(e):
-            if e.button != 1:
-                self.cell_to_split=-1
-                self.Enable(self.button_split)
-            else:
-                x = int(e.xdata)
-                y = int(e.ydata)
-                self.cell_to_split = self.m.plotmask[y,x]
-                self.m.mpl_disconnect(self.id)
-                self.ClickSplitCell()
-
-        self.id = self.m.mpl_connect('button_press_event', sel_cell)
+        """Function called upon clicking Split Cell button"""
+      
+        if self.button_split.isChecked():
+            self.cell_to_split=-1
+            self.Disable(self.button_split)
+            self.WriteStatusBar('First select cell to split with left click. '
+                                'Then click to draw a polygon to split off the '
+                                'selected cell. Right click to confirm.')
+            
+            def sel_cell(e):
+                if e.button != 1:
+                    self.cell_to_split=-1
+                    self.Enable(self.button_split)
+                else:
+                    x = int(e.xdata)
+                    y = int(e.ydata)
+                    self.cell_to_split = self.m.plotmask[y,x]
+                    self.m.mpl_disconnect(self.id)
+                    self.ClickSplitCell()
+    
+            self.id = self.m.mpl_connect('button_press_event', sel_cell)
+            
+        else:
+            self.DoSplitCell()
 
 
     def ClickSplitCell(self):
@@ -1319,18 +1326,20 @@ class App(QMainWindow):
         
     def DoSplitCell(self):
         self.m.mpl_disconnect(self.id)
-        nx, ny = self.m.plotmask.shape
-        img = Image.new('L', (ny, nx), 0)
-        ImageDraw.Draw(img).polygon(self.m.storemouseclicks, outline=1, fill=1)
-        polygon = np.array(img).astype(bool)
-        selected_mask = self.m.plotmask==self.cell_to_split
-        replace_cell = self.m.plotmask.max() + 1
-        self.m.plotmask[selected_mask & polygon] = replace_cell
+        if len(self.m.storemouseclicks) > 2:
+            nx, ny = self.m.plotmask.shape
+            img = Image.new('L', (ny, nx), 0)
+            ImageDraw.Draw(img).polygon(self.m.storemouseclicks, outline=1, fill=1)
+            polygon = np.array(img).astype(bool)
+            selected_mask = self.m.plotmask==self.cell_to_split
+            replace_cell = self.m.plotmask.max() + 1
+            self.m.plotmask[selected_mask & polygon] = replace_cell
         self.Enable(self.button_split)
         self.m.UpdatePlots()
         self.ClearStatusBar()
         self.SaveMask()
         self.m.storemouseclicks = []
+        self.button_split.setChecked(False)
         
         
     def UpdateTitleSubplots(self):
