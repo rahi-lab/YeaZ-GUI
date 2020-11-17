@@ -71,6 +71,7 @@ from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as Navigatio
 
 from sklearn.decomposition import PCA
 import imageio
+from PIL import Image, ImageDraw
 
 #append all the paths where the modules are stored. Such that this script
 #looks into all of these folders when importing modules.
@@ -226,6 +227,9 @@ class App(QMainWindow):
         
         self.button_hidemask = QCheckBox('Hide mask')
         self.buttonlist.append(self.button_hidemask)
+        
+        self.button_split = QPushButton('Split Cell')
+        self.buttonlist.append(self.button_split)
         
         self.button_nextframe = QPushButton("Next time frame")
         self.buttonlist.append(self.button_nextframe)
@@ -1254,17 +1258,12 @@ class App(QMainWindow):
                 self.WriteStatusBar(('Draw using the brush, right click to select '
                                      'the cell to draw.'))
                 self.Disable(self.button_drawmouse)
-                #pixmap = QtGui.QPixmap(path_icons+'brush2.png')
-                #cursor = QtGui.QCursor(pixmap, 0,25)
                 
             elif do_erase:
                 self.WriteStatusBar('Erasing by setting the values to 0.')
                 self.Disable(self.button_eraser)
-                #pixmap = QtGui.QPixmap(path_icons+'eraser.png')
-                #cursor = QtGui.QCursor(pixmap, 0,26)
                 self.m.cellval = 0
-            
-            #self.m.setCursor(cursor)
+                
             radius = self.spinbox_brushsize.value()
             self.id2 = self.m.mpl_connect('button_press_event', 
                                           lambda e: self.m.OneClick(e, radius))
@@ -1282,9 +1281,67 @@ class App(QMainWindow):
             self.Enable(self.button_eraser)
             self.SaveMask()
             self.ClearStatusBar()
+            
+            
+    
+    def SelectSplitCell(self):
+        """Function called upon clicking Split Cell button"""
+      
+        if self.button_split.isChecked():
+            self.cell_to_split=-1
+            self.Disable(self.button_split)
+            self.WriteStatusBar('First select cell to split with left click. '
+                                'Then click to draw a polygon to split off the '
+                                'selected cell. Right click to confirm.')
+            
+            def sel_cell(e):
+                if e.button != 1:
+                    self.cell_to_split=-1
+                    self.Enable(self.button_split)
+                else:
+                    x = int(e.xdata)
+                    y = int(e.ydata)
+                    self.cell_to_split = self.m.plotmask[y,x]
+                    self.m.mpl_disconnect(self.id)
+                    self.ClickSplitCell()
+    
+            self.id = self.m.mpl_connect('button_press_event', sel_cell)
+            
+        else:
+            self.DoSplitCell()
 
-            
-            
+
+    def ClickSplitCell(self):
+        self.WriteStatusBar('Click to define the corners of a polygon which'
+                            'will be split off the selected cell. Right click '
+                            'or reclick the button to confirm.')
+        if self.cell_to_split == -1:
+            return
+        
+        self.m.tempmask = self.m.plotmask.copy()
+        self.m.storemouseclicks = [] 
+        self.id = self.m.mpl_connect('button_press_event', 
+                                     lambda e: self.m.multiple_click(e, self.DoSplitCell))
+
+        
+    def DoSplitCell(self):
+        self.m.mpl_disconnect(self.id)
+        if len(self.m.storemouseclicks) > 2:
+            nx, ny = self.m.plotmask.shape
+            img = Image.new('L', (ny, nx), 0)
+            ImageDraw.Draw(img).polygon(self.m.storemouseclicks, outline=1, fill=1)
+            polygon = np.array(img).astype(bool)
+            selected_mask = self.m.plotmask==self.cell_to_split
+            replace_cell = self.m.plotmask.max() + 1
+            self.m.plotmask[selected_mask & polygon] = replace_cell
+        self.Enable(self.button_split)
+        self.m.UpdatePlots()
+        self.ClearStatusBar()
+        self.SaveMask()
+        self.m.storemouseclicks = []
+        self.button_split.setChecked(False)
+        
+        
     def UpdateTitleSubplots(self):
         """This function updates the title of the plots according to the 
         current time index. So it called whenever a frame or a fov is changed.
@@ -1468,6 +1525,7 @@ class App(QMainWindow):
         self.button_exval.setEnabled(True)
         self.button_changecellvalue.setEnabled(True)
         self.button_showval.setEnabled(True)
+        self.button_split.setEnabled(True)
         
         
     def DisableCorrectionsButtons(self):
@@ -1478,7 +1536,8 @@ class App(QMainWindow):
         self.button_exval.setEnabled(False)
         self.button_changecellvalue.setEnabled(False)
         self.button_showval.setEnabled(False)
-
+        self.button_split.setEnabled(False)
+        
     
     def SaveMask(self):
         """

@@ -176,6 +176,25 @@ class PlotCanvas(FigureCanvas):
             
         else:
             return
+        
+        
+    def multiple_click(self, event, call_after, radius=3):
+        """Function to keep track of multiple left clicks, confirmed with 
+        a right click. After right click, the function call_after is called"""        
+        
+        if (event.button == 1  # left click
+            and (event.xdata != None and event.ydata != None) 
+            and self.ax == event.inaxes):
+            
+            newx = int(event.xdata)
+            newy = int(event.ydata)
+            self.storemouseclicks.append((newx, newy))
+            
+            self.updateplot(newx, newy, False)
+        
+        elif (event.button == 3): # right click
+            call_after()
+
             
     
     def PaintBrush(self, event, radius=3):
@@ -441,19 +460,23 @@ class PlotCanvas(FigureCanvas):
         self.ann_list_next = []
         
         
-    def updateplot(self, posx, posy):
+    def updateplot(self, posx, posy, first_is_cell=True):
         """
         it updates the plot once the user clicks on the plot and draws a 4x4 pixel dot
         at the coordinate of the click 
         """        
-        # remove the first coordinate as it should only coorespond 
-        # to the value that the user wants to attribute to the drawn region   
-        xtemp, ytemp = self.storemouseclicks[0]
-
-        # here we initialize the value attributed to the pixels.
-        # it means that the first click selects the value that will be attributed to
-        # the pixels inside the polygon (drawn by the following mouse clicks of the user)
-        self.cellval = self.plotmask[ytemp, xtemp]
+        if first_is_cell:
+            # remove the first coordinate as it should only coorespond 
+            # to the value that the user wants to attribute to the drawn region   
+            xtemp, ytemp = self.storemouseclicks[0]
+    
+            # here we initialize the value attributed to the pixels.
+            # it means that the first click selects the value that will be attributed to
+            # the pixels inside the polygon (drawn by the following mouse clicks of the user)
+            self.cellval = self.plotmask[ytemp, xtemp]
+            
+        else:
+            self.cellval=1
           
         # drawing the 2x2 square ot of the mouse click
         if ((self.button_newcell_check.isChecked() or self.button_drawmouse_check.isChecked()) 
