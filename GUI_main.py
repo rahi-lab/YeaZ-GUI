@@ -1312,9 +1312,9 @@ class App(QMainWindow):
 
 
     def ClickSplitCell(self):
-        self.WriteStatusBar('Draw polygon around a subset of the cell which'
-                            'will be considered as a new cell. Right click '
-                            'to confirm.')
+        self.WriteStatusBar('Click to define the corners of a polygon which'
+                            'will be split off the selected cell. Right click '
+                            'or reclick the button to confirm.')
         if self.cell_to_split == -1:
             return
         

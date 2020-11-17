@@ -167,9 +167,9 @@ def Init(parent):
     parent.button_split.setEnabled(True)
     parent.button_split.clicked.connect(parent.SelectSplitCell)
     parent.button_split.setMaximumWidth(150)
-    parent.button_split.setShortcut("S")
-    parent.button_split.setToolTip("Shortcut: S")
-    parent.button_split.setStatusTip('Split a selected cell into two. First right click to select the cell, then draw a polygon around the area to split off.')
+    parent.button_split.setShortcut("X")
+    parent.button_split.setToolTip("Shortcut: X")
+    parent.button_split.setStatusTip('Split a selected cell into two. First left click to select the cell, then draw a polygon around the area to split off.')
 
     # MAKE THE CELL Correspondence
     parent.button_cellcorrespondence.setEnabled(False)
