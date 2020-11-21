@@ -48,7 +48,7 @@ Our CNN was trained on fewer cells with the bright-field technique (3841 unique 
 
 ### Graphical user interface not working on Mac OS Big Sur
 
-Jordan Xiao of Stanford University pointed out that one of the python modules (Pyqt5) has some issues on MaC OS Big Sur. Check out https://stackoverflow.com/questions/64833558/apps-not-popping-up-on-macos-big-sur-11-0-1 and https://stackoverflow.com/questions/64818879/is-there-any-solution-regarding-to-pyqt-library-doesnt-work-in-mac-os-big-sur/64856281 for more information and possible fixes.
+Jordan Xiao of Stanford University pointed out that one of the python modules (Pyqt5) has some issues on Mac OS Big Sur. Check out https://stackoverflow.com/questions/64833558/apps-not-popping-up-on-macos-big-sur-11-0-1 and https://stackoverflow.com/questions/64818879/is-there-any-solution-regarding-to-pyqt-library-doesnt-work-in-mac-os-big-sur/64856281 for more information and possible fixes.
 
 ## User Guide
 
