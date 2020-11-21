@@ -34,7 +34,7 @@ Installation time is less than 5 minutes.
 
 Using the neural network to make predictions is very memory intensive. This can lead the computer to run out of memory, which in turn causes the program to abort. However, the amount of memory that is needed depends on the size of the image. So, you may try cropping your images into several smaller images or removing empty space around cells if you do not have enough memory. For instance, using a 2015 MacBook Pro with 8GB of RAM and a 2.9GHz Intel Core i5 CPU, we were able to predict images of size 700 x 500 pixels.
 
-### Small buds aren't recognized as cells
+### Small buds are not recognized as cells
 
 If small buds aren't recognized as cells in your image, this is likely linked to a segmentation parameter that is too high. Relaunching the CNN with a smaller parameter will likely yield better results.
 
@@ -45,6 +45,10 @@ In case you only want to use the functionalities of the convolutional neural net
 ### CNN performs less well on bright-field images
 
 Our CNN was trained on fewer cells with the bright-field technique (3841 unique cells imaged with 6 different exposure levels versus >8000 for phase contrast).
+
+### Graphical user interface not working on Mac OS Big Sur
+
+Jordan Xiao of Stanford University pointed out that one of the python modules (Pyqt5) has some issues on Max OS Big Sur. Check out https://stackoverflow.com/questions/64833558/apps-not-popping-up-on-macos-big-sur-11-0-1 and https://stackoverflow.com/questions/64818879/is-there-any-solution-regarding-to-pyqt-library-doesnt-work-in-mac-os-big-sur/64856281 for more information.
 
 ## User Guide
 
