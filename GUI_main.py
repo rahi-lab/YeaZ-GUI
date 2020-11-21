@@ -1290,8 +1290,8 @@ class App(QMainWindow):
         if self.button_split.isChecked():
             self.cell_to_split=-1
             self.Disable(self.button_split)
-            self.WriteStatusBar('First select cell to split with left click. '
-                                'Then click to draw a polygon to split off the '
+            self.WriteStatusBar('First, select the cell to be split with a left click. '
+                                'Then, left-click the corners of a polygon to be split off from the '
                                 'selected cell. Right click to confirm.')
             
             def sel_cell(e):
