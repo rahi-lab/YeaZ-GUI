@@ -52,8 +52,11 @@ class Reader:
             with ND2Reader(self.nd2path) as images:
                 self.sizex = images.sizes['x']
                 self.sizey = images.sizes['y']
-                self.sizec = images.sizes['c']
                 self.sizet = images.sizes['t']
+                try:
+                    self.sizec = images.sizes['c']
+                except KeyError:
+                    self.sizec = 1
                 try:
                     self.Npos  = images.sizes['v']
                 except KeyError:
@@ -280,7 +283,10 @@ class Reader:
                     images.default_coords['v'] = currentfov
                 except ValueError:
                     pass
-                images.default_coords['c'] = self.default_channel
+                try:
+                    images.default_coords['c'] = self.default_channel
+                except ValueError:
+                    pass
                 images.iter_axes = 't'
                 im = images[currentT]
                 
@@ -318,8 +324,11 @@ class Reader:
                     images.default_coords['v'] = currentFOV
                 except ValueError:
                     pass
+                try:
+                    images.iter_axes = 'c'
+                except ValueError:
+                    pass
                 images.default_coords['t'] = currentT
-                images.iter_axes = 'c'
                 im = images[ch]
                 return np.array(im)
         
