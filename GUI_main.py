@@ -228,8 +228,11 @@ class App(QMainWindow):
         self.button_hidemask = QCheckBox('Hide mask')
         self.buttonlist.append(self.button_hidemask)
         
-        self.button_split = QPushButton('Split Cell')
+        self.button_split = QPushButton('Split cell')
         self.buttonlist.append(self.button_split)
+        
+        self.button_mergewithneighbors = QPushButton('Merge cells')
+        self.buttonlist.append(self.button_mergewithneighbors)
         
         self.button_nextframe = QPushButton("Next time frame")
         self.buttonlist.append(self.button_nextframe)
@@ -1475,6 +1478,77 @@ class App(QMainWindow):
             self.SaveMask()
             
             
+    def MergeWithNeighbors(self):
+        """This function is called when the button Merge With Neighbors is
+        clicked. It displays the instructions on the status bar.
+        And if the user clicks in the graph where the current mask is displayed
+        it connects the event of the click (meaning that user has clicked on
+        one cell) to the function self.PerformMergeWithNeighbors. 
+        This function will then merge the cell selected by the user with
+        the click with all (touching) neighbors.
+        """
+        
+        # displaying the instructions on the statusbar
+        self.WriteStatusBar((
+            'Left-click to select cell, right-click to abort.'))
+
+        # disables all the buttons
+        self.Disable(self.button_mergewithneighbors)
+        
+        # connects the event "press mouse button" in the matplotlib plot 
+        # (picture) to the function self.PerformMergeWithNeighbors
+        self.id = self.m.mpl_connect('button_press_event', self.PerformMergeWithNeighbors)
+        
+        
+    def PerformMergeWithNeighbors(self, event):
+        """This function is called after the user has selected
+        the button Merge With Neighbors and clicked in the picture to select
+        the desired cell to start the merger.
+        
+        It first deconnects the mouse click event in matplotlib with this 
+        function to not generate any other dialog window.
+        
+        It then tests if the click is inside the matplotlib plot (if it is
+        outside it equals to None) and if it is the current and editable plot
+        (the one in the middle of the gui, self.m.ax)
+        
+        If is true, then it sets the coordinates to int. and creates a dialog
+        window where the user is asked to type a value to set it to the cell.
+        
+        If the user presses ok, it tests if the entry is valid (>0 and not 
+        empty) and looks for the old cell value and replaces it. And then
+        it updates the plot such that the result of the change can be seen.
+        """
+        # the function is disconnected from the matplotlib event.
+        self.m.mpl_disconnect(self.id)
+        
+        # test if the button is a left click and if the coordinates
+        # chosen by the user click is inside of the current matplotlib plot
+        # which is given by self.m.ax
+        if (event.button == 1 
+            and (event.xdata != None and event.ydata != None) 
+            and self.m.ax == event.inaxes):
+            newx = int(event.xdata)
+            newy = int(event.ydata)
+            # get the ID of the selected cell
+            selectedcell_ID = self.m.plotmask[newy,newx]
+            # binarize the existing mask and number ("label") each component
+            labeled_binarized_mask = skimage.measure.label(self.m.plotmask > 0)
+            # select the component pixels that corresponds to the selected point
+            flood_indices=(labeled_binarized_mask==labeled_binarized_mask[newy,newx])
+            # set the mask pixels that correspond to the component to the cell ID
+            self.m.plotmask[flood_indices] = selectedcell_ID
+                    
+            # updates the plot to see the modification.
+            self.m.updatedata()
+                    
+        self.Enable(self.button_mergewithneighbors)
+        self.button_mergewithneighbors.setChecked(False)
+        self.m.ShowCellNumbers()
+        self.SaveMask()
+        self.ClearStatusBar()
+        
+        
 # -----------------------------------------------------------------------------
 # BUTTON ENABLE / DISABLE
     

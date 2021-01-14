@@ -44,6 +44,7 @@ def Init(parent):
     hboxcorrectionsbuttons.addWidget(parent.button_add_region)
     hboxcorrectionsbuttons.addWidget(parent.button_newcell)
     hboxcorrectionsbuttons.addWidget(parent.button_split)
+    hboxcorrectionsbuttons.addWidget(parent.button_mergewithneighbors)
     hboxcorrectionsbuttons.addWidget(parent.button_drawmouse)
     hboxcorrectionsbuttons.addWidget(parent.button_eraser)
     hboxcorrectionsbuttons.addWidget(parent.label_brushsize)

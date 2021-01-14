@@ -161,7 +161,7 @@ def Init(parent):
 #    parent.button_changecellvalue.setStatusTip('')
     parent.button_changecellvalue.setStatusTip('Change ID value of one cell. Use left click to select one cell and enter a new ID value.')
 
-    # EXCHANGE CELL VALUES
+    # SPLIT CELLS
     parent.button_split.toggle()
     parent.button_split.setCheckable(True)
     parent.button_split.setEnabled(True)
@@ -170,6 +170,16 @@ def Init(parent):
     parent.button_split.setShortcut("X")
     parent.button_split.setToolTip("Shortcut: X")
     parent.button_split.setStatusTip('Split a selected cell into two. First left-click to select the cell, then draw a polygon around an area to split it off.')
+
+    # MERGE CELLS
+    parent.button_mergewithneighbors.toggle()
+    parent.button_mergewithneighbors.setCheckable(True)
+    parent.button_mergewithneighbors.setEnabled(True)
+    parent.button_mergewithneighbors.clicked.connect(parent.MergeWithNeighbors)
+    parent.button_mergewithneighbors.setMaximumWidth(150)
+    parent.button_mergewithneighbors.setShortcut("F")
+    parent.button_mergewithneighbors.setToolTip("Shortcut: F")
+    parent.button_mergewithneighbors.setStatusTip('Merge a cell with its immediate neighbors. Left-click to select the cell or right-click to abort.')
 
     # MAKE THE CELL Correspondence
     parent.button_cellcorrespondence.setEnabled(False)
