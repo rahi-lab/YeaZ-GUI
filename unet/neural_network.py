@@ -67,7 +67,7 @@ def prediction(im, is_pc):
     if is_pc:
         path = path_weights + 'unet_weights_batchsize_25_Nepochs_100_SJR0_10.hdf5'
     else:
-        path = path_weights + 'unet_weights_BF_batchsize_25_Nepochs_100_SJR_0_1.hdf5'
+        path = path_weights + 'weights_budding_BF_02.hdf5'
     
     if not os.path.exists(path):
         raise ValueError('Path does not exist')
