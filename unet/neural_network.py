@@ -46,7 +46,7 @@ def threshold(im,th = None):
     return bi
 
 
-def prediction(im, is_pc):
+def prediction(im, is_pc, pretrained_weights=None):
     """
     Calculate the prediction of the label corresponding to image im
     Param:
@@ -60,19 +60,18 @@ def prediction(im, is_pc):
     col_add = 16-ncol%16
     padded = np.pad(im, ((0, row_add), (0, col_add)))
     
-    # WHOLE CELL PREDICTION
-    model = unet(pretrained_weights = None,
-                 input_size = (None,None,1))
-
-    if is_pc:
-        path = path_weights + 'unet_weights_batchsize_25_Nepochs_100_SJR0_10.hdf5'
-    else:
-        path = path_weights + 'unet_weights_BF_batchsize_25_Nepochs_100_SJR_0_1.hdf5'
+    if pretrained_weights is None:
+        if is_pc:
+            pretrained_weights = path_weights + 'unet_weights_batchsize_25_Nepochs_100_SJR0_10.hdf5'
+        else:
+            pretrained_weights = path_weights + 'unet_weights_BF_batchsize_25_Nepochs_100_SJR_0_1.hdf5'
     
-    if not os.path.exists(path):
+    if not os.path.exists(pretrained_weights):
         raise ValueError('Path does not exist')
-    
-    model.load_weights(path)
+
+    # WHOLE CELL PREDICTION
+    model = unet(pretrained_weights = pretrained_weights,
+                 input_size = (None,None,1))
 
     results = model.predict(padded[np.newaxis,:,:,np.newaxis], batch_size=1)
 
