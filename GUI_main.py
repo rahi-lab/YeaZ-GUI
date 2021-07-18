@@ -744,18 +744,18 @@ class App(QMainWindow):
         self.reader.SaveMask(timeindex, fovindex, seg)
         print('--------- Finished segmenting.')
           
-          
-    def LaunchPrediction(self, im, is_pc):
+    @staticmethod   
+    def LaunchPrediction(im, is_pc, pretrained_weights=None):
         """It launches the neural neutwork on the current image and creates 
         an hdf file with the prediction for the time T and corresponding FOV. 
         """
         im = skimage.exposure.equalize_adapthist(im)
         im = im*1.0;	
-        pred = nn.prediction(im, is_pc)                        
+        pred = nn.prediction(im, is_pc, pretrained_weights)                        
         return pred
 
-
-    def ThresholdPred(self, thvalue, pred):     
+    @staticmethod
+    def ThresholdPred(thvalue, pred):     
         """Thresholds prediction with value"""
         if thvalue == None:
             thresholdedmask = nn.threshold(pred)
