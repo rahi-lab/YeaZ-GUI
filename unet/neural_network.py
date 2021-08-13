@@ -65,9 +65,17 @@ def prediction(im, is_pc):
                  input_size = (None,None,1))
 
     if is_pc:
-        path = path_weights + 'unet_weights_batchsize_25_Nepochs_100_SJR0_10.hdf5'
+        path = '/home/sjrahi/Research/YeaZ/unet_weights/2021_05_27_budding_BF_all/files-p-G/unet_weights_budding_BF_multilab-p-G_SJR_0_1_batchsize_10_Nepochs_250.hdf5'
+        # '/home/sjrahi/Research/YeaZ/unet_weights/2021_04_15_Silke_pombe/unet_weights_pombe_Silke_all_SJR_0_1_batchsize_5_Nepochs_500.hdf5'
+        # path_weights + 'unet_weights_batchsize_25_Nepochs_100_SJR0_10.hdf5'
     else:
-        path = path_weights + 'weights_budding_BF_02.hdf5'
+        path = '/home/sjrahi/Research/YeaZ/unet_weights/2021_05_09_pombe_all/unet_weights_pombe_all_SJR_0_2_batchsize_8_Nepochs_400.hdf5'
+        # '/home/sjrahi/Research/YeaZ/unet_weights/2021_04_15_Silke_pombe/unet_weights_BF_batchsize_15_Nepochs_400_SJR_0_1.hdf5'
+        # '/home/sjrahi/Research/YeaZ/unet_weights/2021_04_15_Silke_pombe/unet_weights_BF_batchsize_25_Nepochs_200_SJR_0_1.hdf5'
+        # '/home/sjrahi/Research/YeaZ/unet_weights/2021_04_15_Silke_pombe/unet_weights_epoch_600_batchsize_50_fold_1_4.hdf5'
+        # '/home/sjrahi/Research/YeaZ/unet_weights/2021_04_15_Silke_pombe/unet_weights_epoch_2000_batchsize_50_fold_1.hdf5'
+        # '/home/sjrahi/Research/YeaZ/unet_weights/2021_04_15_Silke_pombe/unet_weights_epoch_600_batchsize_50_fold_1_4.hdf5'
+        # path_weights + 'weights_budding_BF_02.hdf5'
     
     if not os.path.exists(path):
         raise ValueError('Path does not exist')

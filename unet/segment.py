@@ -94,10 +94,12 @@ def cell_merge(wsh, pred):
         
         objcounter = objcounter + 1
         orig1 = objs[obj1,:,:]
+        
+        last_obj2_added_to_obj1 = -1
 
         for obj2 in range(obj1+1,wsh.max()):
             dil2 = dil_objs[obj2,:,:]
-        
+            
             # only check border if bounding box overlaps, and second mask 
             # is not yet deleted
             if (do_box_overlap(obj_coords[obj1,:], obj_coords[obj2,:])
@@ -107,7 +109,7 @@ def cell_merge(wsh, pred):
                 border_pred = pred[border]
                 
                 # Border is too small to be considered
-                if len(border_pred) < 32:
+                if len(border_pred) < 16:	#SJR: Changed on 18.04.2021 from previously 32. Not sure why 32. I remember 8.
                     continue
                 
                 # Sum of top 25% of predicted border values
@@ -119,11 +121,27 @@ def cell_merge(wsh, pred):
                 # merge cells
                 if top_border_height / top_border_area > .99:
                     orig1 = np.logical_or(orig1, objs[obj2,:,:])
-                    dil_objs[obj1,:,:] = np.logical_or(dil1, dil2)
+                    dil1 = np.logical_or(dil1, dil2)
+                    dil_objs[obj1,:,:] = dil1
                     dil_objs[obj2,:,:] = np.zeros((wshshape[0], wshshape[1]))
                     obj_coords[obj1,:] = get_bounding_box(dil_objs[obj1,:,:])
+#                    obj_coords[obj2,:] = get_bounding_box(dil_objs[obj2,:,:])
+                    last_obj2_added_to_obj1 = obj2
+        
+        # the last object that obj1 was merged with should be equal to obj1 so that additional cells could be merged with it
+        if last_obj2_added_to_obj1 > -1:
+            obj2 = last_obj2_added_to_obj1
+            dil_objs[obj2,:,:] = dil1
+            objs[obj2,:,:] = orig1
+            obj_coords[obj2,:] = get_bounding_box(dil_objs[obj2,:,:])
+            
                     
-        wshclean = wshclean + orig1*objcounter
+        wshclean = (1-orig1)*wshclean + orig1*objcounter
+        
+    # resort wshclean
+    u = np.unique(wshclean)[1:]	#ignore background
+    for obj1 in range(len(u)):
+        wshclean[wshclean==u[obj1]] = obj1 + 1
             
     return wshclean
 

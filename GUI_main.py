@@ -1257,6 +1257,10 @@ class App(QMainWindow):
         if do_draw or do_erase:
             self.m.tempmask = self.m.plotmask.copy()
             
+            #save status of the showval check box, then turn off (slows brush/eraser down too much)
+            self.showval_was_checked = self.button_showval.isChecked()
+            self.button_showval.setChecked(False)
+            
             if do_draw:
                 self.WriteStatusBar(('Draw using the brush, right click to select '
                                      'the cell to draw.'))
@@ -1271,7 +1275,7 @@ class App(QMainWindow):
             self.id2 = self.m.mpl_connect('button_press_event', 
                                           lambda e: self.m.OneClick(e, radius))
             self.id = self.m.mpl_connect('motion_notify_event', 
-                                         lambda e: self.m.PaintBrush(e, radius))
+                                          lambda e: self.m.PaintBrush(e, radius))
             self.id3 = self.m.mpl_connect('button_release_event', self.m.ReleaseClick)
                 
                         
@@ -1282,6 +1286,7 @@ class App(QMainWindow):
             QApplication.restoreOverrideCursor()
             self.Enable(self.button_drawmouse)
             self.Enable(self.button_eraser)
+            self.button_showval.setChecked(self.showval_was_checked)
             self.SaveMask()
             self.ClearStatusBar()
             

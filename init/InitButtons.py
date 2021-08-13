@@ -158,6 +158,8 @@ def Init(parent):
     parent.button_changecellvalue.setEnabled(True)
     parent.button_changecellvalue.clicked.connect(parent.ChangeOneValue)
     parent.button_changecellvalue.setMaximumWidth(150)
+    parent.button_changecellvalue.setShortcut("C")
+    parent.button_changecellvalue.setToolTip("Shortcut: C")
 #    parent.button_changecellvalue.setStatusTip('')
     parent.button_changecellvalue.setStatusTip('Change ID value of one cell. Use left click to select one cell and enter a new ID value.')
 
