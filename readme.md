@@ -4,6 +4,15 @@ This is the user manual for the graphical interface for segmenting yeast images 
 
 Want to try out the neural network without installing any software? Check out our online segmentation tool at https://lpbs-nn.epfl.ch/.
 
+## Latest updates
+
+14.08.2021:
+
+1. Updated the bright-field neural network parameters based on the multi-lab bright-field training set.
+2. Added a keyboard short-cut for the cell change ID function.
+3. Fixed a bug in the cell-cell boundary test.
+4. Turn off cell numbers while using the brush of eraser to avoid significant system slow-down.
+
 ## Installation
 
 ### System requirements
@@ -21,7 +30,7 @@ Installation time is less than 5 minutes.
 1. Clone this repository ("git clone https://github.com/lpbsscientist/YeaZ-GUI").
 2. Download the parameters for the neural network:
 3. Download the parameters for segmenting phase contrast images from: https://drive.google.com/file/d/1UTivmx_aEMpeGdOkCZO1CS9mcdJ3zmw2. Put the file in the folder `/unet`.
-4. Download the parameters for segmenting bright-field images from: https://drive.google.com/file/d/1oxZpbJOwXxH6g453lCrBkdPB_2KD6rNo. Put the file in the folder `/unet`.
+4. Download the parameters for segmenting bright-field images from: https://drive.google.com/file/d/1VYBzUtgLQcS-w6S9XpjGcSBacKyItYJ_. Put the file in the folder `/unet`.
 5. If you don't have conda or miniconda installed, download it from https://docs.conda.io/en/latest/miniconda.html.
 6. In the command line, create a virtual environment with python 3.6.8 with the command `conda create -n YeaZ python=3.6.8`. 
 7. Activate that environment using `conda activate YeaZ`. 
