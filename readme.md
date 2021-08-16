@@ -12,6 +12,7 @@ Want to try out the neural network without installing any software? Check out ou
 2. Added a keyboard short-cut for the cell change ID function.
 3. Fixed a bug in the cell-cell boundary test.
 4. Turn off cell numbers while using the brush of eraser to avoid significant system slow-down.
+5. Added a command-line script to run the neural network from the command line
 
 ## Installation
 
