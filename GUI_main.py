@@ -591,9 +591,9 @@ class App(QMainWindow):
             
             # PCA only works for multiple points
             if area > 1:
-                pca = PCA().fit(np.array([y,x]).T)
+                pca = PCA().fit(np.array([x,y]).T)
                 pc1_x, pc1_y = pca.components_[0,:]
-                angle = np.arctan(pc1_y / pc1_x) / np.pi * 360
+                angle = np.arctan(pc1_y / pc1_x) / (2*np.pi) * 360
                 v1, v2 = pca.explained_variance_
                 
                 len_maj = 4*np.sqrt(v1)
