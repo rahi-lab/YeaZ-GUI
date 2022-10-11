@@ -983,7 +983,7 @@ class App(QMainWindow):
         self.Enable(self.button_cellcorrespondence)
         self.button_cellcorrespondence.setChecked(False)
         self.ClearStatusBar()
-        selis f.reader.SaveMask(self.Tindex, self.FOVindex, self.m.plotmask)
+        self.reader.SaveMask(self.Tindex, self.FOVindex, self.m.plotmask)
     
     def ButtonSaveSegMask(self):
         """saves the segmented mask
