@@ -33,7 +33,7 @@ Installation time is less than 5 minutes.
 3. Download the parameters for segmenting phase contrast images from: https://drive.google.com/file/d/1UTivmx_aEMpeGdOkCZO1CS9mcdJ3zmw2/view?usp=sharing. Put the file in the folder `/unet`.
 4. Download the parameters for segmenting bright-field images from: https://drive.google.com/file/d/1VYBzUtgLQcS-w6S9XpjGcSBacKyItYJ_/view?usp=sharing. Put the file in the folder `/unet`.
 5. If you don't have conda or miniconda installed, download it from https://docs.conda.io/en/latest/miniconda.html.
-6. In the command line, create a virtual environment with python 3.6.8 with the command `conda create -n YeaZ python=3.6.8`. 
+6. In the command line, create a virtual environment with python 3.6.8 with the command `conda create -n YeaZ python=3.9`. 
 7. Activate that environment using `conda activate YeaZ`. 
 8. Install the necessary packages using `pip install -r requirements.txt`.
 9. Run the program from your command line with `python GUI_main.py`
