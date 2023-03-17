@@ -15,18 +15,35 @@ sys.path.append("./disk")
 #this file handles the interaction with the disk, so loading/saving images
 #and masks and it also runs the neural network.
 
-from GUI_main import App
+
 from segment import segment
 import Reader as nd
 import argparse
 import skimage
 import neural_network as nn
 
+def LaunchPrediction(im, is_pc, pretrained_weights=None):
+    """It launches the neural neutwork on the current image and creates 
+    an hdf file with the prediction for the time T and corresponding FOV. 
+    """
+    im = skimage.exposure.equalize_adapthist(im)
+    im = im*1.0;	
+    pred = nn.prediction(im, is_pc, pretrained_weights)
+    return pred
+
+
+
+def ThresholdPred(thvalue, pred):
+    """Thresholds prediction with value"""
+    if thvalue == None:
+        thresholdedmask = nn.threshold(pred)
+    else:
+        thresholdedmask = nn.threshold(pred, thvalue)
+    return thresholdedmask
 
 def LaunchInstanceSegmentation(reader, image_type, fov_indices=[0], time_value1=0, time_value2=0, thr_val=None, min_seed_dist=5, path_to_weights=None):
     """
     """
-
     # cannot have both path_to_weights and image_type supplied
     if (image_type is not None) and (path_to_weights is not None):
         print("image_type and path_to_weights cannot be both supplied.")
@@ -58,7 +75,7 @@ def LaunchInstanceSegmentation(reader, image_type, fov_indices=[0], time_value1=
             im = reader.LoadOneImage(t, fov_ind)
 
             try:
-                pred = App.LaunchPrediction(im, is_pc, pretrained_weights=path_to_weights)
+                pred = LaunchPrediction(im, is_pc, pretrained_weights=path_to_weights)
             except ValueError:
                 print('Error! ',
                       'The neural network weight files could not '
@@ -67,7 +84,7 @@ def LaunchInstanceSegmentation(reader, image_type, fov_indices=[0], time_value1=
                       'the folder unet, or specify a path to a custom weights file with -w argument.')
                 return
 
-            thresh = App.ThresholdPred(thr_val, pred)
+            thresh = ThresholdPred(thr_val, pred)
             seg = segment(thresh, pred, min_seed_dist)
             reader.SaveMask(t, fov_ind, seg)
             print('--------- Finished segmenting.')
