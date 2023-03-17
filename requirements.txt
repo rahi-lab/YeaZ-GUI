@@ -4,10 +4,8 @@ matplotlib>=3.1.1
 nd2reader==3.2.1
 h5py==2.9.0
 scikit-image>=0.15.0
-openpyxl==3.0.1
-Tensorflow==1.15.2
-Keras==2.3.1
-opencv-python-headless==4.2.0.34
+Tensorflow==2.11.0
+opencv-python-headless>=4.7.0.72
 pandas>=0.25.3
 munkres==1.1.2
 sklearn==0.0
