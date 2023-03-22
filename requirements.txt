@@ -9,6 +9,7 @@ Tensorflow==2.11.0
 opencv-python-headless>=4.7.0.72
 pandas>=0.25.3
 munkres
-sklearn
+sklearn==0.0
 imageio>=2.6.1
 Pillow>=6.2.1
+torch>=2.0.0
