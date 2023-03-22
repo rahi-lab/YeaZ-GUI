@@ -6,11 +6,14 @@ Created on Sat Dec 21 18:54:10 2019
 """
 import os
 import sys
-from model import unet
+from model_pytorch import UNet
+from model_tensorflow import unet
 import numpy as np
 import skimage
 from skimage import io
 import skimage.transform as trans
+import torch
+import tensorflow as tf
 
 if getattr(sys, 'frozen', False):
     path_weights  = os.path.join(sys._MEIPASS, 'unet/')
@@ -46,7 +49,7 @@ def threshold(im,th = None):
     return bi
 
 
-def prediction(im, is_pc, pretrained_weights=None):
+def prediction(im, is_pc, pretrained_weights=None, model_type='pytorch'):
     """
     Calculate the prediction of the label corresponding to image im
     Param:
@@ -62,19 +65,41 @@ def prediction(im, is_pc, pretrained_weights=None):
     
     if pretrained_weights is None:
         if is_pc:
-            pretrained_weights = path_weights + 'unet_weights_batchsize_25_Nepochs_100_SJR0_10.hdf5'
+            pretrained_weights = path_weights + 'unet_weights_batchsize_25_Nepochs_100_SJR0_10'
         else:
-            pretrained_weights = path_weights + 'weights_budding_BF_multilab_0_1.hdf5'
+            pretrained_weights = path_weights + 'weights_budding_BF_multilab_0_1'
+        if model_type == 'tensorflow':
+            pretrained_weights = pretrained_weights + '.hdf5'
     
     if not os.path.exists(pretrained_weights):
         raise ValueError('Path does not exist')
 
     # WHOLE CELL PREDICTION
-    model = unet(pretrained_weights = pretrained_weights,
-                 input_size = (None,None,1))
 
-    results = model.predict(padded[np.newaxis,:,:,np.newaxis], batch_size=1)
+    if model_type == 'tensorflow':
+        tf_model = unet(pretrained_weights = pretrained_weights,
+                    input_size = (None,None,1))
+        input = padded[np.newaxis,:,:,np.newaxis]
+        tf_results = tf_model.predict(input, batch_size=1)
+        tf_res = tf_results[0,:,:,0]
+        
+        return tf_res
 
-    res = results[0,:,:,0]
-    return res[:nrow, :ncol]
-
+    elif model_type == 'pytorch': 
+        # Load saved weights in pytorch model and run the pytorch model
+        model = UNet()
+        model.load_state_dict(torch.load(pretrained_weights))
+        model.eval()
+        with torch.no_grad():
+            # Convert input tensor to PyTorch tensor
+            input_tensor = torch.from_numpy(padded[np.newaxis,np.newaxis,:,:]).float()
+            # Pass input through the model
+            output_tensor = model.forward(input_tensor)
+            # Convert output tensor to NumPy array
+            output_array = output_tensor.detach().numpy()
+        pt_res = output_array[0, 0, :, :]
+        
+        return pt_res[:nrow, :ncol]
+    
+    else:
+        raise ValueError('model_type is not valid. should be either "pytorch" or "tensorflow".')
