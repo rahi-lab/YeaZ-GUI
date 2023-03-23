@@ -30,13 +30,13 @@ Installation time is less than 5 minutes.
 
 1. Clone this repository ("git clone https://github.com/lpbsscientist/YeaZ-GUI").
 2. Download the parameters for the neural network:
-3. Download the parameters for segmenting phase contrast images from: https://drive.google.com/file/d/1UTivmx_aEMpeGdOkCZO1CS9mcdJ3zmw2/view?usp=sharing. Put the file in the folder `/unet`.
-4. Download the parameters for segmenting bright-field images from: https://drive.google.com/file/d/1VYBzUtgLQcS-w6S9XpjGcSBacKyItYJ_/view?usp=sharing. Put the file in the folder `/unet`.
-5. If you don't have conda or miniconda installed, download it from https://docs.conda.io/en/latest/miniconda.html.
-6. In the command line, create a virtual environment with python 3.6.8 with the command `conda create -n YeaZ python=3.9`. 
-7. Activate that environment using `conda activate YeaZ`. 
-8. Install the necessary packages using `pip install -r requirements.txt`.
-9. Run the program from your command line with `python GUI_main.py`
+    2-1. Download the parameters for segmenting phase contrast images from: https://drive.google.com/file/d/1Wd2QjGlH3tcKFoFvsQ4dzAhmw23XVnYd/view?usp=sharing. Put the file in the folder `/unet`.
+    2-2. Download the parameters for segmenting bright-field images from: https://drive.google.com/file/d/1ROQOWdTfxUeKlyrUXyNzA78RENv5HEQZ/view?usp=sharing. Put the file in the folder `/unet`.
+3. If you don't have conda or miniconda installed, download it from https://docs.conda.io/en/latest/miniconda.html.
+4. In the command line, create a virtual environment with python 3.6.8 with the command `conda create -n YeaZ python=3.9`. 
+5. Activate that environment using `conda activate YeaZ`. 
+6. Install the necessary packages using `pip install -r requirements.txt`.
+7. Run the program from your command line with `python GUI_main.py`
 
 ## Troubleshooting / FAQ
 
@@ -50,7 +50,9 @@ If small buds aren't recognized as cells in your image, this is likely linked to
 
 ### I just want the CNN, but not the GUI
 
-In case you only want to use the functionalities of the convolutional neural network and the segmentation, but not the full GUI, you only need the files `unet/model.py`, `unet/neural_network.py` (for making predictions), `unet/segment.py` (for doing watershed segmentation) and `unet/hungarian.py` (for tracking), as well as the weights for the neural network which have to be in the same folder. You can create predictions using the `prediction` function in `neural_network.py` (note that before making predictions, you have to use the function `equalize_adapthist` from `skimage.exposure` on the image). The segmentations can be obtained with the `segment` function in `segment.py`, and tracking between two frames is done using the `correspondence` function in `hungarian.py`. 
+In case you only want to use the functionalities of the convolutional neural network and the segmentation, but not the full GUI, you only need the files `unet/model_pytorch.py`, `unet/neural_network.py` (for making predictions), `unet/segment.py` (for doing watershed segmentation) and `unet/hungarian.py` (for tracking), as well as the weights for the neural network which have to be in the same folder. You can create predictions using the `prediction` function in `neural_network.py` (note that before making predictions, you have to use the function `equalize_adapthist` from `skimage.exposure` on the image). The segmentations can be obtained with the `segment` function in `segment.py`, and tracking between two frames is done using the `correspondence` function in `hungarian.py`.
+You can also run `Launch_NN_comand_Line.py` and give input arguments to run the whole pipeline and save final mask. Here is an example for running the CNN on a phase contrast image:
+`python Launch_NN_command_line.py -i "example_data/2020_3_19_frame_100_cropped.tif" -m "newmaskfile.h5" --image_type  "pc"`
 
 ### CNN performs less well on bright-field images
 
