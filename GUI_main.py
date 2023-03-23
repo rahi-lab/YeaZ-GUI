@@ -103,6 +103,9 @@ import ChangeOneCellValue as cocv
 #a specific range of pictures.
 import LaunchBatchPrediction as lbp
 
+#this file contains a dialog window where a time range can be selected to retrack
+import BatchRetrack as br
+
 #this file initializes all the buttons present in the gui, sets the shortcuts
 #to these buttons and also connect the buttons to the function that are 
 #triggered when the buttons are pressed.
@@ -968,7 +971,53 @@ class App(QMainWindow):
             self.button_timeindex.clearFocus()
             return
         
-     
+    def BatchCellCorresp(self):
+        def reset():
+            self.ClearStatusBar()
+            self.Enable(self.button_cellcorrespondence)
+            self.button_cellcorrespondence.setChecked(False)
+        
+        self.Disable(self.button_cellcorrespondence)
+        self.WriteStatusBar('retracking... ')
+
+        if(self.Tindex==self.reader.sizet-1):
+            QMessageBox.critical(self, "This is the last frame. Nothing to retrack after this")
+            reset()
+            return 
+
+
+        # creates a dialog window from the BatchRetrack.py file
+        dlg = br.CustomDialog(self)
+        
+        # this if tests if the user pressed 'ok' in the dialog window
+        if dlg.exec_() == QDialog.Accepted:
+            # it tests if the user has entered some values
+            if not (dlg.entry1.text()!= ''):
+                QMessageBox.critical(self, "Error", "No Time Specified")
+                reset()
+                return 
+            
+            # reads out the entry given by the user and converts the index
+            # to integers
+            time_value1 = int(dlg.entry1.text())
+    
+            # it tests if the value is bigger than current frame
+            if (time_value1 <  self.Tindex or time_value1 > self.reader.sizet-1):
+                QMessageBox.critical(self, "Error", 'Invalid Time Constraints')
+                reset()
+                return
+
+            for t in range(self.Tindex+1, time_value1+1):
+                log.debug('start correspondance for frame'.format(t))                    
+                #calls the cell correspondance for current time, t, and t+1
+                temp_mask = self.reader.CellCorrespondence(t, self.FOVindex)               
+                self.reader.SaveMask(t, self.FOVindex, temp_mask)
+                log.debug('finish correspondance and savemask for frame'.format(t))                    
+            
+            self.ReloadThreeMasks()
+            log.info('reload three frames')
+        reset()
+
     def CellCorrespActivation(self):
         self.Disable(self.button_cellcorrespondence)
         self.WriteStatusBar('Doing the cell correspondence')

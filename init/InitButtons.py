@@ -186,10 +186,10 @@ def Init(parent):
     # MAKE THE CELL Correspondence
     parent.button_cellcorrespondence.setEnabled(False)
     parent.button_cellcorrespondence.setCheckable(True)
-    parent.button_cellcorrespondence.clicked.connect(parent.CellCorrespActivation)
+    parent.button_cellcorrespondence.clicked.connect(parent.BatchCellCorresp)
     parent.button_cellcorrespondence.setMaximumWidth(150)
-    parent.button_cellcorrespondence.setStatusTip('Retrack cell ID numbers based on the previous frame.')
-    
+    parent.button_cellcorrespondence.setStatusTip('Retrack cell ID numbers for next frame(s) or selected next frames based on this frame.')
+        
     # EXTRACT FLUORESCENCE IN DIFFERENT CHANNELS    
     parent.button_extractfluorescence.setEnabled(False)
     parent.button_extractfluorescence.toggle()
