@@ -16,6 +16,14 @@ import skimage.io
 #import pytiff
 import hungarian as hu
 
+import logging
+import os
+logging.basicConfig(
+    format='%(asctime)s %(levelname)s %(funcName)s: %(message)s',
+    level=os.environ.get("LOGLEVEL", "DEBUG")
+)
+log = logging.getLogger(__name__)
+
 
 class Reader:
     
@@ -193,6 +201,7 @@ class Reader:
         file = h5py.File(self.hdfpath,'r+')
         if self.TestTimeExist(currentT,currentFOV,file):
             mask = np.array(file['/{}/{}'.format(self.fovlabels[currentFOV], self.tlabels[currentT])], dtype = np.uint16)
+            log.debug('load mask')
             file.close()
             
             return mask
@@ -201,6 +210,7 @@ class Reader:
             zeroarray = np.zeros([self.sizey, self.sizex],dtype = np.uint16)
             file.create_dataset('/{}/{}'.format(self.fovlabels[currentFOV], self.tlabels[currentT]), 
                                 data = zeroarray, compression = 'gzip')
+            log.debug('create dataset with zeroarray')
             file.close()
             return zeroarray
             
@@ -251,10 +261,12 @@ class Reader:
         if self.TestTimeExist(currentT,currentFOV,file):
             dataset= file['/{}/{}'.format(self.fovlabels[currentFOV], self.tlabels[currentT])]
             dataset[:] = mask
+            log.debug('save mask for FOV {} and frame {} to file'.format(self.fovlabels[currentFOV], self.tlabels[currentT]))
             file.close()
             
         else:
             file.create_dataset('/{}/{}'.format(self.fovlabels[currentFOV], self.tlabels[currentT]), data = mask, compression = 'gzip')
+            log.debug('create dateset and save mask to file')
             file.close()
         
         
@@ -344,6 +356,7 @@ class Reader:
         track has no precedent, returns unaltered mask. If no mask exists
         for the current timeframe, returns zero array."""
         filemasks = h5py.File(self.hdfpath, 'r+')
+        log.debug('Reader.CellCorrespondence')
         
         if self.TestTimeExist(currentT-1, currentFOV, filemasks):
             prevmask = np.array(filemasks['/{}/{}'.format(self.fovlabels[currentFOV], 
@@ -354,9 +367,11 @@ class Reader:
                                                               self.tlabels[currentT])])             
                 newmask = hu.correspondence(prevmask, nextmask)
                 out = newmask
+                log.debug('make new mask')
             # No mask exists for the current timeframe, return empty array
             else:
                 null = np.zeros([self.sizey, self.sizex])
+                log.warn('No mask exists in FOV {} for the current timeframe {}, return empty array'.format(self.fovlabels[currentFOV],self.tlabels[currentT-1]))
                 out = null
         
         else:
@@ -365,9 +380,10 @@ class Reader:
                 nextmask = np.array(filemasks['/{}/{}'.format(self.fovlabels[currentFOV],
                                                               self.tlabels[currentT])]) 
                 out = nextmask
-            
+                log.warn('NCurrent mask exists, but no previous - returns current mask unchanged. FOV {} and Time {}'.format(self.fovlabels[currentFOV],self.tlabels[currentT-1]))
             # Neither current nor previous mask exists - return empty array
             else:
+                log.warn('Neither current nor previous mask exists - return empty array. FOV {} and Time {}'.format(self.fovlabels[currentFOV],self.tlabels[currentT-1]))
                 null = np.zeros([self.sizey, self.sizex])
                 out = null
                     

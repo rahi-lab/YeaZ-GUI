@@ -123,6 +123,14 @@ from image_loader import load_image
 from segment import segment
 import neural_network as nn
 
+import logging
+import os
+logging.basicConfig(
+    format='%(asctime)s %(levelname)s %(funcName)s: %(message)s',
+    level=os.environ.get("LOGLEVEL", "DEBUG")
+)
+log = logging.getLogger(__name__)
+
 
 if getattr(sys, 'frozen', False):
     path_icons = os.path.join(sys._MEIPASS, "icons/")
@@ -149,6 +157,7 @@ class App(QMainWindow):
     def __init__(self, nd2pathstr, hdfpathstr, newhdfstr):
         super().__init__()
         self.setWindowTitle('YeaZ')
+        log.info('initiating application')
 
         # all these ids are integers which are used to set a connection between
         # the button and the function that this button calls.
@@ -288,6 +297,7 @@ class App(QMainWindow):
         
         After all this has been initialized, the program is ready to be used.
         """
+        log.info('initiate UI')
         self._main = QtWidgets.QWidget()
         self.setCentralWidget(self._main)
 
@@ -860,6 +870,7 @@ class App(QMainWindow):
         indices. Needed after the batch prediction is completed to display
         the result of the NN.
         """
+        log.debug("reload three mask for frame {}".format(self.Tindex))
         
         if self.Tindex >= 0 and self.Tindex <= self.reader.sizet-1:
             if self.Tindex == 0:
@@ -1019,6 +1030,7 @@ class App(QMainWindow):
         reset()
 
     def CellCorrespActivation(self):
+        log.debug('An outdated function is called')
         self.Disable(self.button_cellcorrespondence)
         self.WriteStatusBar('Doing the cell correspondence')
         if self.Tindex > 0:

@@ -7,6 +7,14 @@ are shown.
 import numpy as np
 from skimage import morphology as morph
 from skimage import draw
+import logging
+import os
+logging.basicConfig(
+    format='%(asctime)s %(levelname)s %(funcName)s: %(message)s',
+    level=os.environ.get("LOGLEVEL", "DEBUG")
+)
+log = logging.getLogger(__name__)
+
 
 # Import everything for the Graphical User Interface from the PyQt5 library.
 from PyQt5.QtWidgets import QSizePolicy
@@ -372,6 +380,7 @@ class PlotCanvas(FigureCanvas):
 
     
     def ShowCellNumbers(self):
+        log.debug("show cell numbers called")
         """Checks whether to show cell numbers, and does so if button is 
         checked"""
         if self.button_showval_check.isChecked():
