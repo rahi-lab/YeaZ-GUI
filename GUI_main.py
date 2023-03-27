@@ -992,7 +992,7 @@ class App(QMainWindow):
         self.WriteStatusBar('retracking... ')
 
         if(self.Tindex==self.reader.sizet-1):
-            QMessageBox.critical(self, "This is the last frame. Nothing to retrack after this")
+            QMessageBox.critical(self, 'Error',"This is the last frame. Nothing to retrack after this")
             reset()
             return 
 
