@@ -122,6 +122,7 @@ import Extract as extr
 from image_loader import load_image
 from segment import segment
 import neural_network as nn
+from ProgressBar import ProgressBar
 
 import logging
 import os
@@ -1017,15 +1018,25 @@ class App(QMainWindow):
                 QMessageBox.critical(self, "Error", 'Invalid Time Constraints')
                 reset()
                 return
-
+            # if everything was okay, start a progress bar to show progress:
+            progress = ProgressBar(self)
+            progress_value = 0
+            ratio = 100/(time_value1 - (self.Tindex+1))
             for t in range(self.Tindex+1, time_value1+1):
-                log.debug('start correspondance for frame'.format(t))                    
+                log.debug('start correspondance for frame {}'.format(t))                    
                 #calls the cell correspondance for current time, t, and t+1
-                temp_mask = self.reader.CellCorrespondence(t, self.FOVindex)               
+                temp_mask = self.reader.CellCorrespondence(t, self.FOVindex)
+                progress_value += ratio
+                progress.update_progress(progress_value)
+                # update the progress status label
+                progress.status.setText("Processing frame {}... ".format(t+1))
                 self.reader.SaveMask(t, self.FOVindex, temp_mask)
-                log.debug('finish correspondance and savemask for frame'.format(t))                    
-            
+                QApplication.processEvents()  # Process events to allow GUI to update               
+                log.debug('finish correspondance and savemask for frame {}'.format(t))                    
+            # close the progress bar dialog
+            progress.close()
             self.ReloadThreeMasks()
+
             log.info('reload three frames')
         reset()
 
