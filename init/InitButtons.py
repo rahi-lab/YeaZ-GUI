@@ -198,7 +198,7 @@ def Init(parent):
     parent.button_extractfluorescence.setStatusTip('Start the dialog box for exporting cell geometries and fluorescence for different channels.')
     
     # SHOW THE VALUES OF THE CELLS
-    parent.button_showval.stateChanged.connect(parent.m.UpdatePlots)
+    parent.button_showval.stateChanged.connect(parent.m.OnShowCellID)
     parent.button_showval.setShortcut('S')
     parent.button_showval.setToolTip("Shortcut: S")
         

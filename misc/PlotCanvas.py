@@ -27,6 +27,8 @@ from matplotlib import cm
 from matplotlib.colors import ListedColormap
 #from matplotlib.path import Path
 
+from scipy import ndimage
+
 from PIL import Image, ImageDraw
 
 
@@ -46,6 +48,7 @@ class PlotCanvas(FigureCanvas):
         fig.subplots_adjust(bottom=0, top=1, left=0, right=1, wspace = 0.05, hspace = 0.05)
         FigureCanvas.__init__(self, fig)
         self.setParent(parent)
+        self.parent = parent
         
         # this is some mambo jambo.
         FigureCanvas.setSizePolicy(self,
@@ -146,7 +149,7 @@ class PlotCanvas(FigureCanvas):
         """
         if self.ax == event.inaxes:
             self.storebrushclicks = [False, False]
-            self.ShowCellNumbers()
+            self.ShowCellNumbers(type = 'current')
 
         
     def OneClick(self, event, radius=3):
@@ -300,12 +303,13 @@ class PlotCanvas(FigureCanvas):
                          interpolation = 'None', alpha = 0.2, cmap = newcmp))
    
     
-    def UpdatePlots(self):
+    def UpdatePlots(self, type = "all"):
         """
         Updates plots, handles mask and cell numbers.
         """
         
         # Plot images
+        log.debug('call UpdatePlot')
         self.currplot.set_data(self.currpicture)
         self.currplot.set_clim(np.amin(self.currpicture), np.amax(self.currpicture))
         self.ax.draw_artist(self.currplot)
@@ -329,7 +333,7 @@ class PlotCanvas(FigureCanvas):
             self.previousmask.set_data(np.zeros(self.plotmask.shape))
             self.nextmask.set_data(np.zeros(self.plotmask.shape))
         
-        self.ShowCellNumbers()
+        self.ShowCellNumbers(type=type)
         self.draw()
         self.update()
         self.flush_events()
@@ -349,12 +353,12 @@ class PlotCanvas(FigureCanvas):
            self.currmask.set_data((self.plotmask%10+1)*(self.plotmask!=0))
        else:
            self.currmask.set_data((self.tempmask%10+1)*(self.tempmask!=0))
-       
+       log.debug('updatedata with flag {}'.format(flag))
        # show the updates by redrawing the array using draw_artist, it is faster 
        # to use as it only redraws the array itself, and not everything else.
        self.ax.draw_artist(self.currplot)
        self.ax.draw_artist(self.currmask)
-       self.ShowCellNumbers()
+       self.ShowCellNumbers(type='current' if flag else 'None')
        self.update()
        # self.flush_events()
               
@@ -365,36 +369,41 @@ class PlotCanvas(FigureCanvas):
                  
     def _getCellCenters(self, plotmask):
         """Get approximate locations for cell centers"""
+        log.debug('start')
         vals = np.unique(plotmask).astype(int)
-        vals = np.delete(vals,np.where(vals==0)) 
-        xtemp = []
-        ytemp = []
-        for k in vals:
-            y,x = (plotmask==k).nonzero()
-            sample = np.random.choice(len(x), size=20, replace=True)
-            meanx = np.mean(x[sample])
-            meany = np.mean(y[sample])
-            xtemp.append(int(round(meanx)))
-            ytemp.append(int(round(meany)))
+        vals = np.delete(vals, np.where(vals == 0))
+        centers = np.array(ndimage.measurements.center_of_mass(plotmask, labels=plotmask, index=vals))
+        xtemp = np.round(centers[:, 1]).astype(int)
+        ytemp = np.round(centers[:, 0]).astype(int)
+        log.debug('finish')
         return vals, xtemp, ytemp
 
-    
-    def ShowCellNumbers(self):
-        log.debug("show cell numbers called")
-        """Checks whether to show cell numbers, and does so if button is 
-        checked"""
+    def OnShowCellID(self):
+        """This function is only called when we activate the show cell IDs checkbox."""
+        self.UpdatePlots(type='all')
+
+    def ShowCellNumbers(self, type='all'):
+        """
+        Checks whether to show cell numbers, and does so if button is 
+        checked
+        This function can apply to current frame or to all frames
+        """
+        log.debug("show cell numbers called with type {}".format(type))
         if self.button_showval_check.isChecked():
-            self.ShowCellNumbersCurr()
-            self.ShowCellNumbersNext()
-            self.ShowCellNumbersPrev()
+            if(type == 'current'):
+                self.ShowCellNumbersCurr()
+            elif(type == 'all'):
+                self.ShowCellNumbersCurr()
+                self.ShowCellNumbersNext()
+                self.ShowCellNumbersPrev()
+            self.draw()
         else:
             self.clearAnnLists()
         
     
     def ShowCellNumbersCurr(self):
-         """This function is called to display the cell values and it 
-         takes 10 random points inside of the cell, computes the mean of these
-         points and this gives the coordinate where the number will be 
+         """This function is called to display the cell values and computes the cebter of each cell and
+         gives the coordinate where the number will be 
          displayed. The number to be displayed is just given by the value
          in the mask of the cell.
          This function is just used for the current time subplot.
@@ -403,58 +412,69 @@ class PlotCanvas(FigureCanvas):
          for i,a in enumerate(self.ann_list):
              a.remove()
          self.ann_list[:] = []
-         
+         # check if the mask is not empty
+         if np.sum(self.plotmask)==0 :
+             return
+             
          vals, xtemp, ytemp = self._getCellCenters(self.plotmask)
-         if xtemp:
+         if xtemp.any():
              for i in range(0,len(xtemp)):
                  ann = self.ax.annotate(str(int(vals[i])), (xtemp[i], ytemp[i]),
                                           ha='center', va='center')
                  self.ann_list.append(ann)
+        #  self.draw()
                      
              
     def ShowCellNumbersPrev(self):
-         """This function is called to display the cell values and it 
-         takes 10 random points inside of the cell, computes the mean of these
-         points and this gives the coordinate where the number will be 
+         """This function is called to display the cell values and computes the cebter of each cell and
+         gives the coordinate where the number will be 
          displayed. The number to be displayed is just given by the value
          in the mask of the cell.
-         This function is just used for the previous time subplot.
+         This function is just used for the previous time subplot and check if it is the first frame or not.
          """
          
          for i,a in enumerate(self.ann_list_prev):
              a.remove()
          self.ann_list_prev[:] = []
-         
-         vals, xtemp, ytemp = self._getCellCenters(self.prevplotmask)
-     
-         if xtemp:
-             for i in range(0,len(xtemp)):
-                  ann = self.ax2.annotate(str(vals[i]), (xtemp[i], ytemp[i]),
-                                          ha='center', va='center')
-                  self.ann_list_prev.append(ann)
-         self.draw()
+            
+         if(self.parent.Tindex != 0):
+             if np.sum(self.prevplotmask)==0 :
+                 return
+             
+             vals, xtemp, ytemp = self._getCellCenters(self.prevplotmask)
+             if xtemp.any():
+                 for i in range(0,len(xtemp)):
+                     ann = self.ax2.annotate(str(vals[i]), (xtemp[i], ytemp[i]),
+                                             ha='center', va='center')
+                     self.ann_list_prev.append(ann)
+            #  self.draw()
+         else:
+             self.ann_list_prev = []
              
              
     def ShowCellNumbersNext(self):
-         """This function is called to display the cell values and it 
-         takes 10 random points inside of the cell, computes the mean of these
-         points and this gives the coordinate where the number will be 
+         """This function is called to display the cell values and computes the cebter of each cell and
+         gives the coordinate where the number will be 
          displayed. The number to be displayed is just given by the value
          in the mask of the cell.
-         This function is just used for the next time subplot.
+         This function is just used for the next time subplot and check if it is the first frame or not.
          """
          for i,a in enumerate(self.ann_list_next):
              a.remove()
          self.ann_list_next[:] = []
-                     
-         vals, xtemp, ytemp = self._getCellCenters(self.nextplotmask)
-                 
-         if xtemp:
-             for i in range(0,len(xtemp)):
-                 ann = self.ax3.annotate(str(vals[i]), (xtemp[i], ytemp[i]),
-                                          ha='center', va='center')
-                 self.ann_list_next.append(ann)
-         self.draw()
+         if(self.parent.Tindex != self.parent.reader.sizet-1):
+             if np.sum(self.nextplotmask)==0 :
+                 return           
+             vals, xtemp, ytemp = self._getCellCenters(self.nextplotmask)
+                    
+             if xtemp.any():
+                 for i in range(0,len(xtemp)):
+                     ann = self.ax3.annotate(str(vals[i]), (xtemp[i], ytemp[i]),
+                                            ha='center', va='center')
+                     self.ann_list_next.append(ann)
+            #  self.draw()
+         else: 
+             self.ann_list_next = []
         
         
     def clearAnnLists(self):

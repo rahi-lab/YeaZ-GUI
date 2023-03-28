@@ -1021,7 +1021,7 @@ class App(QMainWindow):
             # if everything was okay, start a progress bar to show progress:
             progress = ProgressBar(self)
             progress_value = 0
-            ratio = 100/(time_value1 - (self.Tindex+1))
+            ratio = 100/(time_value1 - self.Tindex)
             for t in range(self.Tindex+1, time_value1+1):
                 log.debug('start correspondance for frame {}'.format(t))                    
                 #calls the cell correspondance for current time, t, and t+1
@@ -1119,7 +1119,6 @@ class App(QMainWindow):
             
             self.m.nextpicture = self.reader.LoadOneImage(self.Tindex+2, self.FOVindex)
             self.m.nextplotmask = self.reader.LoadMask(self.Tindex+2, self.FOVindex)
-            self.m.UpdatePlots()
 
             if self.Tindex + 1 == 1:
                 self.button_previousframe.setEnabled(True)
@@ -1135,11 +1134,11 @@ class App(QMainWindow):
                                           dtype = np.uint16)
             self.m.nextplotmask = np.zeros([self.reader.sizey,self.reader.sizex], 
                                            dtype = np.uint16)
-            self.m.UpdatePlots()
 
             self.button_nextframe.setEnabled(False)
 
         self.Tindex = self.Tindex+1
+        self.m.UpdatePlots()
         self.UpdateTitleSubplots()
         
         if self.button_hidemask.isChecked():
@@ -1178,7 +1177,7 @@ class App(QMainWindow):
             self.m.prevpicture = self.reader.LoadOneImage(self.Tindex-2, self.FOVindex)
             self.m.prevplotmask = self.reader.LoadMask(self.Tindex-2, self.FOVindex)
 
-        self.m.UpdatePlots()
+        
         if self.Tindex-1 == self.reader.sizet-2:
             self.button_nextframe.setEnabled(True)            
         
@@ -1186,6 +1185,7 @@ class App(QMainWindow):
             self.m.HideMask()
         
         self.Tindex -= 1
+        self.m.UpdatePlots()
         self.UpdateTitleSubplots()
             
         self.Enable(self.button_previousframe)
@@ -1275,7 +1275,7 @@ class App(QMainWindow):
                     
         self.Enable(self.button_changecellvalue)
         self.button_changecellvalue.setChecked(False)
-        self.m.ShowCellNumbers()
+        self.m.ShowCellNumbers(type='current')
         self.SaveMask()
         self.ClearStatusBar()
         
@@ -1303,7 +1303,7 @@ class App(QMainWindow):
                     self.m.ExchangeCellValue(value1,value2)
                 except ValueError as e:
                     QMessageBox.critical(self, 'Error', str(e))
-                self.m.ShowCellNumbers()
+                self.m.ShowCellNumbers(type='current')
                 self.SaveMask()
         else:
             return
@@ -1417,7 +1417,7 @@ class App(QMainWindow):
             replace_cell = self.m.plotmask.max() + 1
             self.m.plotmask[selected_mask & polygon] = replace_cell
         self.Enable(self.button_split)
-        self.m.UpdatePlots()
+        self.m.UpdatePlots(type='current')
         self.ClearStatusBar()
         self.SaveMask()
         self.m.storemouseclicks = []
@@ -1484,7 +1484,7 @@ class App(QMainWindow):
             else:
                 self.m.updatedata()
             self.Enable(self.button_newcell)
-            self.m.ShowCellNumbers()
+            self.m.ShowCellNumbers(type='current')
             self.ClearStatusBar()
             self.SaveMask()
             
@@ -1552,7 +1552,7 @@ class App(QMainWindow):
                 self.m.updatedata()
                 
             self.Enable(self.button_add_region)
-            self.m.ShowCellNumbers()
+            self.m.ShowCellNumbers(type='current')
             self.ClearStatusBar()
             self.SaveMask()
             
@@ -1623,7 +1623,7 @@ class App(QMainWindow):
                     
         self.Enable(self.button_mergewithneighbors)
         self.button_mergewithneighbors.setChecked(False)
-        self.m.ShowCellNumbers()
+        self.m.ShowCellNumbers(type='current')
         self.SaveMask()
         self.ClearStatusBar()
         
