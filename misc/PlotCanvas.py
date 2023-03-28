@@ -268,39 +268,39 @@ class PlotCanvas(FigureCanvas):
                 
 
     def DefineColormap(self, Ncolors):
-       """Define a new colormap by assigning 10 values of the jet colormap
-        such that there are only colors for the values 0-10 and the values >10
-        will be treated with a modulo operation (updatedata function)
-       """
-       jet = cm.get_cmap('jet', Ncolors)
-       colors = []
-       for i in range(0,Ncolors):
-           if i==0 : 
-               # set background transparency to 0
-               temp = list(jet(i))
-               temp[3]= 0.0
-               colors.append(tuple(temp))
-               
-           else:
-               colors.append(jet(i))
-               
-       colormap = ListedColormap(colors)
-       return colormap
+        """Define a new colormap by assigning 10 values of the jet colormap
+            such that there are only colors for the values 0-10 and the values >10
+            will be treated with a modulo operation (updatedata function)
+        """
+        jet = cm.get_cmap('jet', Ncolors)
+        colors = []
+        for i in range(0,Ncolors):
+            if i==0 : 
+                # set background transparency to 0
+                temp = list(jet(i))
+                temp[3]= 0.0
+                colors.append(tuple(temp))
+                
+            else:
+                colors.append(jet(i))
+                
+        colormap = ListedColormap(colors)
+        return colormap
            
     
     def plot(self, picture, mask, ax):
-       """this function is called for the first time when all the subplots
-       are drawn.
-       """
-       # Define a new colormap with 20 colors.
-       newcmp = self.DefineColormap(21)
-       ax.axis("off")
+        """this function is called for the first time when all the subplots
+        are drawn.
+        """
+        # Define a new colormap with 20 colors.
+        newcmp = self.DefineColormap(21)
+        ax.axis("off")
 
-       self.draw()
-       return (ax.imshow(picture, interpolation= 'None', 
-                         origin = 'upper', cmap = 'gray_r'), 
-               ax.imshow((mask%10+1)*(mask != 0), origin = 'upper', 
-                         interpolation = 'None', alpha = 0.2, cmap = newcmp))
+        self.draw()
+        return (ax.imshow(picture, interpolation= 'None', 
+                        origin = 'upper', cmap = 'gray_r'), 
+                ax.imshow((mask%10+1)*(mask != 0), origin = 'upper', 
+                        interpolation = 'None', alpha = 0.2, cmap = newcmp))
    
     
     def UpdatePlots(self, type = "all"):
@@ -340,27 +340,27 @@ class PlotCanvas(FigureCanvas):
                 
         
     def updatedata(self, flag=True):
-       """
-       In order to just display the cells so regions with value > 0
-       and also to assign to each of the cell values one color,
-       the modulo 10 of the value is take and we add 1, to distinguish
-       the values of 10,20,30,... from the background (although the bckgrnd
-       gets with the addition the value 1) and the result of the 
-       modulo is multiplied with a matrix containing a False value for the 
-       background coordinates, setting the background to 0 again.
-       """
-       if flag:
-           self.currmask.set_data((self.plotmask%10+1)*(self.plotmask!=0))
-       else:
-           self.currmask.set_data((self.tempmask%10+1)*(self.tempmask!=0))
-       log.debug('updatedata with flag {}'.format(flag))
-       # show the updates by redrawing the array using draw_artist, it is faster 
-       # to use as it only redraws the array itself, and not everything else.
-       self.ax.draw_artist(self.currplot)
-       self.ax.draw_artist(self.currmask)
-       self.ShowCellNumbers(type='current' if flag else 'None')
-       self.update()
-       # self.flush_events()
+        """
+        In order to just display the cells so regions with value > 0
+        and also to assign to each of the cell values one color,
+        the modulo 10 of the value is take and we add 1, to distinguish
+        the values of 10,20,30,... from the background (although the bckgrnd
+        gets with the addition the value 1) and the result of the 
+        modulo is multiplied with a matrix containing a False value for the 
+        background coordinates, setting the background to 0 again.
+        """
+        if flag:
+            self.currmask.set_data((self.plotmask%10+1)*(self.plotmask!=0))
+        else:
+            self.currmask.set_data((self.tempmask%10+1)*(self.tempmask!=0))
+        log.debug('updatedata with flag {}'.format(flag))
+        # show the updates by redrawing the array using draw_artist, it is faster 
+        # to use as it only redraws the array itself, and not everything else.
+        self.ax.draw_artist(self.currplot)
+        self.ax.draw_artist(self.currmask)
+        self.ShowCellNumbers(type='current' if flag else 'None')
+        self.update()
+        # self.flush_events()
               
         
     def HideMask(self):
@@ -402,79 +402,79 @@ class PlotCanvas(FigureCanvas):
         
     
     def ShowCellNumbersCurr(self):
-         """This function is called to display the cell values and computes the cebter of each cell and
-         gives the coordinate where the number will be 
-         displayed. The number to be displayed is just given by the value
-         in the mask of the cell.
-         This function is just used for the current time subplot.
-         """         
-         
-         for i,a in enumerate(self.ann_list):
-             a.remove()
-         self.ann_list[:] = []
-         # check if the mask is not empty
-         if np.sum(self.plotmask)==0 :
-             return
-             
-         vals, xtemp, ytemp = self._getCellCenters(self.plotmask)
-         if xtemp.any():
-             for i in range(0,len(xtemp)):
-                 ann = self.ax.annotate(str(int(vals[i])), (xtemp[i], ytemp[i]),
-                                          ha='center', va='center')
-                 self.ann_list.append(ann)
-        #  self.draw()
+        """This function is called to display the cell values and computes the cebter of each cell and
+        gives the coordinate where the number will be 
+        displayed. The number to be displayed is just given by the value
+        in the mask of the cell.
+        This function is just used for the current time subplot.
+        """         
+        
+        for i,a in enumerate(self.ann_list):
+            a.remove()
+        self.ann_list[:] = []
+        # check if the mask is not empty
+        if np.sum(self.plotmask)==0 :
+            return
+            
+        vals, xtemp, ytemp = self._getCellCenters(self.plotmask)
+        if xtemp.any():
+            for i in range(0,len(xtemp)):
+                ann = self.ax.annotate(str(int(vals[i])), (xtemp[i], ytemp[i]),
+                                        ha='center', va='center')
+                self.ann_list.append(ann)
+    #  self.draw()
                      
              
     def ShowCellNumbersPrev(self):
-         """This function is called to display the cell values and computes the cebter of each cell and
-         gives the coordinate where the number will be 
-         displayed. The number to be displayed is just given by the value
-         in the mask of the cell.
-         This function is just used for the previous time subplot and check if it is the first frame or not.
-         """
-         
-         for i,a in enumerate(self.ann_list_prev):
-             a.remove()
-         self.ann_list_prev[:] = []
+        """This function is called to display the cell values and computes the cebter of each cell and
+        gives the coordinate where the number will be 
+        displayed. The number to be displayed is just given by the value
+        in the mask of the cell.
+        This function is just used for the previous time subplot and check if it is the first frame or not.
+        """
+        
+        for i,a in enumerate(self.ann_list_prev):
+            a.remove()
+        self.ann_list_prev[:] = []
+        
+        if(self.parent.Tindex != 0):
+            if np.sum(self.prevplotmask)==0 :
+                return
             
-         if(self.parent.Tindex != 0):
-             if np.sum(self.prevplotmask)==0 :
-                 return
-             
-             vals, xtemp, ytemp = self._getCellCenters(self.prevplotmask)
-             if xtemp.any():
-                 for i in range(0,len(xtemp)):
-                     ann = self.ax2.annotate(str(vals[i]), (xtemp[i], ytemp[i]),
-                                             ha='center', va='center')
-                     self.ann_list_prev.append(ann)
-            #  self.draw()
-         else:
-             self.ann_list_prev = []
+            vals, xtemp, ytemp = self._getCellCenters(self.prevplotmask)
+            if xtemp.any():
+                for i in range(0,len(xtemp)):
+                    ann = self.ax2.annotate(str(vals[i]), (xtemp[i], ytemp[i]),
+                                            ha='center', va='center')
+                    self.ann_list_prev.append(ann)
+        #  self.draw()
+        else:
+            self.ann_list_prev = []
              
              
     def ShowCellNumbersNext(self):
-         """This function is called to display the cell values and computes the cebter of each cell and
-         gives the coordinate where the number will be 
-         displayed. The number to be displayed is just given by the value
-         in the mask of the cell.
-         This function is just used for the next time subplot and check if it is the first frame or not.
-         """
-         for i,a in enumerate(self.ann_list_next):
-             a.remove()
-         self.ann_list_next[:] = []
-         if(self.parent.Tindex != self.parent.reader.sizet-1):
-             if np.sum(self.nextplotmask)==0 :
-                 return           
-             vals, xtemp, ytemp = self._getCellCenters(self.nextplotmask)
-                    
-             if xtemp.any():
-                 for i in range(0,len(xtemp)):
-                     ann = self.ax3.annotate(str(vals[i]), (xtemp[i], ytemp[i]),
-                                            ha='center', va='center')
-                     self.ann_list_next.append(ann)
-            #  self.draw()
-         else: 
-             self.ann_list_next = []
+        """This function is called to display the cell values and computes the cebter of each cell and
+        gives the coordinate where the number will be 
+        displayed. The number to be displayed is just given by the value
+        in the mask of the cell.
+        This function is just used for the next time subplot and check if it is the first frame or not.
+        """
+        for i,a in enumerate(self.ann_list_next):
+            a.remove()
+        self.ann_list_next[:] = []
+        if(self.parent.Tindex != self.parent.reader.sizet-1):
+            if np.sum(self.nextplotmask)==0 :
+                return           
+            vals, xtemp, ytemp = self._getCellCenters(self.nextplotmask)
+                
+            if xtemp.any():
+                for i in range(0,len(xtemp)):
+                    ann = self.ax3.annotate(str(vals[i]), (xtemp[i], ytemp[i]),
+                                        ha='center', va='center')
+                    self.ann_list_next.append(ann)
+        #  self.draw()
+        else: 
+            self.ann_list_next = []
         
         
     def clearAnnLists(self):

@@ -1632,33 +1632,33 @@ class App(QMainWindow):
 # BUTTON ENABLE / DISABLE
     
     def Enable(self, button):
-         """
-         this functions turns on buttons all the buttons, depending on the time
-         index. (next and previous buttons should not be turned on if t = 0 
-         or t = lasttimeindex)
-         """
-         for k in range(0, len(self.buttonlist)):
-             if button != self.buttonlist[k]:
-                 self.buttonlist[k].setEnabled(True)
-                 
-         if self.Tindex == 0:
-             self.button_previousframe.setEnabled(False)
-             
-         if self.Tindex == self.reader.sizet-1:
-             self.button_nextframe.setEnabled(False)
-             
-         self.EnableCNNButtons()
+        """
+        this functions turns on buttons all the buttons, depending on the time
+        index. (next and previous buttons should not be turned on if t = 0 
+        or t = lasttimeindex)
+        """
+        for k in range(0, len(self.buttonlist)):
+            if button != self.buttonlist[k]:
+                self.buttonlist[k].setEnabled(True)
+                
+        if self.Tindex == 0:
+            self.button_previousframe.setEnabled(False)
+            
+        if self.Tindex == self.reader.sizet-1:
+            self.button_nextframe.setEnabled(False)
+            
+        self.EnableCNNButtons()
          
      
     def Disable(self, button):
-         """
-         this functions turns off all the buttons except the one given in 
-         argument.
-         """
+        """
+        this functions turns off all the buttons except the one given in 
+        argument.
+        """
 
-         for k in range(0,len(self.buttonlist)):
-             if button != self.buttonlist[k]:
-                 self.buttonlist[k].setEnabled(False)
+        for k in range(0,len(self.buttonlist)):
+            if button != self.buttonlist[k]:
+                self.buttonlist[k].setEnabled(False)
 
 
     def EnableCNNButtons(self):
