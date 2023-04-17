@@ -11,7 +11,7 @@ import logging
 import os
 logging.basicConfig(
     format='%(asctime)s %(levelname)s %(funcName)s: %(message)s',
-    level=os.environ.get("LOGLEVEL", "DEBUG")
+    level=os.environ.get("LOGLEVEL", "WARNING")
 )
 log = logging.getLogger(__name__)
 

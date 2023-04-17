@@ -124,11 +124,17 @@ from segment import segment
 import neural_network as nn
 from ProgressBar import ProgressBar
 
+import warnings
+# warnings.filterwarnings('ignore')
+
 import logging
 import os
+
+# Configure the root logger
 logging.basicConfig(
     format='%(asctime)s %(levelname)s %(funcName)s: %(message)s',
-    level=os.environ.get("LOGLEVEL", "DEBUG")
+    level=os.environ.get("LOGLEVEL", "WARNING"),
+    filename='yeaz_GUI.log'
 )
 log = logging.getLogger(__name__)
 

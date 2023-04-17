@@ -7,13 +7,12 @@ Created on Sat Dec 21 18:54:10 2019
 import os
 import sys
 from model_pytorch import UNet
-from model_tensorflow import unet
+# from model_tensorflow import unet
 import numpy as np
 import skimage
 from skimage import io
 import skimage.transform as trans
 import torch
-import tensorflow as tf
 
 if getattr(sys, 'frozen', False):
     path_weights  = os.path.join(sys._MEIPASS, 'unet/')

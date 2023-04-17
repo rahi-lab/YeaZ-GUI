@@ -69,7 +69,7 @@ def LaunchInstanceSegmentation(reader, image_type, fov_indices=[0], time_value1=
 
         #iterates over the time indices in the range
         for t in range(time_value1, time_value2+1):         
-            print('--------- Segmenting field of view:',fov_ind,'Time point:',t)
+            log.debug('--------- Segmenting field of view:',fov_ind,'Time point:',t)
 
             #calls the neural network for time t and selected fov
             im = reader.LoadOneImage(t, fov_ind)
