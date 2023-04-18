@@ -6,13 +6,15 @@ Want to try out the neural network without installing any software? Check out ou
 
 ## Latest updates
 
-14.08.2021:
+18.04.2023:
 
-1. Updated the bright-field neural network parameters based on the multi-lab bright-field training set.
-2. Added a keyboard short-cut for the cell change ID function.
-3. Fixed a bug in the cell-cell boundary test.
-4. Turn off cell numbers while using the brush of eraser to avoid significant system slow-down.
-5. Added a command-line script to run the neural network from the command line
+1. Update all dependencies
+2. Update PyQt to PyQt6 (Now the application can run also on machines with m1 or m2 processors)
+3. Add option option to retrack multiple frames together
+4. Replace old Tensofrlow model with PyTorch model
+5. Optimize application when showing cell numbers
+6. Generally increase speed of application
+7. Fix minor bugs
 
 ## Installation
 
