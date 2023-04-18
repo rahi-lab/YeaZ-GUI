@@ -60,10 +60,13 @@ import skimage
 #from openpyxl import load_workbook
 #from openpyxl import Workbook
 
-# Import everything for the Graphical User Interface from the PyQt5 library.
-from PyQt5.QtWidgets import (QApplication, QMainWindow, QDialog, QSpinBox,
-    QMessageBox, QPushButton, QCheckBox, QAction, QStatusBar, QLabel)
-from PyQt5 import QtGui
+# Import everything for the Graphical User Interface from the PyQt6 library.
+from PyQt6.QtWidgets import (QApplication, QMainWindow, QDialog, QSpinBox,
+    QMessageBox, QPushButton, QCheckBox, QStatusBar, QLabel)
+from PyQt6 import QtGui
+from PyQt6.QtGui import QAction
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QPalette, QColor
 
 #Import from matplotlib to use it to display the pictures and masks.
 from matplotlib.backends.qt_compat import QtWidgets
@@ -685,7 +688,8 @@ class App(QMainWindow):
         dlg = lbp.CustomDialog(self)
         
         # this if tests if the user pressed 'ok' in the dialog window
-        if dlg.exec_() == QDialog.Accepted:
+        result = dlg.exec()
+        if result == QDialog.DialogCode.Accepted:
             # it tests if the user has entered some values
             # if not it ignores and returns.
             if not (dlg.entry1.text()!= '' and dlg.entry2.text() != ''):
@@ -750,7 +754,7 @@ class App(QMainWindow):
         Then it segments the thresholded prediction and saves the
         segmentation. 
         """
-        print('--------- Segmenting field of view:',fovindex,'Time point:',timeindex)
+        log.debug('--------- Segmenting field of view:',fovindex,'Time point:',timeindex)
         im = self.reader.LoadOneImage(timeindex, fovindex)
         try:
             pred = self.LaunchPrediction(im, is_pc)
@@ -765,7 +769,7 @@ class App(QMainWindow):
         thresh = self.ThresholdPred(thr_val, pred)
         seg = segment(thresh, pred, seg_val)
         self.reader.SaveMask(timeindex, fovindex, seg)
-        print('--------- Finished segmenting.')
+        log.debug('--------- Finished segmenting.')
           
           
     @staticmethod
@@ -1008,7 +1012,8 @@ class App(QMainWindow):
         dlg = br.CustomDialog(self)
         
         # this if tests if the user pressed 'ok' in the dialog window
-        if dlg.exec_() == QDialog.Accepted:
+        result = dlg.exec()
+        if result == QDialog.DialogCode.Accepted:
             # it tests if the user has entered some values
             if not (dlg.entry1.text()!= ''):
                 QMessageBox.critical(self, "Error", "No Time Specified")
@@ -1264,7 +1269,8 @@ class App(QMainWindow):
             
             #if the user presses 'ok' in the dialog window it executes the code
             #else it does nothing
-            if dlg.exec_():
+            result = dlg.exec()
+            if result == QDialog.DialogCode.Accepted:
                 #it tests that the user has entered some value, that it is not
                 #empty and that it is equal or bigger to 0.
                 if dlg.entry1.text() != '' and int(dlg.entry1.text()) >= 0:
@@ -1295,8 +1301,8 @@ class App(QMainWindow):
         dlg = ecv.CustomDialog(self)
         
         # if the user presses 'ok', it executes the code
-        if dlg.exec_():
-
+        result = dlg.exec()
+        if result == QDialog.DialogCode.Accepted:
             # it tests if both value to be swapped are not empty.
             if dlg.entry1.text()!= '' and dlg.entry2.text() != '':
                 
@@ -1724,17 +1730,20 @@ if __name__ == '__main__':
         nd2name1 = sys.argv[1]
         hdfname1 = sys.argv[2]
         ex = App(nd2name1, hdfname1, '')
-        sys.exit(app.exec_())
+        print('------------------------------------------------ Welcome to YeaZ-GUI -------------------------------------------------------')
+
+        sys.exit(app.exec())
     
     # Launch file browser otherwise
     else:
         wind = dfb.FileBrowser()
-        if wind.exec_():
+        if wind.exec():
             nd2name1 = wind.nd2name
             hdfname1 = wind.hdfname
             hdfnewname = wind.newhdfentry.text()
             ex = App(nd2name1, hdfname1, hdfnewname)
-            sys.exit(app.exec_())
+            print('------------------------------------------------ Welcome to YeaZ-GUI -------------------------------------------------------')
+            sys.exit(app.exec())
         else:
             app.exit()
         

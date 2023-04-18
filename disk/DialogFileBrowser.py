@@ -3,7 +3,7 @@
 Created on Tue Nov 19 17:38:58 2019
 """
 
-from PyQt5.QtWidgets import (QPushButton, QDialog, QDialogButtonBox, 
+from PyQt6.QtWidgets import (QPushButton, QDialog, QDialogButtonBox, 
                              QLineEdit, QFormLayout, QMessageBox, 
                              QFileDialog, QLabel)
 import os
@@ -42,7 +42,7 @@ class FileBrowser(QDialog):
         self.hdfname = ''
         flo = QFormLayout()
         
-        QBtn = QDialogButtonBox.Ok | QDialogButtonBox.Cancel
+        QBtn = QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel
         
         self.buttonBox = QDialogButtonBox(QBtn)
         self.buttonBox.accepted.connect(self.accept)

@@ -7,10 +7,10 @@ GUI to select and deselect cells at extraction time.
 import sys
 import os
 import numpy as np
-from PyQt5.QtWidgets import (QApplication, QPushButton, QLabel,
+from PyQt6.QtWidgets import (QApplication, QPushButton, QLabel,
                              QHBoxLayout, QVBoxLayout, QListWidget,
                              QFileDialog, QMessageBox, QDialog)
-from PyQt5.QtCore import Qt
+from PyQt6.QtCore import Qt
 
 
 from PIL import Image, ImageDraw
@@ -31,7 +31,7 @@ class Extract(QDialog):
     def __init__(self, image, mask, channel_names=[]):
         parent = None
         super(Extract, self).__init__(parent)
-        self.setWindowFlags(Qt.WindowStaysOnTopHint)
+        self.setWindowFlags(Qt.WindowType.WindowStaysOnTopHint)
 #        image, mask = _test_data()
         self.pc = PlotCanvas(image, mask)
         self.file_list = channel_names
@@ -51,7 +51,7 @@ class Extract(QDialog):
         extr_box.addWidget(self.extr_mask)
         extr_box.addWidget(self.extr_fluo)
         extr_box.addWidget(self.done)
-        extr_box.setAlignment(Qt.AlignTop)
+        extr_box.setAlignment(Qt.AlignmentFlag.AlignTop)
         
         # Select Button
         title_select = QLabel('Select cells:')
@@ -74,7 +74,7 @@ class Extract(QDialog):
         sel_box.addWidget(self.sel_sngl)
         sel_box.addWidget(self.desel_mult)
         sel_box.addWidget(self.desel_sngl)
-        sel_box.setAlignment(Qt.AlignTop)
+        sel_box.setAlignment(Qt.AlignmentFlag.AlignTop)
         
         # Additional Fluorescence File
         file_title = QLabel("Manage files and channels for extraction:")
@@ -90,7 +90,7 @@ class Extract(QDialog):
         manage_box.addWidget(file_title)
         manage_box.addWidget(self.list_channels)
         manage_box.addLayout(add_remove)
-        manage_box.setAlignment(Qt.AlignTop)
+        manage_box.setAlignment(Qt.AlignmentFlag.AlignTop)
         
         # Button list
         self.buttons = [self.extr_mask,

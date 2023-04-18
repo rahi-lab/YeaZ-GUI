@@ -16,11 +16,12 @@ logging.basicConfig(
 log = logging.getLogger(__name__)
 
 
-# Import everything for the Graphical User Interface from the PyQt5 library.
-from PyQt5.QtWidgets import QSizePolicy
+# Import everything for the Graphical User Interface from the PyQt6 library.
+from PyQt6.QtWidgets import QSizePolicy
 
 #Import from matplotlib to use it to display the pictures and masks.
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+
 import matplotlib.pyplot as plt
 
 from matplotlib import cm
@@ -51,9 +52,8 @@ class PlotCanvas(FigureCanvas):
         self.parent = parent
         
         # this is some mambo jambo.
-        FigureCanvas.setSizePolicy(self,
-                QSizePolicy.Expanding,
-                QSizePolicy.Expanding)
+        FigureCanvas.setSizePolicy(self, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+
         FigureCanvas.updateGeometry(self)
         
         # the self.currpicture attribute takes the original data and will then 

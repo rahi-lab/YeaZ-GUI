@@ -2,9 +2,11 @@
 """
 Initializing all the buttons in this file.
 """
-from PyQt5.QtWidgets import QPushButton, QComboBox, QLineEdit
-from PyQt5 import QtGui
-from PyQt5.QtCore import Qt
+from PyQt6.QtWidgets import QPushButton, QComboBox, QLineEdit
+from PyQt6 import QtGui
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QKeySequence
+
 import numpy as np
 import os
 import sys
@@ -52,7 +54,9 @@ def Init(parent):
     parent.button_nextframe.pressed.connect(parent.ChangeNextFrame)
     parent.button_nextframe.setToolTip("Shortcut: right arrow (->)")
     parent.button_nextframe.setMaximumWidth(150)
-    parent.button_nextframe.setShortcut(Qt.Key_Right)
+    parent.button_nextframe.setShortcut(Qt.Key.Key_Right)
+
+
     
     # if there is only one picture than this button is disabled
     if np.all(parent.nextframe == 0):
@@ -64,7 +68,7 @@ def Init(parent):
     parent.button_previousframe.pressed.connect(parent.ChangePreviousFrame)
     parent.button_previousframe.setToolTip("Shortcut: left arrow (<-)")
     parent.button_previousframe.setMaximumWidth(150)
-    parent.button_previousframe.setShortcut(Qt.Key_Left)
+    parent.button_previousframe.setShortcut(Qt.Key.Key_Left)
     parent.button_previousframe.move(100,100)
         
     # ZOOM

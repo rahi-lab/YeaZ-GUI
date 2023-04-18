@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QApplication, QDialog, QProgressBar, QVBoxLayout, QPushButton, QLabel
+from PyQt6.QtWidgets import QApplication, QDialog, QProgressBar, QVBoxLayout, QPushButton, QLabel
 import time
 
 class ProgressBar(QDialog):
