@@ -30,12 +30,13 @@ Installation time is less than 5 minutes.
 
 1. Clone this repository ("git clone https://github.com/lpbsscientist/YeaZ-GUI").
 2. Download the parameters for the neural network:
-    2-1. Download the parameters for segmenting phase contrast images from: https://drive.google.com/file/d/1Wd2QjGlH3tcKFoFvsQ4dzAhmw23XVnYd/view?usp=sharing. Put the file in the folder `/unet`.
-    2-2. Download the parameters for segmenting bright-field images from: https://drive.google.com/file/d/1ROQOWdTfxUeKlyrUXyNzA78RENv5HEQZ/view?usp=sharing. Put the file in the folder `/unet`.
+    2.1. Download the parameters for segmenting phase contrast images from: https://drive.google.com/file/d/1Wd2QjGlH3tcKFoFvsQ4dzAhmw23XVnYd/view?usp=sharing. Put the file in the folder `/unet`.
+    2.2. Download the parameters for segmenting bright-field images from: https://drive.google.com/file/d/1ROQOWdTfxUeKlyrUXyNzA78RENv5HEQZ/view?usp=sharing. Put the file in the folder `/unet`.
 3. If you don't have conda or miniconda installed, download it from https://docs.conda.io/en/latest/miniconda.html.
 4. In the command line, create a virtual environment with python 3.6.8 with the command `conda create -n YeaZ python=3.9`. 
 5. Activate that environment using `conda activate YeaZ`. 
 6. Install the necessary packages using `pip install -r requirements.txt`.
+    6.1. If you have trouble installing a package with pip, we suggest trying to install it with conda instead, or vice versa (specially in machines with m1 or m2 processors).
 7. Run the program from your command line with `python GUI_main.py`
 
 ## Troubleshooting / FAQ
@@ -60,7 +61,7 @@ Our CNN was trained on fewer cells with the bright-field technique (3841 unique 
 
 ### Graphical user interface not working on Mac OS Big Sur
 
-Jordan Xiao of Stanford University pointed out that one of the python modules (Pyqt5) has some issues on Mac OS Big Sur. Check out https://stackoverflow.com/questions/64833558/apps-not-popping-up-on-macos-big-sur-11-0-1 and https://stackoverflow.com/questions/64818879/is-there-any-solution-regarding-to-pyqt-library-doesnt-work-in-mac-os-big-sur/64856281 for more information and possible fixes.
+Jordan Xiao of Stanford University pointed out that one of the python modules (Pyqt) has some issues on Mac OS Big Sur. Check out https://stackoverflow.com/questions/64833558/apps-not-popping-up-on-macos-big-sur-11-0-1 and https://stackoverflow.com/questions/64818879/is-there-any-solution-regarding-to-pyqt-library-doesnt-work-in-mac-os-big-sur/64856281 for more information and possible fixes.
 
 ## User Guide
 
