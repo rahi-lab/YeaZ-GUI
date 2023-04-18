@@ -99,8 +99,9 @@ class FileBrowser(QDialog):
         path, ext = os.path.splitext(self.hdfname)
         if ext=='.tiff' or ext=='.tif' or ext=='.TIFF' or ext=='.TIF':
             if os.path.isfile(path+'.h5'):
-                QMessageBox.critical(self, 'Warning',
+                msg_box = QMessageBox(QMessageBox.Icon.Critical, 'Warning',
                                  'A .h5 file with the same name as the loaded '
                                  'tif exists already and will be overwritten.'
                                  ' Rename either the tif or the h5 file to '
-                                 'avoid data loss.')
+                                 'avoid data loss.', parent=self)
+                msg_box.exec()

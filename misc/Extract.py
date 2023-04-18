@@ -132,7 +132,8 @@ class Extract(QDialog):
         if ext == '':
             self.outfile += '.csv'
         elif ext != '.csv':
-            QMessageBox.critical(self,'Error','Must specify .csv file')
+            msg_box = QMessageBox(QMessageBox.Icon.Critical,'Error','Must specify .csv file', parent=self)
+            msg_box.exec()
             return 
         
         self.exit_code = 1
@@ -151,7 +152,8 @@ class Extract(QDialog):
         if ext == '':
             self.outfile += '.tif'
         elif ext != '.tif' and ext!='.tiff' and ext!='.TIF' and ext!='.TIFF':
-            QMessageBox.critical(self,'Error','Must specify .tif file')
+            msg_box = QMessageBox(QMessageBox.Icon.Critical,'Error','Must specify .tif file', parent=self)
+            msg_box.exec()
             return 
 
         self.exit_code = 2
@@ -272,10 +274,12 @@ class Extract(QDialog):
             try: 
                 im = load_image(f, 0)
             except ValueError:
-                QMessageBox.critical(self, "Error", "Could not load file")
+                msg_box = QMessageBox(QMessageBox.Icon.Critical, "Error", "Could not load file", parent=self)
+                msg_box.exec()
                 return False
             if not im.shape == self.pc.mask.shape:
-                QMessageBox.critical(self, "Error", "Loaded image has wrong size")
+                msg_box = QMessageBox(QMessageBox.Icon.Critical, "Error", "Loaded image has wrong size", parent=self)
+                msg_box.exec()
                 return False
         return True
             

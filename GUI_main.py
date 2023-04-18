@@ -472,7 +472,8 @@ class App(QMainWindow):
                 break
             
             if time_index==0:
-                QMessageBox(self, 'Error', 'No mask found')
+                msg_box = QMessageBox(QMessageBox.Icon.Critical, 'Error', 'No mask found', parent=self)
+                msg_box.exec()
                 self.Enable(self.button_extractfluorescence)
                 self.ClearStatusBar()
         
@@ -693,7 +694,8 @@ class App(QMainWindow):
             # it tests if the user has entered some values
             # if not it ignores and returns.
             if not (dlg.entry1.text()!= '' and dlg.entry2.text() != ''):
-                QMessageBox.critical(self, "Error", "No Time Specified")
+                msg_box = QMessageBox(QMessageBox.Icon.Critical, 'Error', "No Time Specified", parent=self)
+                msg_box.exec()
                 reset()
                 return 
             
@@ -706,7 +708,8 @@ class App(QMainWindow):
             # time_value1 is the lower range of the time range
             # and time_value2 the upper boundary of the range.
             if time_value1 > time_value2 :
-                QMessageBox.critical(self, "Error", 'Invalid Time Constraints')
+                msg_box = QMessageBox(QMessageBox.Icon.Critical, 'Error', 'Invalid Time Constraints', parent=self)
+                msg_box.exec()
                 reset()
                 return
             
@@ -717,7 +720,9 @@ class App(QMainWindow):
             #of view, to return the corresponding index, the function
             #dlg.listfov.row(item) is used which gives an integer
             if len(dlg.listfov.selectedItems())==0:
-                QMessageBox.critical(self, "Error", "No FOV Selected")
+                msg_box = QMessageBox(QMessageBox.Icon.Critical, "Error", "No FOV Selected", parent=self)
+                msg_box.exec()
+
             
             for item in dlg.listfov.selectedItems():
                 #iterates over the time indices in the range
@@ -759,11 +764,12 @@ class App(QMainWindow):
         try:
             pred = self.LaunchPrediction(im, is_pc)
         except ValueError:
-            QMessageBox.critical(self, 'Error',
+            QMessageBox(QMessageBox.Icon.Critical,'Error',
                                  'The neural network weight files could not '
                                  'be found. Make sure to download them from '
                                  'the link in the readme and put them into '
-                                 'the folder unet')
+                                 'the folder unet', parent=self)
+            
             return
 
         thresh = self.ThresholdPred(thr_val, pred)
@@ -1003,7 +1009,8 @@ class App(QMainWindow):
         self.WriteStatusBar('retracking... ')
 
         if(self.Tindex==self.reader.sizet-1):
-            QMessageBox.critical(self, 'Error',"This is the last frame. Nothing to retrack after this")
+            msg_box = QMessageBox(QMessageBox.Icon.Critical, 'Error',"This is the last frame. Nothing to retrack after this", parent=self)
+            msg_box.exec()
             reset()
             return 
 
@@ -1016,7 +1023,8 @@ class App(QMainWindow):
         if result == QDialog.DialogCode.Accepted:
             # it tests if the user has entered some values
             if not (dlg.entry1.text()!= ''):
-                QMessageBox.critical(self, "Error", "No Time Specified")
+                msg_box = QMessageBox(QMessageBox.Icon.Critical, "Error", "No Time Specified", parent=self)
+                msg_box.exec()
                 reset()
                 return 
             
@@ -1026,7 +1034,8 @@ class App(QMainWindow):
     
             # it tests if the value is bigger than current frame
             if (time_value1 <  self.Tindex or time_value1 > self.reader.sizet-1):
-                QMessageBox.critical(self, "Error", 'Invalid Time Constraints')
+                msg_box = QMessageBox(QMessageBox.Icon.Critical, "Error", 'Invalid Time Constraints', parent=self)
+                msg_box.exec()
                 reset()
                 return
             # if everything was okay, start a progress bar to show progress:
@@ -1314,7 +1323,8 @@ class App(QMainWindow):
                 try:
                     self.m.ExchangeCellValue(value1,value2)
                 except ValueError as e:
-                    QMessageBox.critical(self, 'Error', str(e))
+                    msg_box = QMessageBox(QMessageBox.Icon.Critical, 'Error', str(e), parent=self)
+                    msg_box.exec()
                 self.m.ShowCellNumbers(type='current')
                 self.SaveMask()
         else:
