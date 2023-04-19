@@ -8,13 +8,15 @@ Want to try out the neural network without installing any software? Check out ou
 
 18.04.2023:
 
-1. Update all dependencies
-2. Update PyQt to PyQt6 (Now the application can run also on machines with m1 or m2 processors)
-3. Add option option to retrack multiple frames together
-4. Replace old Tensofrlow model with PyTorch model
-5. Optimize application when showing cell numbers
-6. Generally increase speed of application
-7. Fix minor bugs
+1. Update all dependencies to the latest versions
+2. Update PyQt to PyQt6, enabling the application to run on machines with m1 or m2 processors
+3. Add the ability to retrack multiple frames together
+4. Replace the old TensorFlow model with a PyTorch model
+5. Optimize the application's speed when showing cell numbers
+6. Improve the overall speed and performance of the application
+7. Add the ability to segment fission images
+8. Fix minor bugs and improve overall stability
+
 
 ## Installation
 
@@ -30,10 +32,11 @@ Installation time is less than 5 minutes.
 
 ### Installation Steps
 
-1. Clone this repository ("git clone https://github.com/lpbsscientist/YeaZ-GUI").
+1. Clone this repository ("git clone https://github.com/rahi-lab/YeaZ-GUI").
 2. Download the parameters for the neural network:
-    2.1. Download the parameters for segmenting phase contrast images from: https://drive.google.com/file/d/1Wd2QjGlH3tcKFoFvsQ4dzAhmw23XVnYd/view?usp=sharing. Put the file in the folder `/unet`.
-    2.2. Download the parameters for segmenting bright-field images from: https://drive.google.com/file/d/1ROQOWdTfxUeKlyrUXyNzA78RENv5HEQZ/view?usp=sharing. Put the file in the folder `/unet`.
+    2.1. Download the parameters for segmenting phase contrast images from: https://drive.google.com/file/d/1tcdl34Aq11mrPVlyu0Qd4rUigw_6948b. Put the file in the folder `/unet`.
+    2.2. Download the parameters for segmenting bright-field images from: https://drive.google.com/file/d/1vnhkp54McM836yczh4F-YYJwPahbTsY0. Put the file in the folder `/unet`.
+    2.3. Download the parameters for segmenting fission images form: https://drive.google.com/file/d/15Egg0zXSAFHD34a0urbthStIxlb4Q_G_. Put the file in the folder `/unet`.
 3. If you don't have conda or miniconda installed, download it from https://docs.conda.io/en/latest/miniconda.html.
 4. In the command line, create a virtual environment with python 3.6.8 with the command `conda create -n YeaZ python=3.9`. 
 5. Activate that environment using `conda activate YeaZ`. 
@@ -85,7 +88,7 @@ On the bottom of the images, there are three rows of buttons. The first row of b
 
 ### Launching the CNN
 
-After opening a new image file, the next step is typically to launch the convolutional neural network with the `Launch CNN` button. Note that if you are using a file with multiple color channels, this has to be done with the brightfield channel visible. This will open a dialog box, in which you can specify the time frames that you want to launch the CNN on as well as the field of view you want to use. 
+After opening a new image file, the next step is typically to launch the convolutional neural network with the `Launch CNN` button. Note that if you are using a file with multiple color channels, this has to be done with the brightfield channel visible. This will open a dialog box, in which you can specify the time frames that you want to launch the CNN on as well as the field of view you want to use and type of your images. 
 
 Moreover, it lets you specify two parameters: The **threshold value** specifies the predicted value above which a pixel is considered to belong to a cell. This value is set at 0.5 per default and doesn't have to be changed in our experience. Increasing this value will decrease the sizes of the cells and can come in handy if the cells tend to exceed their borders. The **segmentation parameter** tells the program how far away two cell centers have to be at least, in order for two cells to be considered as separate entities. It has to be adjusted depending on how large the image resolution is: For small resolutions, a value of 2 seems to work well, whereas 5 is good for higher resolutions.
 
