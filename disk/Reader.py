@@ -47,14 +47,7 @@ class Reader:
         
         self.nd2path = nd2pathname # path name is nd2path for legacy reasons
         self.hdfpath = hdfpathname
-        
-        # Create newhdfname with right path
-        templist = self.nd2path.split('/')
-        tmp = ""
-        for k in range(0, len(templist)-1):
-            tmp += templist[k]+'/'        
-        self.newhdfpath = tmp+newhdfname+'.h5'
-        self.newhdfname = newhdfname
+        self.newhdfpath = newhdfname
         
         if self.isnd2:
             with ND2Reader(self.nd2path) as images:

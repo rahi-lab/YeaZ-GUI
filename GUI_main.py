@@ -1759,7 +1759,16 @@ if __name__ == '__main__':
         if wind.exec():
             nd2name1 = wind.nd2name
             hdfname1 = wind.hdfname
-            hdfnewname = wind.newhdfentry.text()
+            hdfnewname = wind.newhdfentry.text() 
+            if hdfnewname != '':
+                # Create newhdfname with right path
+                templist = nd2name1.split('/')
+                tmp = ""
+                for name in templist[:-1]:
+                    tmp += name+'/'        
+                hdfnewname = tmp+hdfnewname+'.h5' 
+            else:
+                hdfnewname = '_new_mask.h5'
             ex = App(nd2name1, hdfname1, hdfnewname)
             print('------------------------------------------------ Welcome to YeaZ-GUI -------------------------------------------------------')
             sys.exit(app.exec())

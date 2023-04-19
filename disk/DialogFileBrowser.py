@@ -36,7 +36,7 @@ class FileBrowser(QDialog):
         self.button_openhdf.setMaximumWidth(150)
         
         self.newhdfentry = QLineEdit()
-        self.newhdfentry.setText("newmaskfile")
+        self.newhdfentry.setText("_new_mask.h5")
 
         self.nd2name = ''
         self.hdfname = ''
@@ -79,6 +79,7 @@ class FileBrowser(QDialog):
         if self.nd2name != '':
             self.labelnd2.setText(self.nd2name)
             self.labelfolder.setText('')
+            self.newhdfentry.setText(self.nd2name.split('.')[0].split('/')[-1] + '_new_mask.h5')
       
     def gethdfpath(self):
         self.hdfname,_ = QFileDialog.getOpenFileName(self,'Open mask file','', 'Mask files (*.h5 *.tif *.tiff)')
