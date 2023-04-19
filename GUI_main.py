@@ -722,7 +722,16 @@ class App(QMainWindow):
             if len(dlg.listfov.selectedItems())==0:
                 msg_box = QMessageBox(QMessageBox.Icon.Critical, "Error", "No FOV Selected", parent=self)
                 msg_box.exec()
-
+            # Check if the user have selected a mic type
+            
+            mic_type = dlg.mic_type.currentData()
+            if dlg.mic_type.currentData() is not None:
+                # User has selected an option, do something with it
+                log.debug(msg='Mic type selected: {}'.format(mic_type))
+            else:
+                # User has not selected any option, show error message
+                msg_box = QMessageBox(QMessageBox.Icon.Critical, "Error", "No Image Type Selected", parent=self)
+                msg_box.exec()
             
             for item in dlg.listfov.selectedItems():
                 #iterates over the time indices in the range
@@ -737,9 +746,9 @@ class App(QMainWindow):
                         seg_val = int(dlg.entry_segmentation.text())
                     else:
                         seg_val = 10
-                    is_pc = dlg.radiobuttons.checkedId() == 1
+                    
                     self.PredThreshSeg(t, dlg.listfov.row(item), thr_val, seg_val,
-                                       is_pc)
+                                       mic_type)
                     
                     # apply tracker if wanted and if not at first time
                     temp_mask = self.reader.CellCorrespondence(t, dlg.listfov.row(item))
@@ -750,7 +759,7 @@ class App(QMainWindow):
 
     
     def PredThreshSeg(self, timeindex, fovindex, thr_val, seg_val, 
-                      is_pc):
+                      mic_type):
         """
         This function is called in the LaunchBatchPrediction function.
         This function calls the neural network function in the
@@ -762,7 +771,7 @@ class App(QMainWindow):
         log.debug('--------- Segmenting field of view:',fovindex,'Time point:',timeindex)
         im = self.reader.LoadOneImage(timeindex, fovindex)
         try:
-            pred = self.LaunchPrediction(im, is_pc)
+            pred = self.LaunchPrediction(im, mic_type)
         except ValueError:
             QMessageBox(QMessageBox.Icon.Critical,'Error',
                                  'The neural network weight files could not '
@@ -779,13 +788,13 @@ class App(QMainWindow):
           
           
     @staticmethod
-    def LaunchPrediction(im, is_pc, pretrained_weights=None):
+    def LaunchPrediction(im, mic_type, pretrained_weights=None):
         """It launches the neural neutwork on the current image and creates 
         an hdf file with the prediction for the time T and corresponding FOV. 
         """
         im = skimage.exposure.equalize_adapthist(im)
         im = im*1.0;	
-        pred = nn.prediction(im, is_pc, pretrained_weights)
+        pred = nn.prediction(im, mic_type, pretrained_weights)
         return pred
 
 

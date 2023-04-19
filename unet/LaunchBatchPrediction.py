@@ -5,7 +5,7 @@ Created on Tue Nov 19 17:38:58 2019
 
 from PyQt6.QtWidgets import (QDialog, QDialogButtonBox, QLineEdit, QFormLayout, 
                              QLabel, QListWidget, QAbstractItemView, QCheckBox,
-                             QButtonGroup, QRadioButton)
+                             QButtonGroup, QRadioButton, QComboBox)
 from PyQt6 import QtGui
 
 
@@ -48,14 +48,14 @@ class CustomDialog(QDialog):
         flo.addRow('Threshold value:', self.entry_threshold)
         flo.addRow('Min. distance between seeds:', self.entry_segmentation)
         
-        self.radiobuttons = QButtonGroup()
-        self.buttonBF = QRadioButton('Images are bright-field')
-        self.buttonPC = QRadioButton('Images are phase contrast')
-        self.buttonPC.setChecked(True)
-        self.radiobuttons.addButton(self.buttonBF, id=0)
-        self.radiobuttons.addButton(self.buttonPC, id=1)
-        flo.addWidget(self.buttonBF)
-        flo.addWidget(self.buttonPC)
+        self.mic_type = QComboBox()
+        self.mic_type.addItem("Image type", None)
+        self.mic_type.addItem("Bright-field budding yeast", "bf")
+        self.mic_type.addItem("Phase contrast budding yeast", "pc")
+        self.mic_type.addItem("Bud phase contrast fission", "fission")
+
+        self.mic_type.setCurrentIndex(0)
+        flo.addRow("Select image type: ", self.mic_type)
         
         QBtn = QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel
         

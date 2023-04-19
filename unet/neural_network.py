@@ -48,7 +48,7 @@ def threshold(im,th = None):
     return bi
 
 
-def prediction(im, is_pc, pretrained_weights=None, model_type='pytorch'):
+def prediction(im, mic_type, pretrained_weights=None, model_type='pytorch'):
     """
     Calculate the prediction of the label corresponding to image im
     Param:
@@ -63,10 +63,12 @@ def prediction(im, is_pc, pretrained_weights=None, model_type='pytorch'):
     padded = np.pad(im, ((0, row_add), (0, col_add)))
     
     if pretrained_weights is None:
-        if is_pc:
-            pretrained_weights = path_weights + 'unet_weights_batchsize_25_Nepochs_100_SJR0_10'
-        else:
+        if mic_type == 'pc':
+            pretrained_weights = path_weights + 'weights_budding_PhC_multilab_0_1'
+        elif mic_type == 'bf':
             pretrained_weights = path_weights + 'weights_budding_BF_multilab_0_1'
+        elif mic_type == 'fission':
+            pretrained_weights = path_weights + 'weights_fission_multilab_0_1'
         if model_type == 'tensorflow':
             pretrained_weights = pretrained_weights + '.hdf5'
     

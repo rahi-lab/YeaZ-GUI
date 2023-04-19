@@ -22,13 +22,13 @@ import argparse
 import skimage
 import neural_network as nn
 
-def LaunchPrediction(im, is_pc, pretrained_weights=None):
+def LaunchPrediction(im, mic_type, pretrained_weights=None):
     """It launches the neural neutwork on the current image and creates 
     an hdf file with the prediction for the time T and corresponding FOV. 
     """
     im = skimage.exposure.equalize_adapthist(im)
     im = im*1.0;	
-    pred = nn.prediction(im, is_pc, pretrained_weights)
+    pred = nn.prediction(im, mic_type, pretrained_weights)
     return pred
 
 
@@ -55,7 +55,6 @@ def LaunchInstanceSegmentation(reader, image_type, fov_indices=[0], time_value1=
         print("Wrong imaging type value ('{}')!".format(image_type),
               "imaging type must be either 'bf' or 'pc'")
         return
-    is_pc = image_type == 'pc'
 
     # check range_of_frames constraint
     if time_value1 > time_value2 :
@@ -75,7 +74,7 @@ def LaunchInstanceSegmentation(reader, image_type, fov_indices=[0], time_value1=
             im = reader.LoadOneImage(t, fov_ind)
 
             try:
-                pred = LaunchPrediction(im, is_pc, pretrained_weights=path_to_weights)
+                pred = LaunchPrediction(im, mic_type, pretrained_weights=path_to_weights)
             except ValueError:
                 print('Error! ',
                       'The neural network weight files could not '
