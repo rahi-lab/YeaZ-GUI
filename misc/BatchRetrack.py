@@ -17,7 +17,7 @@ class CustomDialog(QDialog):
         self.entry1.setValidator(QtGui.QIntValidator())
         self.entry1.setMaxLength(4)
         self.entry1.setAlignment(Qt.AlignmentFlag.AlignRight)
-        self.labeltime = QLabel("Enter farme number between {} to {}".format(app.Tindex+1, app.reader.sizet-1))
+        self.labeltime = QLabel("Enter a frame number between {} to {}".format(app.Tindex+1, app.reader.sizet-1))
         flo = QFormLayout()
         flo.addWidget(self.labeltime)
         flo.addRow('retracking frames from {} (next frame) to '.format(app.Tindex+1), self.entry1)       
