@@ -68,13 +68,13 @@ def LaunchInstanceSegmentation(reader, image_type, fov_indices=[0], time_value1=
 
         #iterates over the time indices in the range
         for t in range(time_value1, time_value2+1):         
-            log.debug('--------- Segmenting field of view:',fov_ind,'Time point:',t)
+            # print('--------- Segmenting field of view:',fov_ind,'Time point:',t)
 
             #calls the neural network for time t and selected fov
             im = reader.LoadOneImage(t, fov_ind)
 
             try:
-                pred = LaunchPrediction(im, mic_type, pretrained_weights=path_to_weights)
+                pred = LaunchPrediction(im, image_type, pretrained_weights=path_to_weights)
             except ValueError:
                 print('Error! ',
                       'The neural network weight files could not '
@@ -97,7 +97,7 @@ def main(args):
     if '.h5' in args.mask_path:
         args.mask_path = args.mask_path.replace('.h5','')
 
-    reader = nd.Reader("", args.mask_path, args.image_path)
+    reader = nd.Reader("", args.mask_path+'.h5', args.image_path)
 
     LaunchInstanceSegmentation(reader, args.image_type, args.fov,
                                args.range_of_frames[0],  args.range_of_frames[1], args.threshold, args.min_seed_dist, args.path_to_weights)
