@@ -8,7 +8,6 @@ from PyQt6.QtWidgets import (QPushButton, QDialog, QDialogButtonBox,
                              QFileDialog, QLabel)
 import os
 
-
 class FileBrowser(QDialog):
 
     def __init__(self, *args, **kwargs):
@@ -76,10 +75,15 @@ class FileBrowser(QDialog):
                           '*.pbm *.pgm *.ppm *.pxm *.pnm *.jp2 '
                           '*.TIF *.TIFF *.JPG *.JPEG *.PNG *.BMP '
                           '*.PBM *.PGM *.PPM *.PXM *.PNM *.JP2)')
+        self.nd2name = self.nd2name
         if self.nd2name != '':
-            self.labelnd2.setText(self.nd2name)
+            path , ext = s.path.splitext(self.nd2name)
+            self.labelnd2.setText(str(self.nd2name))
             self.labelfolder.setText('')
-            self.newhdfentry.setText(self.nd2name.split('.')[0].split('/')[-1] + '_new_mask.h5')
+            self.newhdfname = path +'_new_mask.h5'
+            self.newhdfentry.setText(self.newhdfname)
+            self.check_new_hdfpath()
+
       
     def gethdfpath(self):
         self.hdfname,_ = QFileDialog.getOpenFileName(self,'Open mask file','', 'Mask files (*.h5 *.tif *.tiff)')
@@ -87,12 +91,20 @@ class FileBrowser(QDialog):
             self.check_hdfpath()
             self.labelhdf.setText(self.hdfname)
             self.newhdfentry.setText("")
+            self.newhdfname = ''
         
     def getfolder(self):
-        self.nd2name = QFileDialog.getExistingDirectory(self, ("Select Image Folder"))
-        if self.nd2name != '':
+        folder = QFileDialog.getExistingDirectory(self, ("Select Image Folder"))
+        if folder != '':
+            self.nd2name = folder
             self.labelfolder.setText(self.nd2name)
             self.labelnd2.setText('')
+            self.newhdfname = os.path.join(str(self.nd2name), '_new_mask.h5')
+            self.newhdfentry.setText(self.newhdfname)
+            self.check_new_hdfpath()
+        else: # if canceled
+            self.labelnd2.setText(self.nd2name) # keep old path
+
             
     def check_hdfpath(self):
         """Checks if hdf path already exists when loading tiff, to avoid 
@@ -105,4 +117,16 @@ class FileBrowser(QDialog):
                                  'tif exists already and will be overwritten.'
                                  ' Rename either the tif or the h5 file to '
                                  'avoid data loss.', parent=self)
+                msg_box.exec()
+
+    def check_new_hdfpath(self):
+        """Checks if hdf path already exists when creating new hdf, to avoid 
+        data loss"""
+        if self.newhdfentry.text() != '':
+            if os.path.isfile(self.newhdfname):
+                msg_box = QMessageBox(QMessageBox.Icon.Critical, 'Warning',
+                                 'A .h5 file with the same name as the new '
+                                 'hdf exists already and will be overwritten.'
+                                 ' Rename either the new hdf or the existing '
+                                 'hdf file to avoid data loss.', parent=self)
                 msg_box.exec()

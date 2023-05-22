@@ -128,7 +128,7 @@ import neural_network as nn
 from ProgressBar import ProgressBar
 
 import warnings
-warnings.filterwarnings('ignore')
+# warnings.filterwarnings('ignore')
 
 import logging
 import os
@@ -1757,19 +1757,11 @@ if __name__ == '__main__':
     else:
         wind = dfb.FileBrowser()
         if wind.exec():
-            nd2name1 = wind.nd2name
+            nd2name1 = wind.nd2name 
             hdfname1 = wind.hdfname
-            hdfnewname = wind.newhdfentry.text() 
-            if hdfnewname != '':
-                # Create newhdfname with right path
-                templist = nd2name1.split('/')
-                tmp = ""
-                for name in templist[:-1]:
-                    tmp += name+'/'        
-                hdfnewname = tmp+hdfnewname+'.h5' 
-            else:
-                hdfnewname = '_new_mask.h5'
-            ex = App(nd2name1, hdfname1, hdfnewname)
+            hdfnewname = wind.newhdfname
+
+            ex = App(str(nd2name1), str(hdfname1), str(hdfnewname))
             print('------------------------------------------------ Welcome to YeaZ-GUI -------------------------------------------------------')
             sys.exit(app.exec())
         else:

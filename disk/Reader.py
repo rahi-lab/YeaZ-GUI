@@ -98,7 +98,7 @@ class Reader:
                                                          "|.PNG|.TIF|.JPG|.BMP|.JPEG|.PBM|.PGM|.PPM|.PXM|.PNM|.JP2", f)]
             
             for f in filelist:
-                im = skimage.io.imread(self.nd2path + '/' + f)
+                im = skimage.io.imread(os.path.join(self.nd2path , f))
                 self.sizey = max(self.sizey, im.shape[0]) #SJR: changed by me
                 self.sizex = max(self.sizex, im.shape[1]) #SJR: changed by me
             self.sizec = 1
@@ -314,7 +314,7 @@ class Reader:
             for f in filelist:
                 if f.startswith('.'):
                     filelist.remove(f)
-            im = skimage.io.imread(self.nd2path + '/' + filelist[currentT])
+            im = skimage.io.imread(os.path.join(self.nd2path , filelist[currentT]))
             im = np.pad(im,( (0, self.sizey - im.shape[0]) , (0, self.sizex -  im.shape[1] ) ),constant_values=0) # pad with zeros so all images in the same folder have same size
             
         outputarray = np.array(im, dtype = np.uint16)
