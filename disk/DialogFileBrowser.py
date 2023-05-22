@@ -77,7 +77,7 @@ class FileBrowser(QDialog):
                           '*.PBM *.PGM *.PPM *.PXM *.PNM *.JP2)')
         self.nd2name = self.nd2name
         if self.nd2name != '':
-            path , ext = s.path.splitext(self.nd2name)
+            path , ext = os.path.splitext(self.nd2name)
             self.labelnd2.setText(str(self.nd2name))
             self.labelfolder.setText('')
             self.newhdfname = path +'_new_mask.h5'

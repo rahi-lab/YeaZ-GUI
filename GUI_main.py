@@ -775,11 +775,12 @@ class App(QMainWindow):
         try:
             pred = self.LaunchPrediction(im, mic_type)
         except ValueError:
-            QMessageBox(QMessageBox.Icon.Critical,'Error',
+            msg_box = QMessageBox(QMessageBox.Icon.Critical,'Error',
                                  'The neural network weight files could not '
                                  'be found. Make sure to download them from '
                                  'the link in the readme and put them into '
                                  'the folder unet', parent=self)
+            msg_box.exec()
             
             return
 
