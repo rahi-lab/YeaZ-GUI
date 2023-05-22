@@ -107,7 +107,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('-i', '--image_path', type=str, help="Specify the path to a single image or to a folder of images", required=True)
     parser.add_argument('-m', '--mask_path', type=str, help="Specify where to save predicted masks", required=True)
-    parser.add_argument('--image_type', type=str, help="Specify the imaging type, possible 'bf' and 'pc'. Supersedes path_to_weights.")
+    parser.add_argument('--image_type', type=str, help="Specify the imaging type, possible types are 'bf', 'pc', and fission. Supersedes path_to_weights.")
     parser.add_argument('--path_to_weights', default=None, type=str, help="Specify weights path.")
     parser.add_argument('--fov', default=[0], nargs='+', type=int, help="Specify field of view index.")
     parser.add_argument('--range_of_frames', nargs=2, default=[0,0], type=int, help="Specify start and end in range of frames.")
