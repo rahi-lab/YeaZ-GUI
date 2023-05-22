@@ -732,6 +732,8 @@ class App(QMainWindow):
                 # User has not selected any option, show error message
                 msg_box = QMessageBox(QMessageBox.Icon.Critical, "Error", "No Image Type Selected", parent=self)
                 msg_box.exec()
+                reset()
+                return 
             
             for item in dlg.listfov.selectedItems():
                 #iterates over the time indices in the range
