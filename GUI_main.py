@@ -76,6 +76,10 @@ from sklearn.decomposition import PCA
 import imageio
 from PIL import Image, ImageDraw
 
+# tqdm for progress bar
+import tqdm
+import time
+
 #append all the paths where the modules are stored. Such that this script
 #looks into all of these folders when importing modules.
 sys.path.append("./unet")
@@ -735,9 +739,9 @@ class App(QMainWindow):
                 reset()
                 return 
             
-            for item in dlg.listfov.selectedItems():
+            for item in tqdm.tqdm(dlg.listfov.selectedItems(), desc='FOV', position=0, leave=True):
                 #iterates over the time indices in the range
-                for t in range(time_value1, time_value2+1):                    
+                for t in tqdm.tqdm(range(time_value1, time_value2+1), desc='Time', position=1, leave=False):                    
                     #calls the neural network for time t and selected
                     #fov
                     if dlg.entry_threshold.text() !=  '':

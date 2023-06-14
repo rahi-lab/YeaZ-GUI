@@ -6,6 +6,8 @@
 #
 # python Launch_NN_command_line.py -i DIRECTORY/IMAGE_FILE -m OUTPUT_MASK_FILE --image_type pc_OR_bf               --fov N --range_of_frames n1 n2 --min_seed_dist 5 --threshold 0.5
 
+import time
+import tqdm
 
 import sys
 sys.path.append("./unet")
@@ -64,10 +66,10 @@ def LaunchInstanceSegmentation(reader, image_type, fov_indices=[0], time_value1=
     # displays that the neural network is running
     print('Running the neural network...')
     
-    for fov_ind in fov_indices:
+    for fov_ind in tqdm.tqdm(fov_indices, desc='FOV', position=0):
 
         #iterates over the time indices in the range
-        for t in range(time_value1, time_value2+1):         
+        for t in tqdm.tqdm(range(time_value1, time_value2+1), desc='Time', position=1, leave=False):         
             # print('--------- Segmenting field of view:',fov_ind,'Time point:',t)
 
             #calls the neural network for time t and selected fov
