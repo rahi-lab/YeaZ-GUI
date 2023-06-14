@@ -86,21 +86,32 @@ def prediction(im, mic_type, pretrained_weights=None, model_type='pytorch'):
         
         return tf_res
 
-    elif model_type == 'pytorch': 
+    elif model_type == 'pytorch':
         # Load saved weights in pytorch model and run the pytorch model
         model = UNet()
         model.load_state_dict(torch.load(pretrained_weights))
+        
+        if torch.cuda.is_available():
+            device = torch.device('cuda')
+            model = model.to(device)
+            padded = torch.from_numpy(padded).to(device)
+            print('device: ', device)
+        else:
+            device = torch.device('cpu')
+            padded = torch.from_numpy(padded)
+            print('device: ', device)
         model.eval()
         with torch.no_grad():
             # Convert input tensor to PyTorch tensor
-            input_tensor = torch.from_numpy(padded[np.newaxis,np.newaxis,:,:]).float()
+            input_tensor = padded.unsqueeze(0).unsqueeze(0).float()
             # Pass input through the model
             output_tensor = model.forward(input_tensor)
             # Convert output tensor to NumPy array
-            output_array = output_tensor.detach().numpy()
+            output_array = output_tensor.cpu().detach().numpy()
         pt_res = output_array[0, 0, :, :]
         
         return pt_res[:nrow, :ncol]
+    
     
     else:
         raise ValueError('model_type is not valid. should be either "pytorch" or "tensorflow".')
