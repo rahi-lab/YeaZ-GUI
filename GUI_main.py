@@ -132,7 +132,7 @@ import neural_network as nn
 from ProgressBar import ProgressBar
 
 import warnings
-# warnings.filterwarnings('ignore')
+warnings.filterwarnings('ignore')
 
 import logging
 import os
