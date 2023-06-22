@@ -16,6 +16,7 @@ Want to try out the neural network without installing any software? Check out ou
 6. Improve the overall speed and performance of the application
 7. Add the ability to segment fission images
 8. Fix minor bugs and improve overall stability
+9. enable the option to run on GPU (windows and linux only)
 
 
 ## Installation
@@ -42,13 +43,25 @@ Installation time is less than 5 minutes.
 5. Activate that environment using `conda activate YeaZ`. 
 6. Install the necessary packages using `pip install -r requirements.txt`.
     6.1. If you have trouble installing a package with pip, we suggest trying to install it with conda instead, or vice versa (specially in machines with m1 or m2 processors).
-7. Run the program from your command line with `python GUI_main.py`
+7. Install pytorch and cuda using `conda install pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia`
+    7.1. for more information visit https://pytorch.org/get-started/locally/
+8. Run the program from your command line with `python GUI_main.py`
 
-## Troubleshooting / FAQ
+## Troubleshooting / FAQ 
 
-### Running CNN makes program crash
+### Memory error when running on GPU (cuda). Also might happen on CPU.
 
-Using the neural network to make predictions is very memory intensive. This can lead the computer to run out of memory, which in turn causes the program to abort. However, the amount of memory that is needed depends on the size of the image. So, you may try cropping your images into several smaller images or removing empty space around cells if you do not have enough memory. For instance, using a 2015 MacBook Pro with 8GB of RAM and a 2.9GHz Intel Core i5 CPU, we were able to predict images of size 700 x 500 pixels.
+Unlike CPU, GPU memory is very limited. If you get a memory error when running on GPU, try the following steps:
+1. Crop the images to smaller sizes. Memory usage depends on number of pixels in your images. You may try cropping your images into several smaller images or removing empty space around cells.
+2. Another application might be using the GPU memory. Try to close all other applications and run the program again. You can also check applications that use GPU memory using the task manager (windows) or `nvidia-smi` command (linux).
+3. Try running on CPU or on a cluster with more GPU memory.
+
+### The application is running on CPU instead of GPU
+
+if you have specified running on GPU and the application is running on CPU instead, this might be due to the following reasons:
+1. you don't have a cuda compatible gpu. check the list of cuda-compatible gpus here: https://developer.nvidia.com/cuda-gpus
+2. you are using mac os with m1 or m2 processors. Unfortunately, the current version of PyTorch implementation does not fully support Mac M1 or M2 GPUs. In the meantime, you can still run your program on Mac M1 or M2 CPUs, which are quite powerful and can provide significant performance gains over traditional CPUs.
+3. you have not installed cuda. please follow the installation steps above to install cuda (run `conda install pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia`).
 
 ### Small buds are not recognized as cells
 
@@ -58,7 +71,7 @@ If small buds aren't recognized as cells in your image, this is likely linked to
 
 In case you only want to use the functionalities of the convolutional neural network and the segmentation, but not the full GUI, you only need the files `unet/model_pytorch.py`, `unet/neural_network.py` (for making predictions), `unet/segment.py` (for doing watershed segmentation) and `unet/hungarian.py` (for tracking), as well as the weights for the neural network which have to be in the same folder. You can create predictions using the `prediction` function in `neural_network.py` (note that before making predictions, you have to use the function `equalize_adapthist` from `skimage.exposure` on the image). The segmentations can be obtained with the `segment` function in `segment.py`, and tracking between two frames is done using the `correspondence` function in `hungarian.py`.
 You can also run `Launch_NN_comand_Line.py` and give input arguments to run the whole pipeline and save final mask. Here is an example for running the CNN on a phase contrast image:
-`python Launch_NN_command_line.py -i "example_data/2020_3_19_frame_100_cropped.tif" -m "newmaskfile.h5" --image_type  "pc"`
+`python Launch_NN_command_line.py -i "example_data/2020_3_19_frame_100_cropped.tif" -m "newmaskfile.h5" --image_type  "pc" --device "cuda" --range_of_frames 0 0 --`
 
 ### CNN performs less well on bright-field images
 
