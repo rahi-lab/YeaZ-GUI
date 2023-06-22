@@ -47,8 +47,13 @@ def threshold(im,th = None):
     bi[bi <= th] = 0
     return bi
 
+import gc
+def report_gpu():
+    gc.collect()
+    torch.cuda.empty_cache()
+    print('Memory allocated: ', torch.cuda.memory_allocated())
 
-def prediction(im, mic_type, pretrained_weights=None, model_type='pytorch'):
+def prediction(im, mic_type, pretrained_weights=None, model_type='pytorch', device=None):
     """
     Calculate the prediction of the label corresponding to image im
     Param:
@@ -91,7 +96,7 @@ def prediction(im, mic_type, pretrained_weights=None, model_type='pytorch'):
         model = UNet()
         model.load_state_dict(torch.load(pretrained_weights))
         
-        if torch.cuda.is_available():
+        if torch.cuda.is_available() and device == 'cuda':
             device = torch.device('cuda')
             model = model.to(device)
             padded = torch.from_numpy(padded).to(device)
@@ -109,6 +114,10 @@ def prediction(im, mic_type, pretrained_weights=None, model_type='pytorch'):
             # Convert output tensor to NumPy array
             output_array = output_tensor.cpu().detach().numpy()
         pt_res = output_array[0, 0, :, :]
+        
+        # empty cache
+        if (device == 'cuda') and (torch.cuda.is_available()):
+            report_gpu()
         
         return pt_res[:nrow, :ncol]
     

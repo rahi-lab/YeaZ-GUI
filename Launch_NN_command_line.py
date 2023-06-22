@@ -24,13 +24,15 @@ import argparse
 import skimage
 import neural_network as nn
 
-def LaunchPrediction(im, mic_type, pretrained_weights=None):
+import torch
+
+def LaunchPrediction(im, mic_type, pretrained_weights=None, device='cpu'):
     """It launches the neural neutwork on the current image and creates 
     an hdf file with the prediction for the time T and corresponding FOV. 
     """
     im = skimage.exposure.equalize_adapthist(im)
     im = im*1.0;	
-    pred = nn.prediction(im, mic_type, pretrained_weights)
+    pred = nn.prediction(im, mic_type, pretrained_weights, device=device)
     return pred
 
 
@@ -43,9 +45,11 @@ def ThresholdPred(thvalue, pred):
         thresholdedmask = nn.threshold(pred, thvalue)
     return thresholdedmask
 
-def LaunchInstanceSegmentation(reader, image_type, fov_indices=[0], time_value1=0, time_value2=0, thr_val=None, min_seed_dist=5, path_to_weights=None):
-    """
-    """
+def LaunchInstanceSegmentation(reader, image_type, fov_indices=[0], time_value1=0, time_value2=0, thr_val=None, min_seed_dist=5, path_to_weights=None, device='cpu'):
+    if (device == 'cuda') and torch.cuda.is_available():
+        f_device = 'cuda'
+    else:
+        f_device = 'cpu' 
     # cannot have both path_to_weights and image_type supplied
     if (image_type is not None) and (path_to_weights is not None):
         print("image_type and path_to_weights cannot be both supplied.")
@@ -64,7 +68,7 @@ def LaunchInstanceSegmentation(reader, image_type, fov_indices=[0], time_value1=
         return
     
     # displays that the neural network is running
-    print('Running the neural network...')
+    print('Running the neural network on {} ...'.format(f_device))
     
     for fov_ind in tqdm.tqdm(fov_indices, desc='FOV', position=0):
 
@@ -76,7 +80,7 @@ def LaunchInstanceSegmentation(reader, image_type, fov_indices=[0], time_value1=
             im = reader.LoadOneImage(t, fov_ind)
 
             try:
-                pred = LaunchPrediction(im, image_type, pretrained_weights=path_to_weights)
+                pred = LaunchPrediction(im, image_type, pretrained_weights=path_to_weights, device=f_device)
             except ValueError:
                 print('Error! ',
                       'The neural network weight files could not '
@@ -102,18 +106,21 @@ def main(args):
     reader = nd.Reader("", args.mask_path+'.h5', args.image_path)
 
     LaunchInstanceSegmentation(reader, args.image_type, args.fov,
-                               args.range_of_frames[0],  args.range_of_frames[1], args.threshold, args.min_seed_dist, args.path_to_weights)
+                               args.range_of_frames[0],  args.range_of_frames[1], 
+                               args.threshold, args.min_seed_dist, 
+                               args.path_to_weights, device=args.device)
 
 if __name__ == '__main__':
     
     parser = argparse.ArgumentParser(description='', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('-i', '--image_path', type=str, help="Specify the path to a single image or to a folder of images", required=True)
     parser.add_argument('-m', '--mask_path', type=str, help="Specify where to save predicted masks", required=True)
-    parser.add_argument('--image_type', type=str, help="Specify the imaging type, possible types are 'bf', 'pc', and fission. Supersedes path_to_weights.")
+    parser.add_argument('--image_type', type=str, help="Specify the imaging type, possible types are 'bf', 'pc', and 'fission'. Supersedes path_to_weights.")
     parser.add_argument('--path_to_weights', default=None, type=str, help="Specify weights path.")
-    parser.add_argument('--fov', default=[0], nargs='+', type=int, help="Specify field of view index.")
-    parser.add_argument('--range_of_frames', nargs=2, default=[0,0], type=int, help="Specify start and end in range of frames.")
+    parser.add_argument('--fov', default=[0], nargs='+', type=int, help="Specify field of view index (can specify more than one with space between them).")
+    parser.add_argument('--range_of_frames', nargs=2, default=[0,0], type=int, help="Specify start and end in range of frames. (e.g. 0 10)")
     parser.add_argument('--threshold', default=None, type=float, help="Specify threshold value.")
     parser.add_argument('--min_seed_dist', default=5, type=int, help="Specify minimum distance between seeds.")
+    parser.add_argument('--device', default='cpu', type=str, help="Specify device to run on (cpu or cuda).")
     args = parser.parse_args()
     main(args)

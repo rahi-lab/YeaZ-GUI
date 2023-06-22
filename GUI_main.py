@@ -739,6 +739,14 @@ class App(QMainWindow):
                 reset()
                 return 
             
+            # decide between cuda or cpu for running neural network
+            device = None
+            import torch
+            if (dlg.device_selection.currentData() == 'cuda') and (torch.cuda.is_available()):
+                device = 'cuda'
+            else:
+                device = 'cpu'
+            
             for item in tqdm.tqdm(dlg.listfov.selectedItems(), desc='FOV', position=0, leave=True):
                 #iterates over the time indices in the range
                 for t in tqdm.tqdm(range(time_value1, time_value2+1), desc='Time', position=1, leave=False):                    
@@ -754,7 +762,7 @@ class App(QMainWindow):
                         seg_val = 10
                     
                     self.PredThreshSeg(t, dlg.listfov.row(item), thr_val, seg_val,
-                                       mic_type)
+                                       mic_type, device=device)
                     
                     # apply tracker if wanted and if not at first time
                     temp_mask = self.reader.CellCorrespondence(t, dlg.listfov.row(item))
@@ -765,7 +773,7 @@ class App(QMainWindow):
 
     
     def PredThreshSeg(self, timeindex, fovindex, thr_val, seg_val, 
-                      mic_type):
+                      mic_type, device=None):
         """
         This function is called in the LaunchBatchPrediction function.
         This function calls the neural network function in the
@@ -777,7 +785,7 @@ class App(QMainWindow):
         log.debug('--------- Segmenting field of view:',fovindex,'Time point:',timeindex)
         im = self.reader.LoadOneImage(timeindex, fovindex)
         try:
-            pred = self.LaunchPrediction(im, mic_type)
+            pred = self.LaunchPrediction(im, mic_type, device=device)
         except ValueError:
             msg_box = QMessageBox(QMessageBox.Icon.Critical,'Error',
                                  'The neural network weight files could not '
@@ -795,13 +803,13 @@ class App(QMainWindow):
           
           
     @staticmethod
-    def LaunchPrediction(im, mic_type, pretrained_weights=None):
+    def LaunchPrediction(im, mic_type, pretrained_weights=None, device=None):
         """It launches the neural neutwork on the current image and creates 
         an hdf file with the prediction for the time T and corresponding FOV. 
         """
         im = skimage.exposure.equalize_adapthist(im)
         im = im*1.0;	
-        pred = nn.prediction(im, mic_type, pretrained_weights)
+        pred = nn.prediction(im, mic_type, pretrained_weights, device=device)
         return pred
 
 
