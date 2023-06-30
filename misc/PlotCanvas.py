@@ -298,8 +298,8 @@ class PlotCanvas(FigureCanvas):
 
         self.draw()
         return (ax.imshow(picture, interpolation= 'None', 
-                        origin = 'upper', cmap = 'gray_r'), 
-                ax.imshow((mask%10+1)*(mask != 0), origin = 'upper', 
+                        origin = 'lower', cmap = 'gray_r'), 
+                ax.imshow((mask%10+1)*(mask != 0), origin = 'lower', 
                         interpolation = 'None', alpha = 0.2, cmap = newcmp))
    
     
