@@ -73,7 +73,7 @@ def prediction(im, mic_type, pretrained_weights=None, model_type='pytorch', devi
         elif mic_type == 'bf':
             pretrained_weights = path_weights + 'weights_budding_BF_multilab_0_1'
         elif mic_type == 'fission':
-            pretrained_weights = path_weights + 'weights_fission_multilab_0_1'
+            pretrained_weights = path_weights + 'weights_fission_multilab_0_2'
         if model_type == 'tensorflow':
             pretrained_weights = pretrained_weights + '.hdf5'
     
