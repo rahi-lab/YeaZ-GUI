@@ -14,8 +14,6 @@ from PyQt6.QtCore import Qt
 
 
 from PIL import Image, ImageDraw
-sys.path.append("../disk")
-from image_loader import load_image
 
 #Import from matplotlib to use it to display the pictures and masks.
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
@@ -24,6 +22,7 @@ from matplotlib import cm
 from matplotlib.colors import LinearSegmentedColormap
 from matplotlib.figure import Figure
 
+from ..disk.image_loader import load_image
 
 class Extract(QDialog):
     

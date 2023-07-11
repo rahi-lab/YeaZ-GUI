@@ -35,9 +35,6 @@ from PIL import Image, ImageDraw
 
 
 class PlotCanvas(FigureCanvas):
-    
-    
-    
     def __init__(self, parent=None):
         """this class defines the canvas. It initializes a figure, which is then
         used to plot our data using imshow.

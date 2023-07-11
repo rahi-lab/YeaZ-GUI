@@ -33,19 +33,34 @@ Installation time is less than 5 minutes.
 
 ### Installation Steps
 
-1. Clone this repository ("git clone https://github.com/rahi-lab/YeaZ-GUI").
-2. Download the parameters for the neural network:
+1. Download the parameters for the neural network:
     2.1. Download the parameters for segmenting phase contrast images from: https://drive.google.com/file/d/1tcdl34Aq11mrPVlyu0Qd4rUigw_6948b. Put the file in the folder `/unet`.  
     2.2. Download the parameters for segmenting bright-field images from: https://drive.google.com/file/d/1vnhkp54McM836yczh4F-YYJwPahbTsY0. Put the file in the folder `/unet`.  
     2.3. Download the parameters for segmenting fission images form: https://drive.google.com/file/d/15Egg0zXSAFHD34a0urbthStIxlb4Q_G%5f. Put the file in the folder `/unet`.  
-3. If you don't have conda or miniconda installed, download it from https://docs.conda.io/en/latest/miniconda.html.
-4. In the command line, create a virtual environment with python 3.6.8 with the command `conda create -n YeaZ python=3.9`.   
-5. Activate that environment using `conda activate YeaZ`. 
-6. Install the necessary packages using `pip install -r requirements.txt`.
-    6.1. If you have trouble installing a package with pip, we suggest trying to install it with conda instead, or vice versa (specially in machines with m1 or m2 processors).
+
+### Install from PyPi
+
+1. If you don't have conda or miniconda installed, download it from https://docs.conda.io/en/latest/miniconda.html.
+2. In the command line, create a virtual environment with python 3.9 with the command `conda create -n YeaZ python=3.9`. 
+3. Install pytorch and cuda using `conda install pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia`
+    3.1. for more information visit https://pytorch.org/get-started/locally/
+4. Install YeaZ with the command `pip install yeaz`.
+
+### Install from source
+
+1. If you don't have conda or miniconda installed, download it from https://docs.conda.io/en/latest/miniconda.html.
+2. Clone this repository (`git clone https://github.com/rahi-lab/YeaZ-GUI`).
+3. In the command line, navigate to the folder where you cloned YeaZ-GUI (command `cd YeaZ-GUI`).
+4. In the command line, create a virtual environment with python 3.9 with the command `conda create -n YeaZ python=3.9`.   
+5. Activate the environment using `conda activate YeaZ`. 
+6. Install with the command `pip install -e .`.
 7. Install pytorch and cuda using `conda install pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia`
     7.1. for more information visit https://pytorch.org/get-started/locally/
-8. Run the program from your command line with `python GUI_main.py`
+
+## Runnig the GUI
+
+1. Open a terminal and activate the environment using `conda activate YeaZ`. 
+2. Run the program with the command `yeaz`.
 
 ## Troubleshooting / FAQ 
 

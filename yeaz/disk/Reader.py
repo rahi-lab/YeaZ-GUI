@@ -13,8 +13,9 @@ import h5py
 import os.path
 import skimage
 import skimage.io
+
 #import pytiff
-import hungarian as hu
+from ..unet import hungarian as hu
 
 import logging
 import os

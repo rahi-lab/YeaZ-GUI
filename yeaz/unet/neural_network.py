@@ -6,7 +6,7 @@ Created on Sat Dec 21 18:54:10 2019
 """
 import os
 import sys
-from model_pytorch import UNet
+from .model_pytorch import UNet
 # from model_tensorflow import unet
 import numpy as np
 import skimage
