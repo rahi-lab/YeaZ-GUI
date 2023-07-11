@@ -37,7 +37,7 @@ Installation time is less than 5 minutes.
 2. Download the parameters for the neural network:
     2.1. Download the parameters for segmenting phase contrast images from: https://drive.google.com/file/d/1tcdl34Aq11mrPVlyu0Qd4rUigw_6948b. Put the file in the folder `/unet`.  
     2.2. Download the parameters for segmenting bright-field images from: https://drive.google.com/file/d/1vnhkp54McM836yczh4F-YYJwPahbTsY0. Put the file in the folder `/unet`.  
-    2.3. Download the parameters for segmenting fission images form: https://drive.google.com/file/d/15Egg0zXSAFHD34a0urbthStIxlb4Q_G%5f. Put the file in the folder `/unet`.  
+    2.3. Download the parameters for segmenting fission images form: https://drive.google.com/file/d/1h_Wz2d3UY0jkGtMrhl32iEqbOQVXsmKS. Put the file in the folder `/unet`.  
 3. If you don't have conda or miniconda installed, download it from https://docs.conda.io/en/latest/miniconda.html.
 4. In the command line, create a virtual environment with python 3.6.8 with the command `conda create -n YeaZ python=3.9`.   
 5. Activate that environment using `conda activate YeaZ`. 
