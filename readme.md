@@ -40,7 +40,7 @@ Installation time is less than 5 minutes.
     2.2. Download the parameters for segmenting bright-field images from: https://drive.google.com/file/d/1vnhkp54McM836yczh4F-YYJwPahbTsY0. Put the file in the folder `/unet`.  
     2.3. Download the parameters for segmenting fission images form: https://drive.google.com/file/d/1h_Wz2d3UY0jkGtMrhl32iEqbOQVXsmKS. Put the file in the folder `/unet`.  
 4. If you don't have conda or miniconda installed, download it from https://docs.conda.io/en/latest/miniconda.html.
-5. In the command line, create a virtual environment with python 3.6.8 with the command `conda create -n YeaZ python=3.9`.   
+5. In the command line, create a virtual environment with python 3.9 with the command `conda create -n YeaZ python=3.9`.   
 6. Activate that environment using `conda activate YeaZ`. 
 7. Install the necessary packages using `pip install -r requirements.txt`.
     6.1. If you have trouble installing a package with pip, we suggest trying to install it with conda instead, or vice versa (specially in machines with m1 or m2 processors).
