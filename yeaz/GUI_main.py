@@ -60,14 +60,6 @@ import skimage
 #from openpyxl import load_workbook
 #from openpyxl import Workbook
 
-# Import everything for the Graphical User Interface from the PyQt6 library.
-from PyQt6.QtWidgets import (QApplication, QMainWindow, QDialog, QSpinBox,
-    QMessageBox, QPushButton, QCheckBox, QStatusBar, QLabel)
-from PyQt6 import QtGui
-from PyQt6.QtGui import QAction
-from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QPalette, QColor
-
 #Import from matplotlib to use it to display the pictures and masks.
 from matplotlib.backends.qt_compat import QtWidgets
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
@@ -80,56 +72,53 @@ from PIL import Image, ImageDraw
 import tqdm
 import time
 
-#append all the paths where the modules are stored. Such that this script
-#looks into all of these folders when importing modules.
-sys.path.append("./unet")
-sys.path.append("./disk")
-sys.path.append("./icons")
-sys.path.append("./init")
-sys.path.append("./misc")
+# Import everything for the Graphical User Interface from the PyQt6 library.
+from PyQt6.QtWidgets import (QApplication, QMainWindow, QDialog, QSpinBox,
+    QMessageBox, QPushButton, QCheckBox, QStatusBar, QLabel)
+from PyQt6 import QtGui
+from PyQt6.QtGui import QAction
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QPalette, QColor
 
 #Import all the other python files
 #this file handles the interaction with the disk, so loading/saving images
 #and masks and it also runs the neural network.
-import Reader as nd
+from .disk import Reader as nd
 
 #this file contains a dialog window that takes two integers as entry to swap
 #two cell values
-import ExchangeCellValues as ecv
-
-#this file contains a dialog window which is opened before the main program
-#and allows to load the nd2 and hdf files by browsing through the computer.
-import DialogFileBrowser as dfb
+from .misc import ExchangeCellValues as ecv
 
 #this file contains a window that opens to change the value of one cell. It 
 #is opened as soon as the user presses with the left click on a specific cell.
-import ChangeOneCellValue as cocv
+from .misc import ChangeOneCellValue as cocv
 
 #this file contains a dialog window where a time range and the field of views
 #can be selected to then launch a prediction of the neural network on
 #a specific range of pictures.
-import LaunchBatchPrediction as lbp
+from .unet import LaunchBatchPrediction as lbp
 
 #this file contains a dialog window where a time range can be selected to retrack
-import BatchRetrack as br
+from .misc import BatchRetrack as br
 
 #this file initializes all the buttons present in the gui, sets the shortcuts
 #to these buttons and also connect the buttons to the function that are 
 #triggered when the buttons are pressed.
-import InitButtons
+from .init import InitButtons
 
 #this file contains the layout of the main window so it justs puts the buttons
 #and the pictures at the desired position in the main window.
-import InitLayout
+from .init import InitLayout
 
 # PlotCanvas for fast plotting
-from PlotCanvas import PlotCanvas
+from .misc.PlotCanvas import PlotCanvas
 
-import Extract as extr
-from image_loader import load_image
-from segment import segment
-import neural_network as nn
-from ProgressBar import ProgressBar
+from .misc import Extract as extr
+
+from .disk.image_loader import load_image
+from .unet.segment import segment
+from .unet import neural_network as nn
+from .misc.ProgressBar import ProgressBar
 
 import warnings
 # warnings.filterwarnings('ignore')
@@ -1754,31 +1743,3 @@ class App(QMainWindow):
     def ClearStatusBar(self):
         """Removes text from status bar"""
         self.statusBarText.setText('')
-
-
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    
-    # If two arguments are given, make them nd2name and hdfname
-    if len(sys.argv)==3:
-        nd2name1 = sys.argv[1]
-        hdfname1 = sys.argv[2]
-        ex = App(nd2name1, hdfname1, '')
-        print('------------------------------------------------ Welcome to YeaZ-GUI -------------------------------------------------------')
-
-        sys.exit(app.exec())
-    
-    # Launch file browser otherwise
-    else:
-        wind = dfb.FileBrowser()
-        if wind.exec():
-            nd2name1 = wind.nd2name 
-            hdfname1 = wind.hdfname
-            hdfnewname = wind.newhdfname
-
-            ex = App(str(nd2name1), str(hdfname1), str(hdfnewname))
-            print('------------------------------------------------ Welcome to YeaZ-GUI -------------------------------------------------------')
-            sys.exit(app.exec())
-        else:
-            app.exit()
-        
