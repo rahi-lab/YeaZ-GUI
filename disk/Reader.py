@@ -305,6 +305,7 @@ class Reader:
                     pass
                 images.iter_axes = 't'
                 im = images[currentT]
+                outputarray = np.array(im, dtype = np.uint16)
                 
         elif self.issingle:
 #            with pytiff.Tiff(self.nd2path) as handle:
@@ -318,6 +319,7 @@ class Reader:
                 if full.shape[2] < full.shape[0] and full.shape[2] < full.shape[1]:  
                     full = np.moveaxis(full, -1, 0) # move last axis to first
                 im = full[currentT]
+                outputarray = np.array(im, dtype = np.uint16)
 
                                 
         elif self.isfolder:
