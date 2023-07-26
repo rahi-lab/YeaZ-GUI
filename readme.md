@@ -27,7 +27,7 @@ The software requires a standard computer with enough RAM to apply the neural ne
 
 It was tested on OS X High Sierra (10.13.6), Windows 10 Education, and Ubuntu 18.04.4.
 
-Package dependencies: The convolutional neural network relies on Keras with TensorFlow. The Hungarian algorithm is implemented in the munkres package. In addition, standard image processing and scientific computing libraries are used. 
+Package dependencies: The convolutional neural network relies on Pytorch. The Hungarian algorithm is implemented in the munkres package. In addition, standard image processing and scientific computing libraries are used. 
 
 Installation time is less than 5 minutes. 
 

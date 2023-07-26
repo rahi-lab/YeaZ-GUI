@@ -14,9 +14,7 @@ import os.path
 import skimage
 import skimage.io
 
-#import pytiff
 from ..unet import hungarian as hu
-
 import logging
 import os
 logging.basicConfig(

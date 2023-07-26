@@ -4,7 +4,7 @@ nd2reader==3.3.0
 h5py==3.8.0
 scikit-image>=0.15.0
 openpyxl==3.1.2
-Tensorflow==2.11.0
+# Tensorflow==2.11.0
 opencv-python-headless>=4.7.0.72
 pandas>=0.25.3
 munkres
@@ -14,3 +14,4 @@ Pillow>=6.2.1
 torch>=2.0.0
 tqdm
 PyQt6
+imagecodecs
