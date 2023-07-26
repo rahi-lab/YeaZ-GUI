@@ -85,26 +85,31 @@ class Reader:
             self.channel_names = ['Channel1']
                 
         elif self.isfolder:
-            filelist = sorted(os.listdir(self.nd2path))            
+            filelist = sorted(os.listdir(self.nd2path))  
+            # filter filelist for supported image files
+            filelist = [f for f in filelist if re.search(r".png|.tif|.jpg|.bmp|.jpeg|.pbm|.pgm|.ppm|.pxm|.pnm|.jp2"
+                                                         "|.PNG|.TIF|.JPG|.BMP|.JPEG|.PBM|.PGM|.PPM|.PXM|.PNM|.JP2", f)]          
             for f in filelist:
                 if f.startswith('.'):
                     filelist.remove(f)
             self.sizey = 0
             self.sizex = 0
-            
-            # filter filelist for supported image files
-            filelist = [f for f in filelist if re.search(r".png|.tif|.jpg|.bmp|.jpeg|.pbm|.pgm|.ppm|.pxm|.pnm|.jp2"
-                                                         "|.PNG|.TIF|.JPG|.BMP|.JPEG|.PBM|.PGM|.PPM|.PXM|.PNM|.JP2", f)]
-            
-            for f in filelist:
-                im = skimage.io.imread(os.path.join(self.nd2path , f))
-                self.sizey = max(self.sizey, im.shape[0]) #SJR: changed by me
-                self.sizex = max(self.sizex, im.shape[1]) #SJR: changed by me
             self.sizec = 1
             self.Npos = 1
             self.sizet = len(filelist)
-            self.channel_names = ['Channel1']
-                            
+            
+            for f in filelist:
+                im = skimage.io.imread(os.path.join(self.nd2path , f))
+                if im.ndim==3:
+                    self.sizec = max(self.sizec, im.shape[0])
+                    self.sizey = max(self.sizey, im.shape[1]) #SJR: changed by me
+                    self.sizex = max(self.sizex, im.shape[2]) #SJR: changed by me
+                else:
+                    self.sizey = max(self.sizey, im.shape[0]) #SJR: changed by me
+                    self.sizex = max(self.sizex, im.shape[1]) #SJR: changed by me
+
+            self.channel_names = [f'Channel{i}' for i in range(1,self.sizec+1)]
+
         #create the labels which index the masks with respect to time and 
         #fov indices in the hdf5 file
         self.fovlabels = []
@@ -293,11 +298,11 @@ class Reader:
                     pass
                 images.iter_axes = 't'
                 im = images[currentT]
+                outputarray = np.array(im, dtype = np.uint16)
+                return outputarray
+
                 
         elif self.issingle:
-#            with pytiff.Tiff(self.nd2path) as handle:
-#                handle.set_page(currentT)
-#                im = handle[:]
             full = skimage.io.imread(self.nd2path)
             if full.ndim==2:
                 im = full
@@ -307,17 +312,34 @@ class Reader:
                     full = np.moveaxis(full, -1, 0) # move last axis to first
                 im = full[currentT]
 
+            outputarray = np.array(im, dtype = np.uint16)
+            return outputarray
+
                                 
         elif self.isfolder:
             filelist = sorted(os.listdir(self.nd2path))
+            # filter filelist for supported image files
+            filelist = [f for f in filelist if re.search(r".png|.tif|.jpg|.bmp|.jpeg|.pbm|.pgm|.ppm|.pxm|.pnm|.jp2"
+                                                         "|.PNG|.TIF|.JPG|.BMP|.JPEG|.PBM|.PGM|.PPM|.PXM|.PNM|.JP2", f)]
             for f in filelist:
                 if f.startswith('.'):
                     filelist.remove(f)
-            im = skimage.io.imread(os.path.join(self.nd2path , filelist[currentT]))
-            im = np.pad(im,( (0, self.sizey - im.shape[0]) , (0, self.sizex -  im.shape[1] ) ),constant_values=0) # pad with zeros so all images in the same folder have same size
             
-        outputarray = np.array(im, dtype = np.uint16)
-        return outputarray
+            im = skimage.io.imread(os.path.join(self.nd2path , filelist[currentT]))
+            if im.ndim==2:
+                im = np.pad(im,( (0, self.sizey - im.shape[0]) , (0, self.sizex -  im.shape[1] ) ),constant_values=0) # pad with zeros so all images in the same folder have same size
+                outputarray = np.array(im, dtype = np.uint16)
+            elif im.ndim ==3:
+                im = np.pad(im,( (0, self.sizec - im.shape[0]) , (0, self.sizey - im.shape[1]) , (0, self.sizex -  im.shape[2] ) ),constant_values=0)
+                # number of channels should be smaller than x and y
+                if im.shape[2] < im.shape[0] and im.shape[2] < im.shape[1]:  
+                    im = np.moveaxis(im, -1, 0) # move last axis to first
+                im = im[self.default_channel]
+                outputarray = np.array(im, dtype = np.uint16)
+            else:
+                outputarray = np.zeros([self.sizey, self.sizex],dtype = np.uint16)
+                print("Error: image has wrong number of dimensions")
+            return outputarray              
 
     
     def LoadImageChannel(self,currentT, currentFOV, ch):
