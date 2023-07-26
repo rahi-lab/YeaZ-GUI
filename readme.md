@@ -5,6 +5,9 @@ This is the user manual for the graphical interface for segmenting yeast images 
 Want to try out the neural network without installing any software? Check out our online segmentation tool at https://lpbs-nn.epfl.ch/.
 
 ## Latest updates
+26.07.2023:
+1. Updata the installation structure
+2. Packaging and upload on Pypi.
 
 18.04.2023:
 
@@ -34,9 +37,9 @@ Installation time is less than 5 minutes.
 ### Download weight files for neural network
 
 1. Download the parameters for the neural network:<br>
-    2.1. Download the parameters for segmenting phase contrast images from: https://drive.google.com/file/d/1tcdl34Aq11mrPVlyu0Qd4rUigw_6948b. Put the file in the folder `yeaz/unet`.  <br>
-    2.2. Download the parameters for segmenting bright-field images from: https://drive.google.com/file/d/1vnhkp54McM836yczh4F-YYJwPahbTsY0. Put the file in the folder `yeaz/unet`.  <br>
-    2.3. Download the parameters for segmenting fission images form: https://drive.google.com/file/d/1h_Wz2d3UY0jkGtMrhl32iEqbOQVXsmKS. Put the file in the folder `yeaz/unet`.  
+    1.1. Download the parameters for segmenting phase contrast images from: https://drive.google.com/file/d/1tcdl34Aq11mrPVlyu0Qd4rUigw_6948b. Put the file in the folder `yeaz/unet`.  <br>
+    1.2. Download the parameters for segmenting bright-field images from: https://drive.google.com/file/d/1vnhkp54McM836yczh4F-YYJwPahbTsY0. Put the file in the folder `yeaz/unet`.  <br>
+    1.3. Download the parameters for segmenting fission images form: https://drive.google.com/file/d/1h_Wz2d3UY0jkGtMrhl32iEqbOQVXsmKS. Put the file in the folder `yeaz/unet`.  
 
 ### Install from PyPi
 
