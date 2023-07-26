@@ -23,20 +23,20 @@ Want to try out the neural network without installing any software? Check out ou
 
 ### System requirements
 
-The software requires a standard computer with enough RAM to apply the neural network. 8 GB RAM is enough to predict the 700 x 500 px image provided as the test data. The RAM requirements scales linearly with the number of image pixels.
+The software requires a standard computer with enough RAM to apply the neural network. 8 GB RAM is enough to predict the 700 x 500 px image provided as the test data. The RAM requirements scale linearly with the number of image pixels.
 
-It was tested on OS X High Sierra (10.13.6), Windows 10 Education, and Ubuntu 18.04.4.
+It was tested on macOS Ventura (13.4.1), Windows 10 Education, and Ubuntu 20.04.4.
 
 Package dependencies: The convolutional neural network relies on Pytorch. The Hungarian algorithm is implemented in the munkres package. In addition, standard image processing and scientific computing libraries are used. 
 
 Installation time is less than 5 minutes. 
 
-### Installation Steps
+### Download weight files for neural network
 
-1. Download the parameters for the neural network:
-    2.1. Download the parameters for segmenting phase contrast images from: https://drive.google.com/file/d/1tcdl34Aq11mrPVlyu0Qd4rUigw_6948b. Put the file in the folder `/unet`.  
-    2.2. Download the parameters for segmenting bright-field images from: https://drive.google.com/file/d/1vnhkp54McM836yczh4F-YYJwPahbTsY0. Put the file in the folder `/unet`.  
-    2.3. Download the parameters for segmenting fission images form: https://drive.google.com/file/d/15Egg0zXSAFHD34a0urbthStIxlb4Q_G%5f. Put the file in the folder `/unet`.  
+1. Download the parameters for the neural network:<br>
+    2.1. Download the parameters for segmenting phase contrast images from: https://drive.google.com/file/d/1tcdl34Aq11mrPVlyu0Qd4rUigw_6948b. Put the file in the folder `yeaz/unet`.  <br>
+    2.2. Download the parameters for segmenting bright-field images from: https://drive.google.com/file/d/1vnhkp54McM836yczh4F-YYJwPahbTsY0. Put the file in the folder `yeaz/unet`.  <br>
+    2.3. Download the parameters for segmenting fission images form: https://drive.google.com/file/d/1h_Wz2d3UY0jkGtMrhl32iEqbOQVXsmKS. Put the file in the folder `yeaz/unet`.  
 
 ### Install from PyPi
 
