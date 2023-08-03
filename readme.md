@@ -23,6 +23,7 @@ Want to try out the neural network without installing any software? Check out ou
 
 
 ## Installation
+You can either use pip to install YeaZ or install from the source.
 
 ### System requirements
 
@@ -34,20 +35,19 @@ Package dependencies: The convolutional neural network relies on Pytorch. The Hu
 
 Installation time is less than 5 minutes. 
 
-### Download weight files for neural network
-
-1. Download the parameters for the neural network:<br>
-    1.1. Download the parameters for segmenting phase contrast images from: https://drive.google.com/file/d/1tcdl34Aq11mrPVlyu0Qd4rUigw_6948b. Put the file in the folder `yeaz/unet`.  <br>
-    1.2. Download the parameters for segmenting bright-field images from: https://drive.google.com/file/d/1vnhkp54McM836yczh4F-YYJwPahbTsY0. Put the file in the folder `yeaz/unet`.  <br>
-    1.3. Download the parameters for segmenting fission images form: https://drive.google.com/file/d/1h_Wz2d3UY0jkGtMrhl32iEqbOQVXsmKS. Put the file in the folder `yeaz/unet`.  
 
 ### Install from PyPi
 
 1. If you don't have conda or miniconda installed, download it from https://docs.conda.io/en/latest/miniconda.html.
 2. In the command line, create a virtual environment with python 3.9 with the command `conda create -n YeaZ python=3.9`. 
-3. Install pytorch and cuda using `conda install pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia`
+3. Install PyTorch and cuda using `conda install pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia`
     3.1. for more information visit https://pytorch.org/get-started/locally/
 4. Install YeaZ with the command `pip install yeaz`.
+5. Download weight files for neural network and put them in the folder with yeaz installation.
+    5.1. Download the parameters for segmenting phase contrast images from: https://drive.google.com/file/d/1tcdl34Aq11mrPVlyu0Qd4rUigw_6948b.
+   5.2. Download the parameters for segmenting bright-field images from: https://drive.google.com/file/d/1vnhkp54McM836yczh4F-YYJwPahbTsY0
+   5.3. Download the parameters for segmenting fission images form: https://drive.google.com/file/d/1h_Wz2d3UY0jkGtMrhl32iEqbOQVXsmKS.
+   
 
 ### Install from source
 
@@ -59,11 +59,17 @@ Installation time is less than 5 minutes.
 6. Install with the command `pip install -e .`.
 7. Install pytorch and cuda using `conda install pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia`
     7.1. for more information visit https://pytorch.org/get-started/locally/
+8. Download weight files for neural network and put them in the folder with yeaz installation.
+    8.1. Download the parameters for segmenting phase contrast images from: https://drive.google.com/file/d/1tcdl34Aq11mrPVlyu0Qd4rUigw_6948b.
+    8.2. Download the parameters for segmenting bright-field images from: https://drive.google.com/file/d/1vnhkp54McM836yczh4F-YYJwPahbTsY0
+    8.3. Download the parameters for segmenting fission images form: https://drive.google.com/file/d/1h_Wz2d3UY0jkGtMrhl32iEqbOQVXsmKS.
+
 
 ## Runnig the GUI
 
-1. Open a terminal and activate the environment using `conda activate YeaZ`. 
-2. Run the program with the command `yeaz`.
+1. Open a terminal and activate the environment using `conda activate YeaZ`.
+2. Navigate to the directory where you installed YeaZ using `cd path/to/yeaz` (the easiest way is to search for yeaz folder in your files)
+3. Run the program with the command `yeaz`.
 
 ## Troubleshooting / FAQ 
 
