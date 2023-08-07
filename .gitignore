@@ -1,7 +1,5 @@
 # Custom ignores
 *pycache*
-unet_weights*
-weights*
 
 yeaz/_version.py
 yeaz/test.py
