@@ -41,11 +41,15 @@ Installation time is less than 5 minutes.
 1. If you don't have conda or miniconda installed, download it from https://docs.conda.io/en/latest/miniconda.html.
 2. In the command line, create a virtual environment with python 3.9 with the command `conda create -n YeaZ python=3.9`. 
 3. Install PyTorch and cuda using `conda install pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia`
+    
     3.1. for more information visit https://pytorch.org/get-started/locally/
 4. Install YeaZ with the command `pip install yeaz`.
-5. Download weight files for neural network and put them in the folder with yeaz installation.
+5. Download weight files for neural network and put them in the yeaz/unet/weights folder which locates in yeaz installation directory.
+   
     5.1. Download the parameters for segmenting phase contrast images from: https://drive.google.com/file/d/1tcdl34Aq11mrPVlyu0Qd4rUigw_6948b.
+   
    5.2. Download the parameters for segmenting bright-field images from: https://drive.google.com/file/d/1vnhkp54McM836yczh4F-YYJwPahbTsY0
+   
    5.3. Download the parameters for segmenting fission images form: https://drive.google.com/file/d/1h_Wz2d3UY0jkGtMrhl32iEqbOQVXsmKS.
    
 
@@ -58,10 +62,14 @@ Installation time is less than 5 minutes.
 5. Activate the environment using `conda activate YeaZ`. 
 6. Install with the command `pip install -e .`.
 7. Install pytorch and cuda using `conda install pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia`
+    
     7.1. for more information visit https://pytorch.org/get-started/locally/
-8. Download weight files for neural network and put them in the folder with yeaz installation.
+8. Download weight files for neural network and put them in the yeaz/unet/weights folder which locates in yeaz installation directory.
+
     8.1. Download the parameters for segmenting phase contrast images from: https://drive.google.com/file/d/1tcdl34Aq11mrPVlyu0Qd4rUigw_6948b.
+    
     8.2. Download the parameters for segmenting bright-field images from: https://drive.google.com/file/d/1vnhkp54McM836yczh4F-YYJwPahbTsY0
+    
     8.3. Download the parameters for segmenting fission images form: https://drive.google.com/file/d/1h_Wz2d3UY0jkGtMrhl32iEqbOQVXsmKS.
 
 
