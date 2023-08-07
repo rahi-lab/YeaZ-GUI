@@ -10,13 +10,10 @@ from PyQt6.QtGui import QKeySequence
 import numpy as np
 import os
 import sys
-#in case the app is frozen, the original path cannot find the icons.
-if getattr(sys, 'frozen', False):
-    path_icons = os.path.join(sys._MEIPASS, "icons/")
-    
-else:
-    path_icons = './icons/'
 
+import importlib.resources as resources
+# Access icon file
+path_icons = resources.files('yeaz.icons')
 
 def Init(parent):
     """
@@ -74,7 +71,7 @@ def Init(parent):
     # ZOOM
     parent.button_zoom = QPushButton()
     parent.button_zoom.clicked.connect(parent.ZoomTlbar)
-    parent.button_zoom.setIcon(QtGui.QIcon(path_icons+'ZoomIcon.png'))
+    parent.button_zoom.setIcon(QtGui.QIcon(str(path_icons) + '/ZoomIcon.png'))
     parent.button_zoom.setMaximumWidth(30)
     parent.button_zoom.setMaximumHeight(30)
     parent.button_zoom.setStyleSheet("QPushButton:hover { background-color: blue }" )
@@ -87,7 +84,7 @@ def Init(parent):
     # HOME
     parent.button_home = QPushButton()
     parent.button_home.clicked.connect(parent.HomeTlbar)
-    parent.button_home.setIcon(QtGui.QIcon(path_icons+'HomeIcon.png'))
+    parent.button_home.setIcon(QtGui.QIcon(str(path_icons) + '/HomeIcon.png'))
     parent.button_home.setMaximumWidth(30)
     parent.button_home.setMaximumHeight(30)
     parent.button_home.setStyleSheet("QPushButton:hover { background-color: blue }" )
@@ -99,7 +96,7 @@ def Init(parent):
     # PREVIOUS SCALE (ZOOM SCALE)
     parent.button_back = QPushButton()
     parent.button_back.clicked.connect(parent.BackTlbar)
-    parent.button_back.setIcon(QtGui.QIcon(path_icons+'LeftArrowIcon.png'))
+    parent.button_back.setIcon(QtGui.QIcon(str(path_icons) +'/LeftArrowIcon.png'))
     parent.button_back.setMaximumWidth(30)
     parent.button_back.setMaximumHeight(30)
     parent.button_back.setStyleSheet("QPushButton:hover { background-color: blue }" )
@@ -109,7 +106,7 @@ def Init(parent):
     # NEXT SCALE (ZOOM SCALE)
     parent.button_forward = QPushButton()
     parent.button_forward.clicked.connect(parent.ForwardTlbar)
-    parent.button_forward.setIcon(QtGui.QIcon(path_icons+'RightArrowIcon.png'))
+    parent.button_forward.setIcon(QtGui.QIcon(str(path_icons) + '/RightArrowIcon.png'))
     parent.button_forward.setMaximumWidth(30)
     parent.button_forward.setMaximumHeight(30)
     parent.button_forward.setStyleSheet("QPushButton:hover { background-color: blue }")
@@ -119,7 +116,7 @@ def Init(parent):
     # PAN 
     parent.button_pan = QPushButton()
     parent.button_pan.clicked.connect(parent.PanTlbar)
-    parent.button_pan.setIcon(QtGui.QIcon(path_icons+'MoveArrowsIcon.png'))
+    parent.button_pan.setIcon(QtGui.QIcon(str(path_icons) + '/MoveArrowsIcon.png'))
     parent.button_pan.setMaximumWidth(30)
     parent.button_pan.setMaximumHeight(30)
     parent.button_pan.setStyleSheet("QPushButton:hover { background-color: blue }")

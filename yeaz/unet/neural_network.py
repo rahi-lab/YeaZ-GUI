@@ -14,11 +14,9 @@ from skimage import io
 import skimage.transform as trans
 import torch
 
-if getattr(sys, 'frozen', False):
-    path_weights  = os.path.join(sys._MEIPASS, 'unet/')
-    
-else:
-    path_weights = './unet/'
+import importlib.resources as resources
+# Access weight file
+path_weights = resources.files('yeaz.unet')
 
 def create_directory_if_not_exists(path):
     """
@@ -69,11 +67,11 @@ def prediction(im, mic_type, pretrained_weights=None, model_type='pytorch', devi
     
     if pretrained_weights is None:
         if mic_type == 'pc':
-            pretrained_weights = path_weights + 'weights_budding_PhC_multilab_0_1'
+            pretrained_weights = str(path_weights) + '/' + 'weights_budding_PhC_multilab_0_1'
         elif mic_type == 'bf':
-            pretrained_weights = path_weights + 'weights_budding_BF_multilab_0_1'
+            pretrained_weights = str(path_weights) + '/' + 'weights_budding_BF_multilab_0_1'
         elif mic_type == 'fission':
-            pretrained_weights = path_weights + 'weights_fission_multilab_0_2'
+            pretrained_weights = str(path_weights) + '/' + 'weights_fission_multilab_0_2'
         if model_type == 'tensorflow':
             pretrained_weights = pretrained_weights + '.hdf5'
     
