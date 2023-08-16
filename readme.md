@@ -39,12 +39,12 @@ Installation time is less than 5 minutes.
 ### Install from PyPi
 
 1. If you don't have conda or miniconda installed, download it from https://docs.conda.io/en/latest/miniconda.html.
-2. In the command line, create a virtual environment with python 3.9 with the command `conda create -n YeaZ python=3.9`. 
+2. In the command line, create a virtual environment with python 3.9 with the command `conda create -n YeaZ python=3.9`. Then Activate the environment with the command `conda activate YeaZ`.
 3. Install PyTorch and cuda using `conda install pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia`
     
     3.1. for more information visit https://pytorch.org/get-started/locally/
 4. Install YeaZ with the command `pip install yeaz`.
-5. Download weight files for neural network and put them in the yeaz/unet/weights folder which locates in yeaz installation directory.
+5. Download weight files for neural network and put them in the yeaz/unet/weights folder which locates in yeaz installation directory. To find the installation directory, type `pip show -f yeaz | findstr /C:"Location:"` in command line for windows systems or `pip show -f yeaz | grep -E '^Location:'` for linux/macOS.
    
     5.1. Download the parameters for segmenting phase contrast images from: https://drive.google.com/file/d/1tcdl34Aq11mrPVlyu0Qd4rUigw_6948b.
    
@@ -76,8 +76,9 @@ Installation time is less than 5 minutes.
 ## Runnig the GUI
 
 1. Open a terminal and activate the environment using `conda activate YeaZ`.
-2. Navigate to the directory where you installed YeaZ using `cd path/to/yeaz` (the easiest way is to search for yeaz folder in your files)
-3. Run the program with the command `yeaz`.
+3. Navigate to the directory where you installed YeaZ using `cd <installation_directory>/yeaz`. To find the installation directory, type `pip show -f yeaz | findstr /C:"Location:"` in command line for windows systems or `pip show -f yeaz | grep -E '^Location:'` for linux/macOS.
+4. Run the program with the command `yeaz`.
+5. The first time you run yeaz, it asks you if you want to install PyQt6. Answer `y` and wait until it finishes and run the application.
 
 ## Troubleshooting / FAQ 
 
