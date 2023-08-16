@@ -42,7 +42,7 @@ Installation time is less than 5 minutes.
 2. In the command line, create a virtual environment with python 3.9 with the command `conda create -n YeaZ python=3.9`. Then Activate the environment with the command `conda activate YeaZ`.
 3. Install PyTorch and cuda using `conda install pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia`
     
-    3.1. for more information visit https://pytorch.org/get-started/locally/
+    3.1. If you have macOS m1/m2 or a machine without GPU's, you need to install PyTorch for cpu. for more information visit https://pytorch.org/get-started/locally/
 4. Install YeaZ with the command `pip install yeaz`.
 5. Download weight files for neural network and put them in the yeaz/unet/weights folder which locates in yeaz installation directory. To find the installation directory, type `pip show -f yeaz | findstr /C:"Location:"` in command line for windows systems or `pip show -f yeaz | grep -E '^Location:'` for linux/macOS.
    
@@ -63,7 +63,8 @@ Installation time is less than 5 minutes.
 6. Install with the command `pip install -e .`.
 7. Install pytorch and cuda using `conda install pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia`
     
-    7.1. for more information visit https://pytorch.org/get-started/locally/
+    7.1. If you have macOS m1/m2 or a machine without GPU's, you need to install PyTorch for cpu. for more information visit https://pytorch.org/get-started/locally/
+
 8. Download weight files for neural network and put them in the yeaz/unet/weights folder which locates in yeaz installation directory.
 
     8.1. Download the parameters for segmenting phase contrast images from: https://drive.google.com/file/d/1tcdl34Aq11mrPVlyu0Qd4rUigw_6948b.
