@@ -38,6 +38,8 @@ Installation time is less than 5 minutes.
 
 ### Install from PyPi
 
+This is the easiest way to install YeaZ and take around 10 minutes to install on a normal computer with internet connection.
+
 1. If you don't have conda or miniconda installed, download it from https://docs.conda.io/en/latest/miniconda.html.
 2. In the command line, create a virtual environment with python 3.9 with the command `conda create -n YeaZ python=3.9`. Then Activate the environment with the command `conda activate YeaZ`.
 3. Install PyTorch and cuda using `conda install pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia`
@@ -55,6 +57,8 @@ Installation time is less than 5 minutes.
 
 ### Install from source
 
+This mehtod of installation is recommended for those who like to edit code. depending on computer, it may take up to 20 minutes to install.
+
 1. If you don't have conda or miniconda installed, download it from https://docs.conda.io/en/latest/miniconda.html.
 2. Clone this repository (`git clone https://github.com/rahi-lab/YeaZ-GUI`).
 3. In the command line, navigate to the folder where you cloned YeaZ-GUI (command `cd YeaZ-GUI`).
@@ -65,7 +69,7 @@ Installation time is less than 5 minutes.
     
     7.1. If you have macOS m1/m2 or a machine without GPU's, you need to install PyTorch for cpu. for more information visit https://pytorch.org/get-started/locally/
 
-8. Download weight files for neural network and put them in the yeaz/unet/weights folder which locates in yeaz installation directory.
+8. Download weight files for neural network and put them in the yeaz/unet/weights folder.
 
     8.1. Download the parameters for segmenting phase contrast images from: https://drive.google.com/file/d/1tcdl34Aq11mrPVlyu0Qd4rUigw_6948b.
     
@@ -74,10 +78,10 @@ Installation time is less than 5 minutes.
     8.3. Download the parameters for segmenting fission images form: https://drive.google.com/file/d/1h_Wz2d3UY0jkGtMrhl32iEqbOQVXsmKS.
 
 
-## Runnig the GUI
+## Runnig the 
 
 1. Open a terminal and activate the environment using `conda activate YeaZ`.
-3. Navigate to the directory where you installed YeaZ using `cd <installation_directory>/yeaz`. To find the installation directory, type `pip show -f yeaz | findstr /C:"Location:"` in command line for windows systems or `pip show -f yeaz | grep -E '^Location:'` for linux/macOS.
+3. Navigate to the directory where you installed YeaZ using `cd <installation_directory>/yeaz`. If you have installed using PyPi, to find the installation directory, type `pip show -f yeaz | findstr /C:"Location:"` in command line for windows systems or `pip show -f yeaz | grep -E '^Location:'` for linux/macOS.
 4. Run the program with the command `yeaz`.
 5. The first time you run yeaz, it asks you if you want to install PyQt6. Answer `y` and wait until it finishes and run the application.
 
