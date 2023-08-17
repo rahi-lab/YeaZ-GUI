@@ -7,11 +7,11 @@ openpyxl==3.1.2
 # Tensorflow==2.11.0
 opencv-python-headless>=4.7.0.72
 pandas>=0.25.3
-munkres
+munkres==1.1.4
 sklearn==0.0
 imageio>=2.6.1
 Pillow>=6.2.1
 torch>=2.0.0
-tqdm
-PyQt6
-imagecodecs
+tqdm==4.66.1
+PyQt6==6.5.2
+imagecodecs==2023.7.10
