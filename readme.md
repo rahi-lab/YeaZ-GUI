@@ -78,12 +78,12 @@ This mehtod of installation is recommended for those who like to edit code. depe
     8.3. Download the parameters for segmenting fission images form: https://drive.google.com/file/d/1h_Wz2d3UY0jkGtMrhl32iEqbOQVXsmKS.
 
 
-## Runnig the 
+## Runnig the GUI
 
 1. Open a terminal and activate the environment using `conda activate YeaZ`.
-3. Navigate to the directory where you installed YeaZ using `cd <installation_directory>/yeaz`. If you have installed using PyPi, to find the installation directory, type `pip show -f yeaz | findstr /C:"Location:"` in command line for windows systems or `pip show -f yeaz | grep -E '^Location:'` for linux/macOS.
-4. Run the program with the command `yeaz`.
-5. The first time you run yeaz, it asks you if you want to install PyQt6. Answer `y` and wait until it finishes and run the application.
+2. (you need to do this step only if you installed older versions) Navigate to the directory where you installed YeaZ using `cd <installation_directory>/yeaz`. If you have installed using PyPi, to find the installation directory, type `pip show -f yeaz | findstr /C:"Location:"` in command line for windows systems or `pip show -f yeaz | grep -E '^Location:'` for linux/macOS.
+3. Run the program with the command `yeaz`.
+4. The first time you run yeaz, it asks you if you want to install PyQt6. Answer `y` and wait until it finishes and run the application. it will take few minutes.
 
 ## Troubleshooting / FAQ 
 
@@ -127,13 +127,15 @@ Upon starting the program, it prompts you to select your images and your (new) m
 
 The program will save segmentation masks in `.h5` files. You can either create a new file by specifying its name in the text box or if you already have an h5 file for a specific set of images, you can select it using `Open mask file`. Note that when using an existing `.h5` file, you also have to use the same images as you did at its creation.
 
+Depending on the size of your images, it might take up to one minute to load images.
+
 ### The Interface
 
 After clicking OK in the launcher, the main program will open. It consists of an image display of three images, the current image in the middle, the previous one to the left and the next image to the right. This display was chosen to easily be able to check whether the cell numbers and the segmentations are consistent throughout time.
 
-On the very bottom of the program, there is a status bar which displays the state of the program. In addition, when hovering over a button, it gives detailed information about what the button does and how to use it.
+On the very bottom of the program, there is a status bar that displays the state of the program. In addition, when hovering over a button, it gives detailed information about what the button does and how to use it.
 
-On the top left of the three images, there are multiple buttons that allow the user to use pan and zoom to navigate through the image. The home button to the very left allows to reset zoom and pan, while the arrows allow to go to the next and previous pan/zoom positions. 
+On the top left of the three images, there are multiple buttons that allow the user to use the pan and zoom to navigate through the image. The home button to the very left allows you to reset zoom and pan, while the arrows allow you to go to the next and previous pan/zoom positions. 
 
 On the bottom of the images, there are three rows of buttons. The first row of buttons allows the user to select the field of view, color channel, and time frame. Note that support for multiple fields of view and color channels is currently only available when opening .nd2 files. The second row contains tools to make edits to the mask, in order to correct the mistakes of the CNN. Moreover, it allows to show or hide the segmentation mask and the cell numbers. On the bottom right, the buttons allow to launch the CNN, to recalculate the tracking, and to extract the fluorescence or segmentation masks.
 
@@ -142,6 +144,10 @@ On the bottom of the images, there are three rows of buttons. The first row of b
 After opening a new image file, the next step is typically to launch the convolutional neural network with the `Launch CNN` button. Note that if you are using a file with multiple color channels, this has to be done with the brightfield channel visible. This will open a dialog box, in which you can specify the time frames that you want to launch the CNN on as well as the field of view you want to use and type of your images. 
 
 Moreover, it lets you specify two parameters: The **threshold value** specifies the predicted value above which a pixel is considered to belong to a cell. This value is set at 0.5 per default and doesn't have to be changed in our experience. Increasing this value will decrease the sizes of the cells and can come in handy if the cells tend to exceed their borders. The **segmentation parameter** tells the program how far away two cell centers have to be at least, in order for two cells to be considered as separate entities. It has to be adjusted depending on how large the image resolution is: For small resolutions, a value of 2 seems to work well, whereas 5 is good for higher resolutions.
+
+For running CNN, you can specify if the algorithm run on GPU or CPU. While running in GPU is faster, for larger images you might get memory error on GPU. If you get this type of errors, try running on CPU.
+
+Running CNN can take up to hours depending on the number of frames and size of images. For the example data it shouldn't take more than few minutes on a normal computer.
 
 ### Making edits to the mask
 
