@@ -120,8 +120,16 @@ class PlotCanvas(FigureCanvas):
         self.ann_list = []
         self.ann_list_prev = []
         self.ann_list_next = []
+    
+        self.cid = self.mpl_connect('motion_notify_event', self.on_motion)
 
-        
+
+    def on_motion(self, event):
+        if event.inaxes == self.ax:
+            x, y = event.xdata, event.ydata
+            # Update the label texts with the current mouse position
+            self.parent.WriteStatusBar(f'X: {x}, Y: {y}')
+
     def ExchangeCellValue(self, val1, val2):
         """Swaps the values of the cell between two clusters each representing
         one cell. This method is called after the user has entered 
