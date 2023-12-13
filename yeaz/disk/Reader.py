@@ -278,7 +278,7 @@ class Reader:
             return False
 
 
-    def LoadOneImage(self,currentT, currentfov):
+    def LoadOneImage(self,currentT, currentfov, current_channel=None):
         """This method returns from the nd2 file, the picture requested by the 
         main program as an array. It fixes the fov index and iterates over the 
         time index.
@@ -293,7 +293,7 @@ class Reader:
                 except ValueError:
                     pass
                 try:
-                    images.default_coords['c'] = self.default_channel
+                    images.default_coords['c'] = current_channel if current_channel is not None else self.default_channel
                 except ValueError:
                     pass
                 images.iter_axes = 't'
@@ -334,7 +334,10 @@ class Reader:
                 # number of channels should be smaller than x and y
                 if im.shape[2] < im.shape[0] and im.shape[2] < im.shape[1]:  
                     im = np.moveaxis(im, -1, 0) # move last axis to first
-                im = im[self.default_channel]
+                if current_channel == None:
+                    im = im[self.default_channel]
+                else:
+                    im = im[current_channel]
                 outputarray = np.array(im, dtype = np.uint16)
             else:
                 outputarray = np.zeros([self.sizey, self.sizex],dtype = np.uint16)
@@ -359,10 +362,10 @@ class Reader:
                 return np.array(im)
         
         elif self.issingle:
-            return self.LoadOneImage(currentT, currentFOV)
+            return self.LoadOneImage(currentT, currentFOV, current_channel=ch)
                 
         elif self.isfolder:
-            return self.LoadOneImage(currentT, currentFOV)
+            return self.LoadOneImage(currentT, currentFOV,current_channel=ch)
 
 
     def CellCorrespondence(self, currentT, currentFOV):
