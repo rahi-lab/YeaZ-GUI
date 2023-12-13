@@ -90,7 +90,7 @@ def LaunchInstanceSegmentation(reader, image_type, fov_indices=[0], time_value1=
             thresh = ThresholdPred(thr_val, pred)
             seg = segment(thresh, pred, min_seed_dist)
             reader.SaveMask(t, fov_ind, seg)
-            print('--------- Finished segmenting.')
+            # print('--------- Finished segmenting.')
             
             # apply tracker if wanted and if not at first time
             temp_mask = reader.CellCorrespondence(t, fov_ind)
