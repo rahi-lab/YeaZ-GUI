@@ -98,11 +98,11 @@ def prediction(im, mic_type, pretrained_weights=None, model_type='pytorch', devi
             device = torch.device('cuda')
             model = model.to(device)
             padded = torch.from_numpy(padded).to(device)
-            print('device: ', device)
+            # print('device: ', device)
         else:
             device = torch.device('cpu')
             padded = torch.from_numpy(padded)
-            print('device: ', device)
+            # print('device: ', device)
         model.eval()
         with torch.no_grad():
             # Convert input tensor to PyTorch tensor
