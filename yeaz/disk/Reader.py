@@ -64,12 +64,7 @@ class Reader:
                 self.channel_names = images.metadata['channels']
                 
         elif self.issingle:
-#            with pytiff.Tiff(self.nd2path) as handle:
-#                self.sizey, self.sizex = handle.shape #SJR: changed by me
-#                self.sizec = 1
-#                self.sizet = handle.number_of_pages
-#                self.Npos = 1
-#                self.channel_names = ['Channel1']
+
             im = skimage.io.imread(self.nd2path)
 
             if im.ndim==3:
