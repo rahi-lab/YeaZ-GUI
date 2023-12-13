@@ -64,6 +64,12 @@ class CustomDialog(QDialog):
         self.device_selection.setCurrentIndex(0)
         flo.addRow("Select device for running neural network: ", self.device_selection)
         
+        self.tracker = QComboBox()
+        self.tracker.addItem("old-fashion but fast, Hungarian algorithm","Hungarian")
+        self.tracker.addItem ("new-fashion but slower if you have a lot of cells, Graph Convolutional Network","GCN",)
+        self.tracker.setCurrentIndex(0)
+        flo.addRow("Select the algorithm for tracking cells: ", self.tracker)
+        
         QBtn = QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel
         
         self.buttonBox = QDialogButtonBox(QBtn)

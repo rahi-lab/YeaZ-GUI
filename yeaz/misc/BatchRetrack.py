@@ -20,7 +20,13 @@ class CustomDialog(QDialog):
         self.labeltime = QLabel("Enter a frame number between {} to {}".format(app.Tindex+1, app.reader.sizet-1))
         flo = QFormLayout()
         flo.addWidget(self.labeltime)
-        flo.addRow('retracking frames from {} (next frame) to '.format(app.Tindex+1), self.entry1)       
+        flo.addRow('retracking frames from {} (next frame) to '.format(app.Tindex+1), self.entry1)  
+        
+        self.tracker = QComboBox()
+        self.tracker.addItem("old-fashion but fast, Hungarian algorithm","Hungarian")
+        self.tracker.addItem ("new-fashion but slower if you have a lot of cells, Graph Convolutional Network","GCN",)
+        self.tracker.setCurrentIndex(0)
+        flo.addRow("Select the algorithm for tracking cells: ", self.tracker)     
         
         QBtn = QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel
         
