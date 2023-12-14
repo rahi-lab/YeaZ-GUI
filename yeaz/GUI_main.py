@@ -83,37 +83,37 @@ from PyQt6.QtGui import QPalette, QColor
 #Import all the other python files
 #this file handles the interaction with the disk, so loading/saving images
 #and masks and it also runs the neural network.
-from .disk import Reader as nd
+from disk import Reader as nd
 
 #this file contains a dialog window that takes two integers as entry to swap
 #two cell values
-from .misc import ExchangeCellValues as ecv
+from misc import ExchangeCellValues as ecv
 
 #this file contains a window that opens to change the value of one cell. It 
 #is opened as soon as the user presses with the left click on a specific cell.
-from .misc import ChangeOneCellValue as cocv
+from misc import ChangeOneCellValue as cocv
 
 #this file contains a dialog window where a time range and the field of views
 #can be selected to then launch a prediction of the neural network on
 #a specific range of pictures.
-from .unet import LaunchBatchPrediction as lbp
+from unet import LaunchBatchPrediction as lbp
 
 #this file contains a dialog window where a time range can be selected to retrack
-from .misc import BatchRetrack as br
+from misc import BatchRetrack as br
 
 #this file initializes all the buttons present in the gui, sets the shortcuts
 #to these buttons and also connect the buttons to the function that are 
 #triggered when the buttons are pressed.
-from .init import InitButtons
+from init import InitButtons
 
 #this file contains the layout of the main window so it justs puts the buttons
 #and the pictures at the desired position in the main window.
-from .init import InitLayout
+from init import InitLayout
 
 # PlotCanvas for fast plotting
-from .misc.PlotCanvas import PlotCanvas
+from misc.PlotCanvas import PlotCanvas
 
-from .misc import Extract as extr
+from misc import Extract as extr
 
 from .disk.image_loader import load_image
 from .unet.segment import segment

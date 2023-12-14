@@ -11,10 +11,14 @@ log = logging.getLogger(__name__)
 
 
 def start_tracking(reader, fov_ind, time_value1, time_value2):
-    for t in tqdm.tqdm(range(time_value1, time_value2+1), desc='Tracking frames with Hungarian', leave=True):   
-        # apply tracker if wanted and if not at first time
-        temp_mask = CellCorrespondence(reader, t, fov_ind)
-        reader.SaveMask(t, fov_ind, temp_mask)
+    for t in tqdm.tqdm(range(time_value1, time_value2+1), desc='Tracking frames with Hungarian', leave=True):  
+        try:
+            # apply tracker if wanted and if not at first time
+            temp_mask = CellCorrespondence(reader, t, fov_ind)
+            reader.SaveMask(t, fov_ind, temp_mask)
+        except Exception as e:
+            print(e)
+            break
 
 def CellCorrespondence(reader, currentT, currentFOV):
     """Performs tracking, handles loading of the images. If the image to 

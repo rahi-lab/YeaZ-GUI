@@ -38,13 +38,18 @@ def start_tracking(reader, fov_ind, time_value1, time_value2):
     ).initialize()
     GCNTracker.load_params(model_path / 'params.pt')
     GCNTracker.module_.train(False)
-    for t in tqdm.tqdm(range(time_value1, time_value2+1), desc='Tracking frames', leave=True):   
+    for t in tqdm.tqdm(range(time_value1, time_value2+1), desc='Tracking frames with GCN', leave=True):   
         # apply tracker if wanted and if not at first time
-        temp_mask = CellCorrespondenceGCN(reader, feat, t, fov_ind)
-        feat.replace_frame_in_segmentation(t, temp_mask)
-        reader.SaveMask(t, fov_ind, temp_mask)
+        try:
+            temp_mask = CellCorrespondenceGCN(reader, GCNTracker, feat, t, fov_ind)
+            feat.replace_frame_in_segmentation(t, temp_mask)
+            reader.SaveMask(t, fov_ind, temp_mask)
+        except e:
+            print(e)
+            break
     
-def CellCorrespondenceGCN(reader, feat, currentT, currentFOV):
+    
+def CellCorrespondenceGCN(reader,GCNTracker, feat, currentT, currentFOV):
     
     filemasks = h5py.File(reader.hdfpath, 'r+')
     
@@ -106,7 +111,7 @@ def CellCorrespondenceGCN(reader, feat, currentT, currentFOV):
             
             # prediction of trakcing
 
-            assignments_dict = reader.GCNTracker.predict_assignment(gat, assignment_method='modified_hungarian', return_dict=True)
+            assignments_dict = GCNTracker.predict_assignment(gat, assignment_method='modified_hungarian', return_dict=True)
             
             # make the output mask using this assignment
             out = nextmask.copy()
