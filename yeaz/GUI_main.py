@@ -120,6 +120,9 @@ from .unet.segment import segment
 from .unet import neural_network as nn
 from .misc.ProgressBar import ProgressBar
 
+from .unet import gcn as gcn
+from .unet import hungarian as hu
+
 import warnings
 # warnings.filterwarnings('ignore')
 
@@ -735,10 +738,15 @@ class App(QMainWindow):
                 device = 'cuda'
             else:
                 device = 'cpu'
+            tracker = None
+            if(dlg.tracker.currentData() == 'GCN'):
+                tracker = 'GCN'
+            else:
+                tracker = 'Hungarian'
             
             for item in tqdm.tqdm(dlg.listfov.selectedItems(), desc='FOV', position=0, leave=True):
                 #iterates over the time indices in the range
-                for t in tqdm.tqdm(range(time_value1, time_value2+1), desc='Time', position=1, leave=False):                    
+                for t in tqdm.tqdm(range(time_value1, time_value2+1), desc='Segmenting', position=1, leave=True):                    
                     #calls the neural network for time t and selected
                     #fov
                     if dlg.entry_threshold.text() !=  '':
@@ -752,11 +760,11 @@ class App(QMainWindow):
                     
                     self.PredThreshSeg(t, dlg.listfov.row(item), thr_val, seg_val,
                                        mic_type, device=device)
-                    
-                    # apply tracker if wanted and if not at first time
-                    temp_mask = self.reader.CellCorrespondence(t, dlg.listfov.row(item))
-                    self.reader.SaveMask(t,dlg.listfov.row(item), temp_mask)
-            
+                print('--------- Finished segmenting.')
+                if tracker == "GCN":
+                    gcn.start_tracking(self.reader, dlg.listfov.row(item), time_value1, time_value2)
+                else: # Hungarian
+                    hu.start_tracking(self.reader, dlg.listfov.row(item), time_value1, time_value2)
             self.ReloadThreeMasks()
         reset()
 
@@ -1051,25 +1059,13 @@ class App(QMainWindow):
                 msg_box.exec()
                 reset()
                 return
-            # if everything was okay, start a progress bar to show progress:
-            progress = ProgressBar(self)
-            progress_value = 0
-            ratio = 100/(time_value1 - self.Tindex)
-            for t in range(self.Tindex+1, time_value1+1):
-                log.debug('start correspondance for frame {}'.format(t))                    
-                #calls the cell correspondance for current time, t, and t+1
-                temp_mask = self.reader.CellCorrespondence(t, self.FOVindex)
-                progress_value += ratio
-                progress.update_progress(progress_value)
-                # update the progress status label
-                progress.status.setText("Processing frame {}... ".format(t+1))
-                self.reader.SaveMask(t, self.FOVindex, temp_mask)
-                QApplication.processEvents()  # Process events to allow GUI to update               
-                log.debug('finish correspondance and savemask for frame {}'.format(t))                    
-            # close the progress bar dialog
-            progress.close()
-            self.ReloadThreeMasks()
-
+            tracker = dlg.tracker.currentData()
+                        
+            if tracker == 'GCN':
+                gcn.start_tracking(self.reader, self.FOVindex, self.Tindex+1, time_value1)
+            else:
+                hu.start_tracking(self.reader, self.FOVindex, self.Tindex+1, time_value1)
+            self.ReloadThreeMasks()        
             log.info('reload three frames')
         reset()
 
