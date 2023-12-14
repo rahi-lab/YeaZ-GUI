@@ -5,22 +5,9 @@ This is the user manual for the graphical interface for segmenting yeast images 
 Want to try out the neural network without installing any software? Check out our online segmentation tool at https://lpbs-nn.epfl.ch/.
 
 ## Latest updates
-26.07.2023:
-1. Updata the installation structure
-2. Packaging and upload on Pypi.
-
-18.04.2023:
-
-1. Update all dependencies to the latest versions
-2. Update PyQt to PyQt6, enabling the application to run on machines with m1 or m2 processors
-3. Add the ability to retrack multiple frames together
-4. Replace the old TensorFlow model with a PyTorch model
-5. Optimize the application's speed when showing cell numbers
-6. Improve the overall speed and performance of the application
-7. Add the ability to segment fission images
-8. Fix minor bugs and improve overall stability
-9. enable the option to run on GPU (windows and linux only)
-
+14.12.2023:
+1. Add GCN Tracker
+2. Update installation procedure
 
 ## Installation
 You can either use pip to install YeaZ or install from the source.
@@ -62,20 +49,15 @@ This mehtod of installation is recommended for those who like to edit code. depe
 1. If you don't have conda or miniconda installed, download it from https://docs.conda.io/en/latest/miniconda.html.
 2. Clone this repository (`git clone https://github.com/rahi-lab/YeaZ-GUI`).
 3. In the command line, navigate to the folder where you cloned YeaZ-GUI (command `cd YeaZ-GUI`).
-4. In the command line, create a virtual environment with python 3.9 with the command `conda create -n YeaZ python=3.9`.   
-5. Activate the environment using `conda activate YeaZ`. 
-6. Install with the command `pip install -e .`.
-7. Install pytorch and cuda using `conda install pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia`
-    
-    7.1. If you have macOS m1/m2 or a machine without GPU's, you need to install PyTorch for cpu. for more information visit https://pytorch.org/get-started/locally/
+4. Rnter the command `source install.sh` and follow the instructions. This will create a conda environment named YeaZ and install all the required packages including the YeaZ-toolbox package that stores the primary tools for tracking and analysis.
 
-8. Download weight files for neural network and put them in the yeaz/unet/weights folder.
+5. Download weight files for neural network and put them in the yeaz/unet/weights folder.
 
-    8.1. Download the parameters for segmenting phase contrast images from: https://drive.google.com/file/d/1tcdl34Aq11mrPVlyu0Qd4rUigw_6948b.
+    5.1. Download the parameters for segmenting phase contrast images from: https://drive.google.com/file/d/1tcdl34Aq11mrPVlyu0Qd4rUigw_6948b.
     
-    8.2. Download the parameters for segmenting bright-field images from: https://drive.google.com/file/d/1vnhkp54McM836yczh4F-YYJwPahbTsY0
+    5.2. Download the parameters for segmenting bright-field images from: https://drive.google.com/file/d/1vnhkp54McM836yczh4F-YYJwPahbTsY0
     
-    8.3. Download the parameters for segmenting fission images form: https://drive.google.com/file/d/1h_Wz2d3UY0jkGtMrhl32iEqbOQVXsmKS.
+    5.3. Download the parameters for segmenting fission images form: https://drive.google.com/file/d/1h_Wz2d3UY0jkGtMrhl32iEqbOQVXsmKS.
 
 
 ## Runnig the GUI
