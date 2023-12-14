@@ -21,6 +21,8 @@ from yeaz.disk import Reader as nd
 import argparse
 import skimage
 from yeaz.unet import neural_network as nn
+from yeaz.unet import hungarian as hu
+from yeaz.unet import gcn as gcn
 
 import torch
 
@@ -43,7 +45,7 @@ def ThresholdPred(thvalue, pred):
         thresholdedmask = nn.threshold(pred, thvalue)
     return thresholdedmask
 
-def LaunchInstanceSegmentation(reader, image_type, fov_indices=[0], time_value1=0, time_value2=0, thr_val=None, min_seed_dist=5, path_to_weights=None, device='cpu'):
+def LaunchInstanceSegmentation(reader, image_type, fov_indices=[0], time_value1=0, time_value2=0, thr_val=None, min_seed_dist=5, path_to_weights=None, device='cpu', tracker='Hungarian'):
     if (device == 'cuda') and torch.cuda.is_available():
         f_device = 'cuda'
     else:
@@ -71,7 +73,7 @@ def LaunchInstanceSegmentation(reader, image_type, fov_indices=[0], time_value1=
     for fov_ind in tqdm.tqdm(fov_indices, desc='FOV', position=0):
 
         #iterates over the time indices in the range
-        for t in tqdm.tqdm(range(time_value1, time_value2+1), desc='Time', position=1, leave=False):         
+        for t in tqdm.tqdm(range(time_value1, time_value2+1), desc='Segmenting frames', leave=True):         
             # print('--------- Segmenting field of view:',fov_ind,'Time point:',t)
 
             #calls the neural network for time t and selected fov
@@ -90,12 +92,20 @@ def LaunchInstanceSegmentation(reader, image_type, fov_indices=[0], time_value1=
             thresh = ThresholdPred(thr_val, pred)
             seg = segment(thresh, pred, min_seed_dist)
             reader.SaveMask(t, fov_ind, seg)
-            # print('--------- Finished segmenting.')
-            
-            # apply tracker if wanted and if not at first time
-            temp_mask = reader.CellCorrespondence(t, fov_ind)
-            reader.SaveMask(t, fov_ind, temp_mask)
-
+        print('--------- Finished segmenting.')
+        # from pyinstrument import Profiler
+        # with Profiler(interval=0.1) as profiler:
+        if tracker == 'Hungarian':
+            print('--------- Tracking with Hungarian algorithm.')
+            hu.start_tracking(reader, fov_ind, time_value1, time_value2)
+        elif tracker == "GCN":
+            print('--------- Tracking with GCN.')
+            gcn.start_tracking(reader, fov_ind, time_value1, time_value2)
+        else:
+            print("Error", 'Invalid Tracker')
+            return
+        # profiler.print()
+        
 def main(args):
 
     if '.h5' in args.mask_path:
@@ -106,7 +116,8 @@ def main(args):
     LaunchInstanceSegmentation(reader, args.image_type, args.fov,
                                args.range_of_frames[0],  args.range_of_frames[1], 
                                args.threshold, args.min_seed_dist, 
-                               args.path_to_weights, device=args.device)
+                               args.path_to_weights, device=args.device, 
+                               tracker=args.tracker)
 
 if __name__ == '__main__':
     
@@ -120,5 +131,6 @@ if __name__ == '__main__':
     parser.add_argument('--threshold', default=None, type=float, help="Specify threshold value.")
     parser.add_argument('--min_seed_dist', default=5, type=int, help="Specify minimum distance between seeds.")
     parser.add_argument('--device', default='cpu', type=str, help="Specify device to run on (cpu or cuda).")
+    parser.add_argument('--tracker', default='Hungarian', type=str, help="Specify tracker to use (Hungarian or GCN).")
     args = parser.parse_args()
     main(args)

@@ -1,9 +1,59 @@
 import numpy as np
 import pandas as pd
 from munkres import Munkres
+import tqdm
 from sklearn.preprocessing import scale
 from sklearn.metrics.pairwise import euclidean_distances
+import logging
+import h5py
 
+log = logging.getLogger(__name__)
+
+
+def start_tracking(reader, fov_ind, time_value1, time_value2):
+    for t in tqdm.tqdm(range(time_value1, time_value2+1), desc='Tracking frames with Hungarian', leave=True):   
+        # apply tracker if wanted and if not at first time
+        temp_mask = CellCorrespondence(reader, t, fov_ind)
+        reader.SaveMask(t, fov_ind, temp_mask)
+
+def CellCorrespondence(reader, currentT, currentFOV):
+    """Performs tracking, handles loading of the images. If the image to 
+    track has no precedent, returns unaltered mask. If no mask exists
+    for the current timeframe, returns zero array."""
+    filemasks = h5py.File(reader.hdfpath, 'r+')
+    log.debug('Reader.CellCorrespondence')
+    
+    if reader.TestTimeExist(currentT-1, currentFOV, filemasks):
+        prevmask = np.array(filemasks['/{}/{}'.format(reader.fovlabels[currentFOV], 
+                                                        reader.tlabels[currentT-1])])
+        # A mask exists for both time frames
+        if reader.TestTimeExist(currentT, currentFOV, filemasks):
+            nextmask = np.array(filemasks['/{}/{}'.format(reader.fovlabels[currentFOV],
+                                                            reader.tlabels[currentT])])             
+            newmask = correspondence(prevmask, nextmask)
+            out = newmask
+            log.debug('make new mask')
+        # No mask exists for the current timeframe, return empty array
+        else:
+            null = np.zeros([reader.sizey, reader.sizex])
+            log.warn('No mask exists in FOV {} for the current timeframe {}, return empty array'.format(reader.fovlabels[currentFOV],reader.tlabels[currentT-1]))
+            out = null
+    
+    else:
+        # Current mask exists, but no previous - returns current mask unchanged
+        if reader.TestTimeExist(currentT, currentFOV, filemasks):
+            nextmask = np.array(filemasks['/{}/{}'.format(reader.fovlabels[currentFOV],
+                                                            reader.tlabels[currentT])]) 
+            out = nextmask
+            log.warn('NCurrent mask exists, but no previous - returns current mask unchanged. FOV {} and Time {}'.format(reader.fovlabels[currentFOV],reader.tlabels[currentT-1]))
+        # Neither current nor previous mask exists - return empty array
+        else:
+            log.warn('Neither current nor previous mask exists - return empty array. FOV {} and Time {}'.format(reader.fovlabels[currentFOV],reader.tlabels[currentT-1]))
+            null = np.zeros([reader.sizey, reader.sizex])
+            out = null
+                
+    filemasks.close()
+    return out
 
 def correspondence(prev, curr):
     """
