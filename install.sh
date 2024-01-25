@@ -1,27 +1,19 @@
-conda create -n YeaZ python=3.9
-conda activate YeaZ
+# create an environment from the spec-file.yml and activate it
+conda env create -f spec-file.yml
+source activate YeaZ
 
-# Install pip
-conda install -c anaconda pip
+# print the environment information to make sure that yeaz is activated
+conda info --envs
 
-# Install pytorch with conda
-conda install pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia
-# If you have macOS m1/m2 or a machine without GPU's, you need to install PyTorch for cpu. for more information visit https://pytorch.org/get-started/locally/
-
-# Install requirements
-pip install -r requirements.txt
+# install the yeaz package in the environment
 pip install -e .
 
-# Install pytorch with conda
-conda install pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia
-
-
-# Get Reservoir and install it in the environment (Git LFS NEEDED)
+# Get yeaz-toolbox and install it in the environment
 git clone https://github.com/rahi-lab/YeaZ-toolbox.git
 cd YeaZ-toolbox
-pip install -r requirements.txt
 pip install -e .
 cd ../
 
-# Deactivate environment
-conda deactivate
+
+# Echo a message to indicate the installation process is complete
+echo "Installation completed. You can activate the environment using 'conda activate YeaZ'."
