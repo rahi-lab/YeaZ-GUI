@@ -16,7 +16,7 @@ import torch
 
 import importlib.resources as resources
 # Access weight file
-path_weights = resources.files('yeaz.unet.weights')
+path_weights = resources.files('yeaz.nns.weights')
 
 def create_directory_if_not_exists(path):
     """
