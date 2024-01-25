@@ -16,13 +16,13 @@ import sys
 #and masks and it also runs the neural network.
 
 
-from yeaz.unet.segment import segment
+from yeaz.nns.segment import segment
 from yeaz.disk import Reader as nd
 import argparse
 import skimage
-from yeaz.unet import neural_network as nn
-from yeaz.unet import hungarian as hu
-from yeaz.unet import gcn as gcn
+from yeaz.nns import neural_network as nn
+from yeaz.nns import hungarian as hu
+from yeaz.nns import gcn as gcn
 
 import torch
 
@@ -86,7 +86,7 @@ def LaunchInstanceSegmentation(reader, image_type, fov_indices=[0], time_value1=
                       'The neural network weight files could not '
                       'be found. \nMake sure to download them from '
                       'the link in the readme and put them into '
-                      'the folder unet, or specify a path to a custom weights file with -w argument.')
+                      'the folder nns, or specify a path to a custom weights file with -w argument.')
                 return
 
             thresh = ThresholdPred(thr_val, pred)

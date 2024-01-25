@@ -83,45 +83,45 @@ from PyQt6.QtGui import QPalette, QColor
 #Import all the other python files
 #this file handles the interaction with the disk, so loading/saving images
 #and masks and it also runs the neural network.
-from disk import Reader as nd
+from .disk import Reader as nd
 
 #this file contains a dialog window that takes two integers as entry to swap
 #two cell values
-from misc import ExchangeCellValues as ecv
+from .misc import ExchangeCellValues as ecv
 
 #this file contains a window that opens to change the value of one cell. It 
 #is opened as soon as the user presses with the left click on a specific cell.
-from misc import ChangeOneCellValue as cocv
+from .misc import ChangeOneCellValue as cocv
 
 #this file contains a dialog window where a time range and the field of views
 #can be selected to then launch a prediction of the neural network on
 #a specific range of pictures.
-from unet import LaunchBatchPrediction as lbp
+from .nns import LaunchBatchPrediction as lbp
 
 #this file contains a dialog window where a time range can be selected to retrack
-from misc import BatchRetrack as br
+from .misc import BatchRetrack as br
 
 #this file initializes all the buttons present in the gui, sets the shortcuts
 #to these buttons and also connect the buttons to the function that are 
 #triggered when the buttons are pressed.
-from init import InitButtons
+from .init import InitButtons
 
 #this file contains the layout of the main window so it justs puts the buttons
 #and the pictures at the desired position in the main window.
-from init import InitLayout
+from .init import InitLayout
 
 # PlotCanvas for fast plotting
-from misc.PlotCanvas import PlotCanvas
+from .misc.PlotCanvas import PlotCanvas
 
-from misc import Extract as extr
+from .misc import Extract as extr
 
 from .disk.image_loader import load_image
-from .unet.segment import segment
-from .unet import neural_network as nn
+from .nns.segment import segment
+from .nns import neural_network as nn
 from .misc.ProgressBar import ProgressBar
 
-from .unet import gcn as gcn
-from .unet import hungarian as hu
+from .nns import gcn as gcn
+from .nns import hungarian as hu
 
 import warnings
 # warnings.filterwarnings('ignore')
@@ -140,11 +140,11 @@ log = logging.getLogger(__name__)
 
 if getattr(sys, 'frozen', False):
     path_icons = os.path.join(sys._MEIPASS, "icons/")
-    path_weights  = os.path.join(sys._MEIPASS, 'unet/')
+    path_weights  = os.path.join(sys._MEIPASS, 'nns/')
     
 else:
     path_icons = './icons/'
-    path_weights = './unet/'
+    path_weights = './nns/'
 
 
 class NavigationToolbar(NavigationToolbar):
@@ -763,7 +763,7 @@ class App(QMainWindow):
                 print('--------- Finished segmenting.')
                 if tracker == "GCN":
                     gcn.start_tracking(self.reader, dlg.listfov.row(item), time_value1, time_value2)
-                else: # Hungarian
+                elif tracker =='Hungarian': # Hungarian
                     hu.start_tracking(self.reader, dlg.listfov.row(item), time_value1, time_value2)
             self.ReloadThreeMasks()
         reset()
@@ -788,7 +788,7 @@ class App(QMainWindow):
                                  'The neural network weight files could not '
                                  'be found. Make sure to download them from '
                                  'the link in the readme and put them into '
-                                 'the folder unet', parent=self)
+                                 'the folder nns', parent=self)
             msg_box.exec()
             
             return
@@ -1063,7 +1063,7 @@ class App(QMainWindow):
                         
             if tracker == 'GCN':
                 gcn.start_tracking(self.reader, self.FOVindex, self.Tindex+1, time_value1)
-            else:
+            elif tracker == 'Hungarian':
                 hu.start_tracking(self.reader, self.FOVindex, self.Tindex+1, time_value1)
             self.ReloadThreeMasks()        
             log.info('reload three frames')
