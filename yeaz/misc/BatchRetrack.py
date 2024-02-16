@@ -22,9 +22,19 @@ class CustomDialog(QDialog):
         flo.addWidget(self.labeltime)
         flo.addRow('retracking frames from {} (next frame) to '.format(app.Tindex+1), self.entry1)  
         
+        self.mic_type = QComboBox()
+        self.mic_type.addItem("Image type", None)
+        self.mic_type.addItem("Bright-field budding yeast", "bf")
+        self.mic_type.addItem("Phase contrast budding yeast", "pc")
+        self.mic_type.addItem("Bud phase contrast fission", "fission")
+
+        self.mic_type.setCurrentIndex(0)
+        flo.addRow("Select image type: ", self.mic_type)   
+        
+        
         self.tracker = QComboBox()
         self.tracker.addItem("old-fashion but fast, Hungarian algorithm","Hungarian")
-        self.tracker.addItem ("new-fashion but slower if you have a lot of cells, Graph Convolutional Network","GCN",)
+        self.tracker.addItem ("new-fashion but slower with a lot of cells, Graph Convolutional Network","GCN",)
         self.tracker.setCurrentIndex(0)
         flo.addRow("Select the algorithm for tracking cells: ", self.tracker)     
         

@@ -15,7 +15,39 @@ path_weights = resources.files('yeaz.nns.weights')
 
 log = logging.getLogger(__name__)
 
+def start_tracking_fission(reader, fov_ind, time_value1, time_value2):
+    seg = SegmentationFile.from_h5(reader.hdfpath).get_segmentation(f'FOV{fov_ind}')
+    feat = Features(seg, nn_threshold=12)
+    
+    model_path = path_weights / 'fission_tracking/2024-01-31_15:07:49'
+    print('model_path: ' , str(model_path))
+    with open(model_path / 'hyperparams.json') as file:
+        hparams = json.load(file)
 
+    # first initialize the model
+    GCNTracker = tracking.AssignmentClassifier(
+        tracking.GNNTracker,
+        module__num_node_attr=hparams['num_node_attr'],
+        module__num_edge_attr=hparams['num_edge_attr'],
+        module__dropout_rate=hparams['dropout_rate'],
+        module__encoder_hidden_channels=hparams['encoder_hidden_channels'],
+        module__encoder_num_layers=hparams['encoder_num_layers'],
+        module__conv_hidden_channels=hparams['conv_hidden_channels'],
+        module__conv_num_layers=hparams['conv_num_layers'],
+        module__num_classes=1,
+    ).initialize()
+    GCNTracker.load_params(model_path / 'params.pt')
+    GCNTracker.module_.train(False)
+    for t in tqdm.tqdm(range(time_value1, time_value2+1), desc='Tracking frames with GCN', leave=True):   
+        # apply tracker if wanted and if not at first time
+        try:
+            temp_mask = CellCorrespondenceGCN(reader, GCNTracker, feat, t, fov_ind, type='fission')
+            feat.replace_frame_in_segmentation(t, temp_mask)
+            reader.SaveMask(t, fov_ind, temp_mask)
+        except e:
+            print(e)
+            break
+    
 def start_tracking(reader, fov_ind, time_value1, time_value2):
     seg = SegmentationFile.from_h5(reader.hdfpath).get_segmentation(f'FOV{fov_ind}')
     feat = Features(seg, nn_threshold=12)
@@ -42,15 +74,15 @@ def start_tracking(reader, fov_ind, time_value1, time_value2):
     for t in tqdm.tqdm(range(time_value1, time_value2+1), desc='Tracking frames with GCN', leave=True):   
         # apply tracker if wanted and if not at first time
         try:
-            temp_mask = CellCorrespondenceGCN(reader, GCNTracker, feat, t, fov_ind)
+            temp_mask = CellCorrespondenceGCN(reader, GCNTracker, feat, t, fov_ind, type = 'budding')
             feat.replace_frame_in_segmentation(t, temp_mask)
             reader.SaveMask(t, fov_ind, temp_mask)
-        except e:
+        except Exception as e:
             print(e)
             break
     
     
-def CellCorrespondenceGCN(reader,GCNTracker, feat, currentT, currentFOV):
+def CellCorrespondenceGCN(reader,GCNTracker, feat, currentT, currentFOV, type='budding'):
     
     filemasks = h5py.File(reader.hdfpath, 'r+')
     
@@ -61,16 +93,28 @@ def CellCorrespondenceGCN(reader,GCNTracker, feat, currentT, currentFOV):
         if reader.TestTimeExist(currentT, currentFOV, filemasks):
             
             nextmask = np.array(filemasks['/{}/{}'.format(reader.fovlabels[currentFOV],
-                                                            reader.tlabels[currentT])])    
-            
-
-            
-            # run gcn
-            cell_features = [
-                'fourier',
-                10,
-                False,
-                [
+                                                            reader.tlabels[currentT])])
+            if type == 'buddign':
+                # run gcn
+                cell_features = [
+                    'fourier',
+                    10,
+                    False,
+                    [
+                        'area',
+                        'r_equiv',
+                        'r_maj',
+                        'r_min',
+                        'angel',
+                        'ecc',
+                        'maj_x',
+                        'maj_y',
+                        'min_x',
+                        'min_y',
+                    ]
+                ]
+            elif type == 'fission':
+                cell_features = [
                     'area',
                     'r_equiv',
                     'r_maj',
@@ -81,8 +125,11 @@ def CellCorrespondenceGCN(reader,GCNTracker, feat, currentT, currentFOV):
                     'maj_y',
                     'min_x',
                     'min_y',
+                    'x',
+                    'y',
                 ]
-            ]
+            else:
+                print('unsupported cell type')
             
             edge_features = [
                 "cmtocm_x",
@@ -111,8 +158,9 @@ def CellCorrespondenceGCN(reader,GCNTracker, feat, currentT, currentFOV):
             gat, *_ = tracking.to_data(ga)
             
             # prediction of trakcing
+            assignment_method = "hungarian" if type == "budding" else "custom_optimizer"
 
-            assignments_dict = GCNTracker.predict_assignment(gat, assignment_method='modified_hungarian', return_dict=True)
+            assignments_dict = GCNTracker.predict_assignment(gat, assignment_method=assignment_method, return_dict=True)
             
             # make the output mask using this assignment
             out = nextmask.copy()

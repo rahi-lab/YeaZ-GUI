@@ -761,7 +761,9 @@ class App(QMainWindow):
                     self.PredThreshSeg(t, dlg.listfov.row(item), thr_val, seg_val,
                                        mic_type, device=device)
                 print('--------- Finished segmenting.')
-                if tracker == "GCN":
+                if tracker == "GCN" and mic_type == 'fission':
+                    gcn.start_tracking_fission(self.reader, dlg.listfov.row(item), time_value1, time_value2)
+                elif tracker == 'GCN':
                     gcn.start_tracking(self.reader, dlg.listfov.row(item), time_value1, time_value2)
                 elif tracker =='Hungarian': # Hungarian
                     hu.start_tracking(self.reader, dlg.listfov.row(item), time_value1, time_value2)
@@ -1047,6 +1049,17 @@ class App(QMainWindow):
                 msg_box = QMessageBox(QMessageBox.Icon.Critical, "Error", "No Time Specified", parent=self)
                 msg_box.exec()
                 reset()
+                return
+            
+            mic_type = dlg.mic_type.currentData()
+            if dlg.mic_type.currentData() is not None:
+                # User has selected an option, do something with it
+                log.debug(msg='Mic type selected: {}'.format(mic_type))
+            else:
+                # User has not selected any option, show error message
+                msg_box = QMessageBox(QMessageBox.Icon.Critical, "Error", "No Image Type Selected", parent=self)
+                msg_box.exec()
+                reset()
                 return 
             
             # reads out the entry given by the user and converts the index
@@ -1061,7 +1074,9 @@ class App(QMainWindow):
                 return
             tracker = dlg.tracker.currentData()
                         
-            if tracker == 'GCN':
+            if tracker == 'GCN' and mic_type == 'fission':
+                gcn.start_tracking_fission(self.reader, self.FOVindex, self.Tindex+1, time_value1)
+            elif tracker == 'GCN':
                 gcn.start_tracking(self.reader, self.FOVindex, self.Tindex+1, time_value1)
             elif tracker == 'Hungarian':
                 hu.start_tracking(self.reader, self.FOVindex, self.Tindex+1, time_value1)

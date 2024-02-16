@@ -57,9 +57,9 @@ def LaunchInstanceSegmentation(reader, image_type, fov_indices=[0], time_value1=
     
 
     # check if correct imaging value
-    if (image_type not in ['bf', 'pc']) and (path_to_weights is None):
+    if (image_type not in ['bf', 'pc', 'fission']) and (path_to_weights is None):
         print("Wrong imaging type value ('{}')!".format(image_type),
-              "imaging type must be either 'bf' or 'pc'")
+              "imaging type must be either 'bf' or 'pc' or 'fission'. ")
         return
 
     # check range_of_frames constraint
@@ -99,8 +99,12 @@ def LaunchInstanceSegmentation(reader, image_type, fov_indices=[0], time_value1=
             print('--------- Tracking with Hungarian algorithm.')
             hu.start_tracking(reader, fov_ind, time_value1, time_value2)
         elif tracker == "GCN":
-            print('--------- Tracking with GCN.')
-            gcn.start_tracking(reader, fov_ind, time_value1, time_value2)
+            if image_type == 'fission':
+                print('--------- Tracking with GCN for fission files.')
+                gcn.start_tracking_fission(reader, fov_ind, time_value1, time_value2)
+            else:
+                print('--------- Tracking with GCN for budding yeasts.')
+                gcn.start_tracking(reader, fov_ind, time_value1, time_value2)
         else:
             print("Error", 'Invalid Tracker')
             return
