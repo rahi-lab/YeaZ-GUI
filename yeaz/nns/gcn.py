@@ -16,7 +16,7 @@ path_weights = resources.files('yeaz.nns.weights')
 log = logging.getLogger(__name__)
 
 def start_tracking_fission(reader, fov_ind, time_value1, time_value2):
-    seg = SegmentationFile.from_h5(reader.hdfpath).get_segmentation(f'FOV{fov_ind}')
+    seg = SegmentationFile.from_h5(reader.hdfpath, small_particle_threshold = 64).get_segmentation(f'FOV{fov_ind}')
     feat = Features(seg, nn_threshold=12)
     
     model_path = path_weights / 'fission_tracking/2024-01-31_15:07:49'
@@ -41,11 +41,11 @@ def start_tracking_fission(reader, fov_ind, time_value1, time_value2):
     for t in tqdm.tqdm(range(time_value1, time_value2+1), desc='Tracking frames with GCN', leave=True):   
         # apply tracker if wanted and if not at first time
         try:
-            temp_mask = CellCorrespondenceGCN(reader, GCNTracker, feat, t, fov_ind, type='fission')
+            temp_mask = CellCorrespondenceGCN(reader, GCNTracker, seg, feat, t, fov_ind, type='fission')
             feat.replace_frame_in_segmentation(t, temp_mask)
             reader.SaveMask(t, fov_ind, temp_mask)
-        except e:
-            print(e)
+        except Exception as e:
+            print(f'Exception happened at start_tracking_fission: {e}, time: {time_value1} to {time_value2}')
             break
     
 def start_tracking(reader, fov_ind, time_value1, time_value2):
@@ -74,7 +74,7 @@ def start_tracking(reader, fov_ind, time_value1, time_value2):
     for t in tqdm.tqdm(range(time_value1, time_value2+1), desc='Tracking frames with GCN', leave=True):   
         # apply tracker if wanted and if not at first time
         try:
-            temp_mask = CellCorrespondenceGCN(reader, GCNTracker, feat, t, fov_ind, type = 'budding')
+            temp_mask = CellCorrespondenceGCN(reader, GCNTracker, seg, feat, t, fov_ind, type = 'budding')
             feat.replace_frame_in_segmentation(t, temp_mask)
             reader.SaveMask(t, fov_ind, temp_mask)
         except Exception as e:
@@ -82,18 +82,28 @@ def start_tracking(reader, fov_ind, time_value1, time_value2):
             break
     
     
-def CellCorrespondenceGCN(reader,GCNTracker, feat, currentT, currentFOV, type='budding'):
+def CellCorrespondenceGCN(reader,GCNTracker, seg, feat, currentT, currentFOV, type='budding'):
     
     filemasks = h5py.File(reader.hdfpath, 'r+')
     
     if reader.TestTimeExist(currentT-1, currentFOV, filemasks):
-        prevmask = np.array(filemasks['/{}/{}'.format(reader.fovlabels[currentFOV], 
-                                                        reader.tlabels[currentT-1])])
+        # prevmask = np.array(filemasks['/{}/{}'.format(reader.fovlabels[currentFOV], 
+        #                                                 reader.tlabels[currentT-1])])
+        prevmask = seg[currentT-1]
+        
         # A mask exists for both time frames
         if reader.TestTimeExist(currentT, currentFOV, filemasks):
             
-            nextmask = np.array(filemasks['/{}/{}'.format(reader.fovlabels[currentFOV],
-                                                            reader.tlabels[currentT])])
+            # nextmask = np.array(filemasks['/{}/{}'.format(reader.fovlabels[currentFOV],
+            #                                                 reader.tlabels[currentT])])
+            
+            nextmask = seg[currentT]
+            
+            # test if prevmash and nextmask both have only one cell
+            
+            if len(np.unique(prevmask)) == 2 or len(np.unique(nextmask)) == 2:
+                return nextmask
+            
             if type == 'buddign':
                 # run gcn
                 cell_features = [
@@ -139,40 +149,43 @@ def CellCorrespondenceGCN(reader,GCNTracker, feat, currentT, currentFOV, type='b
                 "contour_dist",
             ]
             # Make graphs
-            
-            ga = tracking.build_assgraph(
-                tracking.build_cellgraph(
-                    feat,
-                    currentT-1,
-                    cell_features=cell_features,
-                    edge_features=edge_features,
-                ),
-                tracking.build_cellgraph(
-                    feat,
-                    currentT,
-                    cell_features=cell_features,
-                    edge_features=edge_features,
-                ),
-                include_target_feature=True)
+            try:
+                ga = tracking.build_assgraph(
+                    tracking.build_cellgraph(
+                        feat,
+                        currentT-1,
+                        cell_features=cell_features,
+                        edge_features=edge_features,
+                    ),
+                    tracking.build_cellgraph(
+                        feat,
+                        currentT,
+                        cell_features=cell_features,
+                        edge_features=edge_features,
+                    ),
+                    include_target_feature=True)
+                    
+                gat, *_ = tracking.to_data(ga)
                 
-            gat, *_ = tracking.to_data(ga)
-            
-            # prediction of trakcing
-            assignment_method = "hungarian" if type == "budding" else "custom_optimizer"
+                # prediction of trakcing
+                assignment_method = "hungarian" if type == "budding" else "custom_optimizer"
 
-            assignments_dict = GCNTracker.predict_assignment(gat, assignment_method=assignment_method, return_dict=True)
-            
-            # make the output mask using this assignment
-            out = nextmask.copy()
-            newcell = np.max(prevmask) + 1
-            for key, val in assignments_dict.items():
-                # If new cell
-                if val == -1:
-                    val = newcell
-                    newcell += 1
+                assignments_dict = GCNTracker.predict_assignment(gat, assignment_method=assignment_method, return_dict=True)
                 
-                out[nextmask==key] = val
-                
+                # make the output mask using this assignment
+                out = nextmask.copy()
+                newcell = np.max(prevmask) + 1
+                for key, val in assignments_dict.items():
+                    # If new cell
+                    if val == -1:
+                        val = newcell
+                        newcell += 1
+                    
+                    out[nextmask==key] = val
+            except Exception as e:
+                print(f'Error in tracking with GCN for frame {currentT+1}: {e} /n returning unchanged mask')
+                out = nextmask
+                        
         # No mask exists for the current timeframe, return empty array
         else:
             null = np.zeros([reader.sizey, reader.sizex])
