@@ -102,9 +102,10 @@ def CellCorrespondenceGCN(reader,GCNTracker, seg, feat, currentT, currentFOV, ty
             # test if prevmash and nextmask both have only one cell
             
             if len(np.unique(prevmask)) == 2 or len(np.unique(nextmask)) == 2:
+                print('Only one cell in prevmask or nextmask, returning nextmask')
                 return nextmask
             
-            if type == 'buddign':
+            if type == 'budding':
                 # run gcn
                 cell_features = [
                     'fourier',
