@@ -6,7 +6,7 @@ conda activate YeaZ
 pip install -e .
 
 @REM Get Reservoir and install it in the environment (Git LFS NEEDED)
-git clone https://github.com/rahi-lab/YeaZ-toolbox.git
+git clone https://github.com/rahi-lab/LYN-track-and-trace.git
 cd YeaZ-toolbox
 pip install -e .
 cd ..

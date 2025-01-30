@@ -9,7 +9,7 @@ conda info --envs
 pip install -e .
 
 # Get yeaz-toolbox and install it in the environment
-git clone https://github.com/rahi-lab/YeaZ-toolbox.git
+git clone https://github.com/rahi-lab/LYN-track-and-trace.git
 cd YeaZ-toolbox
 pip install -e .
 cd ../
