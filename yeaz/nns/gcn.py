@@ -52,7 +52,7 @@ def start_tracking(reader, fov_ind, time_value1, time_value2):
     seg = SegmentationFile.from_h5(reader.hdfpath).get_segmentation(f'FOV{fov_ind}')
     feat = Features(seg, nn_threshold=12)
     
-    model_path = path_weights / 'results_fourier_10_and_f10_locality_False/_100KB_/2023-12-19_12_47_30'
+    model_path = path_weights / 'budding_tracking_features_2023-12-25_12_21_17'
     print('model_path: ' , str(model_path))
     with open(model_path / 'hyperparams.json') as file:
         hparams = json.load(file)
@@ -108,21 +108,16 @@ def CellCorrespondenceGCN(reader,GCNTracker, seg, feat, currentT, currentFOV, ty
             if type == 'budding':
                 # run gcn
                 cell_features = [
-                    'fourier',
-                    10,
-                    False,
-                    [
-                        'area',
-                        'r_equiv',
-                        'r_maj',
-                        'r_min',
-                        'angel',
-                        'ecc',
-                        'maj_x',
-                        'maj_y',
-                        'min_x',
-                        'min_y',
-                    ]
+                    "area", 
+                    "r_equiv", 
+                    "r_maj", 
+                    "r_min", 
+                    "angel", 
+                    "ecc", 
+                    "maj_x", 
+                    "maj_y", 
+                    "min_x", 
+                    "min_y"
                 ]
             elif type == 'fission':
                 cell_features = [
