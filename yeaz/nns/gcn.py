@@ -19,7 +19,7 @@ def start_tracking_fission(reader, fov_ind, time_value1, time_value2):
     seg = SegmentationFile.from_h5(reader.hdfpath, small_particle_threshold = 64).get_segmentation(f'FOV{fov_ind}')
     feat = Features(seg, nn_threshold=12)
     
-    model_path = path_weights / 'fission_tracking/2024-01-31_15:07:49'
+    model_path = path_weights / 'fission_tracking/2024-01-31_15_07_49'
     print('model_path: ' , str(model_path))
     with open(model_path / 'hyperparams.json') as file:
         hparams = json.load(file)
@@ -52,7 +52,7 @@ def start_tracking(reader, fov_ind, time_value1, time_value2):
     seg = SegmentationFile.from_h5(reader.hdfpath).get_segmentation(f'FOV{fov_ind}')
     feat = Features(seg, nn_threshold=12)
     
-    model_path = path_weights / 'results_fourier_10_and_f10_locality_False/_100KB_/2023-12-19_12:47:30'
+    model_path = path_weights / 'results_fourier_10_and_f10_locality_False/_100KB_/2023-12-19_12_47_30'
     print('model_path: ' , str(model_path))
     with open(model_path / 'hyperparams.json') as file:
         hparams = json.load(file)
