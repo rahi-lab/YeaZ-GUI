@@ -38,6 +38,12 @@ class CustomDialog(QDialog):
         self.tracker.setCurrentIndex(0)
         flo.addRow("Select the algorithm for tracking cells: ", self.tracker)     
         
+        self.device_selection = QComboBox()
+        self.device_selection.addItem("CPU", "cpu")
+        self.device_selection.addItem("GPU", "cuda")
+        self.device_selection.setCurrentIndex(0)
+        flo.addRow("Select device for running neural network: ", self.device_selection)
+        
         QBtn = QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel
         
         self.buttonBox = QDialogButtonBox(QBtn)
