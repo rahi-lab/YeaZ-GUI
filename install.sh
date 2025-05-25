@@ -10,7 +10,7 @@ pip install -e .
 
 # Get yeaz-toolbox and install it in the environment
 git clone https://github.com/rahi-lab/LYN-track-and-trace.git
-cd YeaZ-toolbox
+cd LYN-track-and-trace
 pip install -e .
 cd ../
 
