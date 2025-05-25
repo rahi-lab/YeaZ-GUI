@@ -96,7 +96,7 @@ from .misc import ChangeOneCellValue as cocv
 #this file contains a dialog window where a time range and the field of views
 #can be selected to then launch a prediction of the neural network on
 #a specific range of pictures.
-from .unet import LaunchBatchPrediction as lbp
+from .nns import LaunchBatchPrediction as lbp
 
 #this file contains a dialog window where a time range can be selected to retrack
 from .misc import BatchRetrack as br
@@ -116,9 +116,12 @@ from .misc.PlotCanvas import PlotCanvas
 from .misc import Extract as extr
 
 from .disk.image_loader import load_image
-from .unet.segment import segment
-from .unet import neural_network as nn
+from .nns.segment import segment
+from .nns import neural_network as nn
 from .misc.ProgressBar import ProgressBar
+
+from .nns import gcn as gcn
+from .nns import hungarian as hu
 
 import warnings
 # warnings.filterwarnings('ignore')
@@ -137,11 +140,11 @@ log = logging.getLogger(__name__)
 
 if getattr(sys, 'frozen', False):
     path_icons = os.path.join(sys._MEIPASS, "icons/")
-    path_weights  = os.path.join(sys._MEIPASS, 'unet/')
+    path_weights  = os.path.join(sys._MEIPASS, 'nns/')
     
 else:
     path_icons = './icons/'
-    path_weights = './unet/'
+    path_weights = './nns/'
 
 
 class NavigationToolbar(NavigationToolbar):
@@ -735,10 +738,15 @@ class App(QMainWindow):
                 device = 'cuda'
             else:
                 device = 'cpu'
+            tracker = None
+            if(dlg.tracker.currentData() == 'GCN'):
+                tracker = 'GCN'
+            else:
+                tracker = 'Hungarian'
             
             for item in tqdm.tqdm(dlg.listfov.selectedItems(), desc='FOV', position=0, leave=True):
                 #iterates over the time indices in the range
-                for t in tqdm.tqdm(range(time_value1, time_value2+1), desc='Time', position=1, leave=False):                    
+                for t in tqdm.tqdm(range(time_value1, time_value2+1), desc='Segmenting', position=1, leave=True):                    
                     #calls the neural network for time t and selected
                     #fov
                     if dlg.entry_threshold.text() !=  '':
@@ -752,11 +760,13 @@ class App(QMainWindow):
                     
                     self.PredThreshSeg(t, dlg.listfov.row(item), thr_val, seg_val,
                                        mic_type, device=device)
-                    
-                    # apply tracker if wanted and if not at first time
-                    temp_mask = self.reader.CellCorrespondence(t, dlg.listfov.row(item))
-                    self.reader.SaveMask(t,dlg.listfov.row(item), temp_mask)
-            
+                print('--------- Finished segmenting.')
+                if tracker == "GCN" and mic_type == 'fission':
+                    gcn.start_tracking_fission(self.reader, dlg.listfov.row(item), time_value1, time_value2)
+                elif tracker == 'GCN':
+                    gcn.start_tracking(self.reader, dlg.listfov.row(item), time_value1, time_value2)
+                elif tracker =='Hungarian': # Hungarian
+                    hu.start_tracking(self.reader, dlg.listfov.row(item), time_value1, time_value2)
             self.ReloadThreeMasks()
         reset()
 
@@ -780,7 +790,7 @@ class App(QMainWindow):
                                  'The neural network weight files could not '
                                  'be found. Make sure to download them from '
                                  'the link in the readme and put them into '
-                                 'the folder unet', parent=self)
+                                 'the folder nns', parent=self)
             msg_box.exec()
             
             return
@@ -1039,6 +1049,17 @@ class App(QMainWindow):
                 msg_box = QMessageBox(QMessageBox.Icon.Critical, "Error", "No Time Specified", parent=self)
                 msg_box.exec()
                 reset()
+                return
+            
+            mic_type = dlg.mic_type.currentData()
+            if dlg.mic_type.currentData() is not None:
+                # User has selected an option, do something with it
+                log.debug(msg='Mic type selected: {}'.format(mic_type))
+            else:
+                # User has not selected any option, show error message
+                msg_box = QMessageBox(QMessageBox.Icon.Critical, "Error", "No Image Type Selected", parent=self)
+                msg_box.exec()
+                reset()
                 return 
             
             # reads out the entry given by the user and converts the index
@@ -1051,25 +1072,15 @@ class App(QMainWindow):
                 msg_box.exec()
                 reset()
                 return
-            # if everything was okay, start a progress bar to show progress:
-            progress = ProgressBar(self)
-            progress_value = 0
-            ratio = 100/(time_value1 - self.Tindex)
-            for t in range(self.Tindex+1, time_value1+1):
-                log.debug('start correspondance for frame {}'.format(t))                    
-                #calls the cell correspondance for current time, t, and t+1
-                temp_mask = self.reader.CellCorrespondence(t, self.FOVindex)
-                progress_value += ratio
-                progress.update_progress(progress_value)
-                # update the progress status label
-                progress.status.setText("Processing frame {}... ".format(t+1))
-                self.reader.SaveMask(t, self.FOVindex, temp_mask)
-                QApplication.processEvents()  # Process events to allow GUI to update               
-                log.debug('finish correspondance and savemask for frame {}'.format(t))                    
-            # close the progress bar dialog
-            progress.close()
-            self.ReloadThreeMasks()
-
+            tracker = dlg.tracker.currentData()
+                        
+            if tracker == 'GCN' and mic_type == 'fission':
+                gcn.start_tracking_fission(self.reader, self.FOVindex, self.Tindex+1, time_value1)
+            elif tracker == 'GCN':
+                gcn.start_tracking(self.reader, self.FOVindex, self.Tindex+1, time_value1)
+            elif tracker == 'Hungarian':
+                hu.start_tracking(self.reader, self.FOVindex, self.Tindex+1, time_value1)
+            self.ReloadThreeMasks()        
             log.info('reload three frames')
         reset()
 

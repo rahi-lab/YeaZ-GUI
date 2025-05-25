@@ -67,3 +67,6 @@ def run():
             sys.exit(app.exec())
         else:
             app.exit()
+
+if __name__ == '__main__':
+    run()

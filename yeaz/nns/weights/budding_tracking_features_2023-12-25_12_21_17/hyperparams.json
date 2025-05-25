@@ -1,0 +1,1 @@
+{"num_node_attr": 20, "num_edge_attr": 10, "dropout_rate": 0.01, "encoder_hidden_channels": 120, "encoder_num_layers": 4, "conv_hidden_channels": 120, "conv_num_layers": 3, "num_classes": 1, "lr": 0.001, "weight_decay": 0.01}

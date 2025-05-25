@@ -14,7 +14,7 @@ import os.path
 import skimage
 import skimage.io
 
-from ..unet import hungarian as hu
+
 import logging
 import os
 logging.basicConfig(
@@ -64,12 +64,7 @@ class Reader:
                 self.channel_names = images.metadata['channels']
                 
         elif self.issingle:
-#            with pytiff.Tiff(self.nd2path) as handle:
-#                self.sizey, self.sizex = handle.shape #SJR: changed by me
-#                self.sizec = 1
-#                self.sizet = handle.number_of_pages
-#                self.Npos = 1
-#                self.channel_names = ['Channel1']
+
             im = skimage.io.imread(self.nd2path)
 
             if im.ndim==3:
@@ -366,47 +361,3 @@ class Reader:
                 
         elif self.isfolder:
             return self.LoadOneImage(currentT, currentFOV,current_channel=ch)
-
-
-    def CellCorrespondence(self, currentT, currentFOV):
-        """Performs tracking, handles loading of the images. If the image to 
-        track has no precedent, returns unaltered mask. If no mask exists
-        for the current timeframe, returns zero array."""
-        filemasks = h5py.File(self.hdfpath, 'r+')
-        log.debug('Reader.CellCorrespondence')
-        
-        if self.TestTimeExist(currentT-1, currentFOV, filemasks):
-            prevmask = np.array(filemasks['/{}/{}'.format(self.fovlabels[currentFOV], 
-                                                          self.tlabels[currentT-1])])
-            # A mask exists for both time frames
-            if self.TestTimeExist(currentT, currentFOV, filemasks):
-                nextmask = np.array(filemasks['/{}/{}'.format(self.fovlabels[currentFOV],
-                                                              self.tlabels[currentT])])             
-                newmask = hu.correspondence(prevmask, nextmask)
-                out = newmask
-                log.debug('make new mask')
-            # No mask exists for the current timeframe, return empty array
-            else:
-                null = np.zeros([self.sizey, self.sizex])
-                log.warn('No mask exists in FOV {} for the current timeframe {}, return empty array'.format(self.fovlabels[currentFOV],self.tlabels[currentT-1]))
-                out = null
-        
-        else:
-            # Current mask exists, but no previous - returns current mask unchanged
-            if self.TestTimeExist(currentT, currentFOV, filemasks):
-                nextmask = np.array(filemasks['/{}/{}'.format(self.fovlabels[currentFOV],
-                                                              self.tlabels[currentT])]) 
-                out = nextmask
-                log.warn('NCurrent mask exists, but no previous - returns current mask unchanged. FOV {} and Time {}'.format(self.fovlabels[currentFOV],self.tlabels[currentT-1]))
-            # Neither current nor previous mask exists - return empty array
-            else:
-                log.warn('Neither current nor previous mask exists - return empty array. FOV {} and Time {}'.format(self.fovlabels[currentFOV],self.tlabels[currentT-1]))
-                null = np.zeros([self.sizey, self.sizex])
-                out = null
-                    
-        filemasks.close()
-        return out
-                
-                
-                
-        
