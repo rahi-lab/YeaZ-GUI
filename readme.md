@@ -5,7 +5,7 @@ This is the user manual for the graphical interface for segmenting yeast images 
 Want to try out the neural network without installing any software? Check out our online segmentation tool at https://lpbs-nn.epfl.ch/.
 
 ## Latest updates
-25.01.2023:
+25.01.2025:
 1. Add GCN Tracker
 2. Update installation procedure
 3. Fix bugs
