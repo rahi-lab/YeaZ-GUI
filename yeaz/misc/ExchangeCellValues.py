@@ -42,5 +42,3 @@ class CustomDialog(QDialog):
         flo.addWidget(self.buttonBox)
         self.setLayout(flo)
         
-        # Set focus to entry1
-        self.entry1.setFocus()
