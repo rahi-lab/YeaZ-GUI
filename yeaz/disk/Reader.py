@@ -69,8 +69,8 @@ class Reader:
 
             if im.ndim==3:
                 # num pages should be smaller than x or y dimension, very unlikely not to be the case
-                # if im.shape[2] < im.shape[0] and im.shape[2] < im.shape[1]:  
-                #     im = np.moveaxis(im, -1, 0) # move last axis to first
+                if im.shape[2] < im.shape[0] and im.shape[2] < im.shape[1]:  
+                     im = np.moveaxis(im, -1, 0) # move last axis to first
                 self.sizet, self.sizey, self.sizex = im.shape
             else:
                 self.sizey, self.sizex = im.shape
@@ -303,8 +303,8 @@ class Reader:
                 im = full
             elif full.ndim==3:
                 # num pages should be smaller than x or y dimension, very unlikely not to be the case
-                # if full.shape[2] < full.shape[0] and full.shape[2] < full.shape[1]:  
-                #     full = np.moveaxis(full, -1, 0) # move last axis to first
+                if full.shape[2] < full.shape[0] and full.shape[2] < full.shape[1]:  
+                     full = np.moveaxis(full, -1, 0) # move last axis to first
                 im = full[currentT]
 
             outputarray = np.array(im, dtype = np.uint16)
@@ -327,8 +327,8 @@ class Reader:
             elif im.ndim ==3:
                 im = np.pad(im,( (0, self.sizec - im.shape[0]) , (0, self.sizey - im.shape[1]) , (0, self.sizex -  im.shape[2] ) ),constant_values=0)
                 # number of channels should be smaller than x and y
-                # if im.shape[2] < im.shape[0] and im.shape[2] < im.shape[1]:  
-                #     im = np.moveaxis(im, -1, 0) # move last axis to first
+                if im.shape[2] < im.shape[0] and im.shape[2] < im.shape[1]:  
+                     im = np.moveaxis(im, -1, 0) # move last axis to first
                 if current_channel == None:
                     im = im[self.default_channel]
                 else:
