@@ -5,10 +5,8 @@ This is the user manual for the graphical interface for segmenting yeast images 
 Want to try out the neural network without installing any software? Check out our online segmentation tool at https://lpbs-nn.epfl.ch/.
 
 ## Latest updates
-25.01.2025:
-1. Add GCN Tracker
-2. Update installation procedure
-3. Fix bugs
+25.11.2025:
+1. Fix installation bugs
 
 ## Installation
 
@@ -16,7 +14,7 @@ Want to try out the neural network without installing any software? Check out ou
 
 The software requires a standard computer with enough RAM to apply the neural network. 8 GB RAM is enough to predict the 700 x 500 px image provided as the test data. The RAM requirements scale linearly with the number of image pixels.
 
-It was tested on macOS Ventura (13.4.1), Windows 10 Education, and Ubuntu 20.04.4.
+It was tested on macOS Sequoia (15.6.1), Windows 10 Education, and Ubuntu 24.03.3 LTS.
 
 Package dependencies: The convolutional neural network relies on Pytorch. The Hungarian algorithm is implemented in the munkres package. In addition, standard image processing and scientific computing libraries are used. 
 
@@ -24,12 +22,12 @@ Installation time is less than 5 minutes.
    
 ### Install from source
 
-follow the instructions below to install the package from source. This is the recommended way of installing the package.
+Follow the instructions below to install the package from source. This is the recommended way of installing the package.
 
 1. If you don't have conda or miniconda installed, download it from https://docs.conda.io/en/latest/miniconda.html.
 2. Clone this repository (`git clone https://github.com/rahi-lab/YeaZ-GUI`).
 3. In the command line, navigate to the folder where you cloned YeaZ-GUI (command `cd YeaZ-GUI`).
-4. Enter the command `source install.sh` (in unix-base systems) or `install.bat` in windows systems. This will create a conda environment named YeaZ and install all the required packages including the YeaZ-toolbox package that stores the primary tools for tracking and analysis. 
+4. Enter the command `source install.sh` (in Unix-base systems) or `install.bat` in Windows systems. This will create a conda environment named YeaZ and install all the required packages including the YeaZ-toolbox package that stores the primary tools for tracking and analysis. 
 
     4.1 If you get the 'permission denied' error, try running `chmod +x install.sh` and then run `source install.sh` again.
 
@@ -45,7 +43,7 @@ follow the instructions below to install the package from source. This is the re
     5.3. Download the parameters for segmenting fission images form: https://drive.google.com/file/d/1h_Wz2d3UY0jkGtMrhl32iEqbOQVXsmKS.
 
 
-## Runnig the GUI
+## Running the GUI
 
 1. Open a terminal and activate the environment using `conda activate YeaZ`.
 2. Run the program with the command `yeaz`.
