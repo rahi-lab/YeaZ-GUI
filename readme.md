@@ -6,7 +6,7 @@ Want to try out the neural network without installing any software? Check out ou
 
 ## Latest updates
 25.11.2025:
-1. Fix installation bugs
+1. Fix installation bugs related to different OS
 
 ## Installation
 
