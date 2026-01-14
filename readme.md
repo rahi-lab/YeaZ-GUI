@@ -5,7 +5,7 @@ This is the user manual for the graphical interface for segmenting yeast images 
 Want to try out the neural network without installing any software? Check out our online segmentation tool at https://lpbs-nn.epfl.ch/.
 
 ## Latest updates
-25.11.2025: Fix installation bugs related to different OS
+25.11.2025: Fix installation bugs related to different OS  
 25.01.2023: Add GNN-based tracker from [Love-thy-neighbor: Neural networks for tracking and lineage tracing in budding yeast](https://www.biorxiv.org/content/10.64898/2026.01.09.698579v1).
 
 ## Installation
